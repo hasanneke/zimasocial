@@ -1,13 +1,8 @@
 package com.zimaberlin.zimasocial.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -21,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "post")
-public class Post {
+public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,11 +41,13 @@ public class Post {
     private Profile user;
 
     @OneToMany(mappedBy = "post")
-    @JsonManagedReference
+    @ToString.Exclude
+    @JsonIgnore
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonManagedReference
+    @ToString.Exclude
+    @JsonIgnore
     private Set<Like> likes =  new HashSet<>();
 
     @CreationTimestamp

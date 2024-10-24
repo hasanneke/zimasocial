@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.aop.ResourceAcess;
 
 import com.zimaberlin.zimasocial.dto.CustomUserDetails;
-import com.zimaberlin.zimasocial.entity.Post;
+import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.Profile;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.exception.UnauthorizedException;
@@ -35,17 +35,17 @@ public class ResourceAccessAspect {
         for (int i = 0; i < parameterNames.length; i++) {
             if (parameterNames[i].equals(targetParam) ) {
                 Long postId = (Long) args[i];
-                validateAccess(postId);
+                validatePostAccess(postId);
                 return;
             }
         }
         throw new IllegalArgumentException("Parameter " + targetParam + " not found");
     }
 
-    private void validateAccess(Long id){
+    private void validatePostAccess(Long id){
         Profile currentUser = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
-        Post post = postRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
-        if(!post.getUser().equals(currentUser)){
+        PostEntity postEntity = postRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+        if(!postEntity.getUser().equals(currentUser)){
             throw new UnauthorizedException("You have no access to this resource");
         }
     }

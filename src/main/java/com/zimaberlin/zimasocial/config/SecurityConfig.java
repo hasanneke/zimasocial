@@ -48,7 +48,6 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated()
                 ))
-
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

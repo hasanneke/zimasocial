@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +23,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private Post post;
+    private PostEntity post;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

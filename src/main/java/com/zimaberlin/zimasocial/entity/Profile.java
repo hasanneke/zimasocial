@@ -1,16 +1,11 @@
 package com.zimaberlin.zimasocial.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -50,9 +45,9 @@ public class Profile {
     private String avatarUrl;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     @JsonIgnore
-    private Set<Post> posts = new HashSet<>();
+    @ToString.Exclude
+    private Set<PostEntity> postEntities = new HashSet<>();
 
     @Column(name = "auth_provider")
     private String authProvider;
