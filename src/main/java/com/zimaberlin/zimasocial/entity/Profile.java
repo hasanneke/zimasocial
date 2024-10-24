@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -23,7 +25,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "profile")
-public class Profile implements UserDetails {
+public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +38,11 @@ public class Profile implements UserDetails {
 
     @Column(name = "family_name")
     private String familyName;
+
+    @ElementCollection(targetClass = UserRole.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_role")
+    private Set<UserRole> roles = new HashSet<>();
 
     @Column(name = "followers_count")
     private int followersCount;
@@ -61,24 +68,16 @@ public class Profile implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @JsonIgnore
-    private String username;
-
-    @JsonIgnore
-    private String password;
-
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profile that = (Profile) o;
+        return Objects.equals(id, that.getId());
     }
 
     @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

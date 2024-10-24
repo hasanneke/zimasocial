@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.controller;
-
-import com.zimaberlin.zimasocial.DTO.PostPayload;
+import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
+import com.zimaberlin.zimasocial.dto.PostPayload;
 import com.zimaberlin.zimasocial.entity.Post;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.PostService;
@@ -32,7 +32,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     public HttpEntity<PagedModel<Post>> getPosts(@RequestParam(name = "page", defaultValue="0") Integer page,
                                                  @RequestParam(name = "size", defaultValue = "10") Integer size,
-                                                 @RequestParam(name = "type", required = false) PostType type) throws NoSuchMethodException {
+                                                 @RequestParam(name = "type", defaultValue = "any") PostType type) throws NoSuchMethodException {
         Page<Post> postPage = postService.getPosts(page, size, type);
 
         PagedModel<Post> pagedModel = PagedModel.of(
@@ -48,12 +48,12 @@ public class PostController {
                 PostType.class);
 
         if(page < postPage.getTotalPages()){
-            Link link = linkTo(method, page + 1, size).withRel(LinkRelation.of("next"));
+            Link link = linkTo(method, page + 1, size, type).withRel(LinkRelation.of("next"));
             pagedModel.add(link);
         }
 
         if(page > 0){
-            Link link = linkTo(method, page - 1, size).withRel(LinkRelation.of("previous"));
+            Link link = linkTo(method, page - 1, size, type).withRel(LinkRelation.of("previous"));
             pagedModel.add(link);
         }
 
@@ -67,10 +67,10 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
-    @DeleteMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity deletePost(@RequestParam Long id){
-        postService.deletePost(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping(path = "/{postId}")
+    @HasPostAccess(idParameterName = "postId")
+    public ResponseEntity deletePost(@PathVariable Long postId){
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.service;
-import com.zimaberlin.zimasocial.DTO.CustomUserDetails;
-import com.zimaberlin.zimasocial.DTO.PostPayload;
+import com.zimaberlin.zimasocial.dto.CustomUserDetails;
+import com.zimaberlin.zimasocial.dto.PostPayload;
 import com.zimaberlin.zimasocial.entity.Like;
 import com.zimaberlin.zimasocial.entity.Post;
 import com.zimaberlin.zimasocial.entity.PostType;
@@ -36,9 +36,13 @@ public class PostService {
 
     public Post createPost(@Validated PostPayload payload){
         CustomUserDetails details =(CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PostType type = payload.getType();
+        if(type == null){
+            type = PostType.any;
+        }
         Post post = Post.builder()
                 .url(payload.getUrl())
-                .type(payload.getType())
+                .type(type)
                 .user(details.getProfile())
                 .content(payload.getContent())
                 .build();
@@ -47,11 +51,6 @@ public class PostService {
     }
 
     public void deletePost(Long id){
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        if(!post.getUser().getId().equals(getCurrentUserProfile().getId())){
-            throw new UnauthorizedException("You don't have permission to delete this post");
-        }
          postRepository.deleteById(id);
     }
 
@@ -65,8 +64,8 @@ public class PostService {
     }
 
     private Profile getCurrentUserProfile() {
-        String principalId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return profileRepository.findById(Long.parseLong(principalId))
+        CustomUserDetails principalId = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return profileRepository.findById(principalId.getProfile().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User profile not found"));
     }
 }

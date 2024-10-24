@@ -2,8 +2,6 @@
 version: '3.9'
 
 services:
-  zimasocial:
-    image:
   postgres:
     image: postgres
     restart: always

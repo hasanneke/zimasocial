@@ -2,14 +2,16 @@ package com.zimaberlin.zimasocial.service;
 
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
-import com.zimaberlin.zimasocial.DTO.TokenResponse;
+import com.zimaberlin.zimasocial.dto.TokenResponse;
 import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.UserRole;
 import com.zimaberlin.zimasocial.repository.ProfileRepository;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class AuthService {
                 .name(name)
                 .familyName(familyName)
                 .authProvider("google")
+                .roles(Set.of(UserRole.regular))
                 .build();
 
         Profile createdProfile = saveUser(profileDto);

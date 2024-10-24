@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.service;
 
-import com.zimaberlin.zimasocial.DTO.CustomUserDetails;
+import com.zimaberlin.zimasocial.dto.CustomUserDetails;
 import com.zimaberlin.zimasocial.entity.Profile;
 import com.zimaberlin.zimasocial.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;

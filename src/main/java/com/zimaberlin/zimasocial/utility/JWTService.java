@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 
-import com.zimaberlin.zimasocial.DTO.TokenResponse;
+import com.zimaberlin.zimasocial.dto.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

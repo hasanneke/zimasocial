@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.config;
 
-import com.zimaberlin.zimasocial.DTO.CustomUserDetails;
+import com.zimaberlin.zimasocial.dto.CustomUserDetails;
 import com.zimaberlin.zimasocial.service.CustomUserDetailsService;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import io.jsonwebtoken.Claims;

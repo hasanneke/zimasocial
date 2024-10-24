@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.DTO;
+package com.zimaberlin.zimasocial.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
