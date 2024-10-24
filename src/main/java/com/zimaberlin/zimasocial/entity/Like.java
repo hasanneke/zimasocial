@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,9 @@ public class Like {
     @JoinColumn(name = "user_id")
     private Profile user;
 
-    @ManyToOne
     @JoinColumn(name = "post_id")
+    @ManyToOne
+    @JsonBackReference
     private Post post;
 
     @CreationTimestamp

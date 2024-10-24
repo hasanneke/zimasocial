@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -28,7 +28,11 @@ spring:
               client-id: 460270477882-v8qn6d75bgnbash0v7fum69pca94ftdj.apps.googleusercontent.com
               client-secret: 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
               scope: openid,profile,email
-
+  flyway:
+    locations: classpath:db/migrations
+    enabled: true
+    baseline-on-migrate: true
+    default-schema: zimasocial
 server:
   port: 8081
 

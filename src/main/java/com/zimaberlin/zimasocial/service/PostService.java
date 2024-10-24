@@ -6,7 +6,7 @@ import com.zimaberlin.zimasocial.entity.Post;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.Profile;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
-import com.zimaberlin.zimasocial.exception.UnauthorizedException;
+import com.zimaberlin.zimasocial.repository.LikeRepository;
 import com.zimaberlin.zimasocial.repository.PostRepository;
 import com.zimaberlin.zimasocial.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,16 @@ import org.springframework.validation.annotation.Validated;
 
 @Service
 public class PostService {
-    @Autowired
     private PostRepository postRepository;
+    private ProfileRepository profileRepository;
+    private LikeRepository likeRepository;
 
     @Autowired
-    private ProfileRepository profileRepository;
+    public PostService(PostRepository postRepository, ProfileRepository profileRepository, LikeRepository likeRepository) {
+        this.postRepository = postRepository;
+        this.profileRepository = profileRepository;
+        this.likeRepository = likeRepository;
+    }
 
     public Page<Post> getPosts(int page, int size, PostType type) throws NoSuchMethodException {
         Pageable pageable = PageRequest.of(page, size);
@@ -46,21 +51,34 @@ public class PostService {
                 .user(details.getProfile())
                 .content(payload.getContent())
                 .build();
-        postRepository.save(post);
-        return post;
+
+        return postRepository.save(post);
     }
 
     public void deletePost(Long id){
          postRepository.deleteById(id);
     }
 
-    public Post likePost(Long id){
+    public String togglePost(Long id){
         Post post = postRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         Profile profile = getCurrentUserProfile();
-        Like like = Like.builder().post(post).user(profile).build();
-        post.getLikes().add(like);
-        Post createdPost = postRepository.save(post);
-        return createdPost;
+        Like like = likeRepository.findByUserAndPost(profile, post).orElse(null);
+
+        if(like == null){
+            Like createLike =Like.builder()
+                    .post(post)
+                    .user(profile)
+                    .build();
+             likeRepository.save(createLike);
+             post.setLikeCount(post.getLikeCount() + 1);
+             postRepository.save(post);
+             return "LIKED";
+        }else{
+            post.setLikeCount(post.getLikeCount() - 1);
+            postRepository.save(post);
+            likeRepository.delete(like);
+            return "DELETED";
+        }
     }
 
     private Profile getCurrentUserProfile() {

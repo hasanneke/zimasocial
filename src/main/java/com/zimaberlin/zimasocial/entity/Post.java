@@ -1,6 +1,8 @@
 package com.zimaberlin.zimasocial.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,11 +46,11 @@ public class Post {
     private Profile user;
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnore
+    @JsonManagedReference
     private Set<Like> likes =  new HashSet<>();
 
     @CreationTimestamp

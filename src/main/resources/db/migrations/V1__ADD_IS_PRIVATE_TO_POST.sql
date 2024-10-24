@@ -1,0 +1,1 @@
+ALTER TABLE post ADD COLUMN is_private BOOLEAN DEFAULT false;

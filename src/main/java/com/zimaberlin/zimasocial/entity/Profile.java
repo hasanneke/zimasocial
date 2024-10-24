@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
-
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -39,7 +35,7 @@ public class Profile {
     @Column(name = "family_name")
     private String familyName;
 
-    @ElementCollection(targetClass = UserRole.class)
+    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role")
     private Set<UserRole> roles = new HashSet<>();
@@ -54,6 +50,7 @@ public class Profile {
     private String avatarUrl;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     @JsonIgnore
     private Set<Post> posts = new HashSet<>();
 
