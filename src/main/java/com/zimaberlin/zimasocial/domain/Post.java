@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.domain;
 
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.ProfileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class Post {
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;
-    private Profile user;
+    private ProfileEntity user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

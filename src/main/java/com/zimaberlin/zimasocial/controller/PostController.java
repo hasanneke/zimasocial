@@ -1,16 +1,10 @@
 package com.zimaberlin.zimasocial.controller;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.domain.Post;
-import com.zimaberlin.zimasocial.dto.CustomUserDetails;
 import com.zimaberlin.zimasocial.dto.PostPayload;
-import com.zimaberlin.zimasocial.entity.Like;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.Profile;
-import com.zimaberlin.zimasocial.repository.LikeRepository;
 import com.zimaberlin.zimasocial.service.PostService.PostService;
-import com.zimaberlin.zimasocial.utility.PostMapper;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +15,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -36,18 +28,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class PostController {
     @Autowired
     private PostService postService;
-    @Autowired
-    private LikeRepository likeRepository;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Transactional
     public HttpEntity<PagedModel<Post>> getPosts(@RequestParam(name = "page", defaultValue="0") Integer page,
                                                  @RequestParam(name = "size", defaultValue = "20") Integer size,
                                                  @RequestParam(name = "type", defaultValue = "any") PostType type) throws NoSuchMethodException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<Post> postPage = postService.getPosts(page, size, type);
-
         PagedModel<Post> pagedModel = PagedModel.of(
                         postPage.getContent(),
                         new PagedModel.PageMetadata(postPage.getSize(),
@@ -89,7 +76,7 @@ public class PostController {
 
     @GetMapping(path = "/{postId}/like")
     public ResponseEntity togglePost(@PathVariable Long postId){
-       String message = postService.togglePost(postId);
+        String message = postService.togglePost(postId);
         return ResponseEntity.ok().body(message);
     }
 }

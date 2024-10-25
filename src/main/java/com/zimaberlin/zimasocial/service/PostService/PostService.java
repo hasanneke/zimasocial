@@ -2,15 +2,15 @@ package com.zimaberlin.zimasocial.service.PostService;
 import com.zimaberlin.zimasocial.domain.Post;
 import com.zimaberlin.zimasocial.dto.CustomUserDetails;
 import com.zimaberlin.zimasocial.dto.PostPayload;
-import com.zimaberlin.zimasocial.entity.Like;
-import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
+import com.zimaberlin.zimasocial.repository.CommentRepository;
 import com.zimaberlin.zimasocial.repository.LikeRepository;
 import com.zimaberlin.zimasocial.repository.PostRepository;
 import com.zimaberlin.zimasocial.repository.ProfileRepository;
+import com.zimaberlin.zimasocial.service.PostService.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.utility.PostMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -22,16 +22,16 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @Service
+@Transactional
 public class PostService {
     private PostRepository postRepository;
-    private ProfileRepository profileRepository;
     private LikeRepository likeRepository;
+    private CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, ProfileRepository profileRepository, LikeRepository likeRepository) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
-        this.profileRepository = profileRepository;
         this.likeRepository = likeRepository;
-
+        this.commentRepository = commentRepository;
     }
 
     public Page<Post> getPosts(int page, int size, PostType type) throws NoSuchMethodException {
@@ -46,9 +46,9 @@ public class PostService {
         List<Post> posts = postsPage.getContent().stream().map(PostMapper::PostEntityToPost).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
-            Profile profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
+            ProfileEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
             for (int i = 0; i < posts.size(); i++) {
-                Like like = likeRepository.findByUserAndPost(profile, postsPage.getContent().get(i)).orElse(null);
+                LikeEntity like = likeRepository.findByUserAndPost(profile, postsPage.getContent().get(i)).orElse(null);
                 if(like != null){
                     posts.get(i).setLiked(true);
                 }
@@ -63,6 +63,7 @@ public class PostService {
         if(type == null){
             type = PostType.any;
         }
+
         PostEntity postEntity = PostEntity.builder()
                 .url(payload.getUrl())
                 .type(type)
@@ -79,10 +80,10 @@ public class PostService {
 
     public String togglePost(Long id){
         PostEntity postEntity = postRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        Profile profile = getCurrentUserProfile();
-        Like like = likeRepository.findByUserAndPost(profile, postEntity).orElse(null);
+        ProfileEntity profile = getCurrentUserProfile();
+        LikeEntity like = likeRepository.findByUserAndPost(profile, postEntity).orElse(null);
         if(like == null){
-            Like createLike =Like.builder()
+            LikeEntity createLike = LikeEntity.builder()
                     .post(postEntity)
                     .user(profile)
                     .build();
@@ -98,9 +99,8 @@ public class PostService {
         }
     }
 
-    private Profile getCurrentUserProfile() {
-        CustomUserDetails principalId = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return profileRepository.findById(principalId.getProfile().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User profile not found"));
+    private ProfileEntity getCurrentUserProfile() {
+        CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return principal.getProfile();
     }
 }

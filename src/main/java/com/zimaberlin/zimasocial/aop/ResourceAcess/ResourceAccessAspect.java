@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.aop.ResourceAcess;
 
 import com.zimaberlin.zimasocial.dto.CustomUserDetails;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.ProfileEntity;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.exception.UnauthorizedException;
 import com.zimaberlin.zimasocial.repository.PostRepository;
@@ -43,7 +43,7 @@ public class ResourceAccessAspect {
     }
 
     private void validatePostAccess(Long id){
-        Profile currentUser = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
+        ProfileEntity currentUser = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
         PostEntity postEntity = postRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
         if(!postEntity.getUser().equals(currentUser)){
             throw new UnauthorizedException("You have no access to this resource");

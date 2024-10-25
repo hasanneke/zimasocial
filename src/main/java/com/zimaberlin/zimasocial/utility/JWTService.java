@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 
-import com.zimaberlin.zimasocial.dto.TokenResponse;
+import com.zimaberlin.zimasocial.domain.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -64,7 +64,7 @@ public class JWTService {
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(getSigningKey())
                 .compact();
 
@@ -72,14 +72,14 @@ public class JWTService {
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 36))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 2))
                 .signWith(getSigningKey())
                 .compact())
-                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 36)).build();
+                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)).build();
 
         return TokenResponse.builder()
                 .token(token)
-                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .refreshToken(refreshToken)
                 .build();
     }

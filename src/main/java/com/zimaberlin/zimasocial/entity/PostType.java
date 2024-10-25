@@ -1,3 +1,3 @@
 package com.zimaberlin.zimasocial.entity;
 
-public enum PostType {music, movie, book, any}
+public enum PostType { music, movie, book, any }

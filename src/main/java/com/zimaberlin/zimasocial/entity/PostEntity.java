@@ -38,17 +38,17 @@ public class PostEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Profile user;
+    private ProfileEntity user;
 
     @OneToMany(mappedBy = "post")
     @ToString.Exclude
     @JsonIgnore
-    private Set<Comment> comments = new HashSet<>();
+    private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
     @ToString.Exclude
     @JsonIgnore
-    private Set<Like> likes =  new HashSet<>();
+    private Set<LikeEntity> likes =  new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

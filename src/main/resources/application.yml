@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,7 +30,7 @@ spring:
               scope: openid,profile,email
   flyway:
     locations: classpath:db/migrations
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
     default-schema: zimasocial
 server:

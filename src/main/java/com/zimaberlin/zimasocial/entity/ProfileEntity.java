@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "profile")
-public class Profile {
+public class ProfileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,16 +30,21 @@ public class Profile {
     @Column(name = "family_name")
     private String familyName;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @ToString.Exclude
+    private Set<LikeEntity> likes = new HashSet<>();
+
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role")
     private Set<UserRole> roles = new HashSet<>();
 
     @Column(name = "followers_count")
-    private int followersCount;
+    private int followersCount = 0;
 
     @Column(name = "following_count")
-    private int followingCount;
+    private int followingCount = 0;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -47,7 +52,7 @@ public class Profile {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     @ToString.Exclude
-    private Set<PostEntity> postEntities = new HashSet<>();
+    private Set<PostEntity> posts = new HashSet<>();
 
     @Column(name = "auth_provider")
     private String authProvider;
@@ -64,7 +69,7 @@ public class Profile {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Profile that = (Profile) o;
+        ProfileEntity that = (ProfileEntity) o;
         return Objects.equals(id, that.getId());
     }
 

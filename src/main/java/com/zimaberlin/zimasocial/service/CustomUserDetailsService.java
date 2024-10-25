@@ -1,9 +1,8 @@
 package com.zimaberlin.zimasocial.service;
 
 import com.zimaberlin.zimasocial.dto.CustomUserDetails;
-import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.ProfileEntity;
 import com.zimaberlin.zimasocial.repository.ProfileRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-       Profile profile = profileRepository.findById(Long.parseLong(username)).orElse(null);
+       ProfileEntity profile = profileRepository.findById(Long.parseLong(username)).orElse(null);
        return CustomUserDetails.builder().profile(profile).build();
     }
 }

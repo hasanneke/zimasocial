@@ -1,12 +1,14 @@
 package com.zimaberlin.zimasocial.repository;
 
-import com.zimaberlin.zimasocial.entity.Like;
+import com.zimaberlin.zimasocial.entity.LikeEntity;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.Profile;
+import com.zimaberlin.zimasocial.entity.ProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface LikeRepository extends JpaRepository<Like, Long> {
-    Optional<Like> findByUserAndPost(Profile user, PostEntity postEntity);
+@Repository
+public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
+    Optional<LikeEntity> findByUserAndPost(ProfileEntity user, PostEntity postEntity);
 }
