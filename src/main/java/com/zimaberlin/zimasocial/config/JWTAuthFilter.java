@@ -1,7 +1,5 @@
 package com.zimaberlin.zimasocial.config;
 
-import com.zimaberlin.zimasocial.dto.CustomUserDetails;
-import com.zimaberlin.zimasocial.service.CustomUserDetailsService;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class JWTAuthFilter extends OncePerRequestFilter {

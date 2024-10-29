@@ -38,3 +38,13 @@ server:
 
 jwt:
   secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+      type:
+        descriptor:
+          sql:
+            BasicBinder: TRACE

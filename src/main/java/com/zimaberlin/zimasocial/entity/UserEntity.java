@@ -1,25 +1,29 @@
 package com.zimaberlin.zimasocial.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(name = "profile")
-public class ProfileEntity {
+@Table(name = "users")
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "slug", unique = true)
+    private String slug;
 
     @Column(name = "email")
     private String email;
@@ -32,13 +36,27 @@ public class ProfileEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    @ToString.Exclude
     private Set<LikeEntity> likes = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<PostEntity> posts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<CommentEntity> comments = new HashSet<>();
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_role")
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
     private Set<UserRole> roles = new HashSet<>();
+
+    @Column(name = "is_private")
+    private boolean isPrivate = false;
+
+    @Column(name = "bio")
+    private String bio;
 
     @Column(name = "followers_count")
     private int followersCount = 0;
@@ -48,11 +66,6 @@ public class ProfileEntity {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
-
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    @ToString.Exclude
-    private Set<PostEntity> posts = new HashSet<>();
 
     @Column(name = "auth_provider")
     private String authProvider;
@@ -69,7 +82,7 @@ public class ProfileEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProfileEntity that = (ProfileEntity) o;
+        UserEntity that = (UserEntity) o;
         return Objects.equals(id, that.getId());
     }
 
@@ -77,4 +90,6 @@ public class ProfileEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
 }

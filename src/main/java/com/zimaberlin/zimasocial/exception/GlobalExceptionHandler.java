@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.exception;
 
 import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.utility.ResponseError;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +12,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ResponseError> resourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(ResponseError.builder()
+                .errorCode("not_found")
+                .message(ex.getMessage())
+                .timeStamp(System.currentTimeMillis())
+                .build(), HttpStatus.NOT_FOUND);
+    }
+
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ResponseError> handleBadCredentialsException(BadCredentialsException ex) {
@@ -31,6 +42,16 @@ public class GlobalExceptionHandler {
                 .build(), HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ResponseError> handleExpiredJWTException(ExpiredJwtException exception){
+        return new ResponseEntity<>(ResponseError.builder()
+                .timeStamp(System.currentTimeMillis())
+                .errorCode("token_expired")
+                .message("JWT Token expired")
+                .build(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
@@ -41,4 +62,16 @@ public class GlobalExceptionHandler {
                 message("Internal Error").build(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ResponseError> handleGenericException(ConflictException ex) {
+        return new ResponseEntity<>(ResponseError.
+                builder().
+                timeStamp(System.currentTimeMillis()).
+                errorCode("conflict").
+                message(ex.getMessage()).build(),
+                HttpStatus.CONFLICT);
+    }
+
 }

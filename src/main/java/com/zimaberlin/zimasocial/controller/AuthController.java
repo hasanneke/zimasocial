@@ -2,8 +2,7 @@ package com.zimaberlin.zimasocial.controller;
 
 import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.domain.TokenResponse;
-import com.zimaberlin.zimasocial.service.AuthService;
-import lombok.NoArgsConstructor;
+import com.zimaberlin.zimasocial.service.Auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,12 @@ public class AuthController {
     @GetMapping(path = "/google-login")
     ResponseEntity<TokenResponse> googleLogin(@RequestParam String token) throws TokenVerifier.VerificationException {
         TokenResponse tokenResponse = authService.googleLogin(token);
+        return ResponseEntity.ok(tokenResponse);
+    }
+
+    @GetMapping(path = "/refresh-token")
+    ResponseEntity<TokenResponse> refreshToken(@RequestParam String refreshToken) throws TokenVerifier.VerificationException {
+        TokenResponse tokenResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }
 }

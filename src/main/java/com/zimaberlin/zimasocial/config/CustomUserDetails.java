@@ -1,5 +1,5 @@
-package com.zimaberlin.zimasocial.dto;
-import com.zimaberlin.zimasocial.entity.ProfileEntity;
+package com.zimaberlin.zimasocial.config;
+import com.zimaberlin.zimasocial.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    private ProfileEntity profile;
+    private UserEntity profile;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
