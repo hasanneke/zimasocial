@@ -9,4 +9,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     Page<CommentEntity> findByPostId(Long postId, Pageable pageable);
     Page<CommentEntity> findByParentId(Long parentId, Pageable pageable);
+    Page<CommentEntity> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId);
 }

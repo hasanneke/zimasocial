@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -28,8 +29,14 @@ public class CommentEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private Set<LikeEntity> likes = new HashSet<>();
+
+    @Column(name = "like_count")
+    private int likeCount = 0;
+
+    @Column(name = "reply_count")
+    private int replyCount = 0;
 
     @Column(name = "content")
     private String content;
@@ -45,4 +52,17 @@ public class CommentEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private CommentEntity parent;
+
+    public void incrementLikeCount(){
+        likeCount = likeCount + 1;
+    }
+    public void decrementLikeCount(){
+        likeCount = likeCount - 1;
+    }
+    public void incrementReplyCount(){
+        replyCount = replyCount + 1;
+    }
+    public void decrementReplyCount(){
+        replyCount = replyCount - 1;
+    }
 }

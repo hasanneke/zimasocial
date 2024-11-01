@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
 @Setter
 public class Comment {
     private Long id;
-    private Post post;
-    private UserEntity user;
+    private String content;
+    private User user;
+    private Integer replyCount = 0;
+    private Integer likeCount = 0;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Comment parent;
 }

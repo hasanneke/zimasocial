@@ -29,7 +29,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         String authorizationHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String userId;

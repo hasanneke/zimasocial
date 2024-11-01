@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service;
+package com.zimaberlin.zimasocial.service.Auth;
 
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String generateUniqueSlug(String email) {
-        String baseSlug = extractEmailPrefix(email);
+        String baseSlug = getTrimmedName(email);
         String slug = baseSlug;
 
         // Keep trying until we find a unique slug
@@ -83,11 +83,12 @@ public class AuthServiceImpl implements AuthService {
         return slug;
     }
 
-    private String extractEmailPrefix(String email) {
-        if (email == null || email.isEmpty()) {
+    private String getTrimmedName(String name) {
+        if (name == null || name.isEmpty()) {
             return "";
         }
-        return email.split("@")[0];
+
+        return name.trim();
     }
 
     private Optional<UserEntity> checkUser(String email, String provider) {

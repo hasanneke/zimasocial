@@ -19,7 +19,7 @@ public class Post {
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;
-    private UserEntity user;
+    private User user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
