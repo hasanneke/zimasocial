@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
             return createToken(profile.get());
         }
 
-        String slug = generateUniqueSlug(email);
+        String slug = generateUniqueSlug(name);
 
         UserEntity profileDto = UserEntity.builder()
                 .email(email)
@@ -69,8 +69,8 @@ public class AuthServiceImpl implements AuthService {
         return createToken(user);
     }
 
-    private String generateUniqueSlug(String email) {
-        String baseSlug = getTrimmedName(email);
+    private String generateUniqueSlug(String name) {
+        String baseSlug = getTrimmedName(name);
         String slug = baseSlug;
 
         // Keep trying until we find a unique slug
