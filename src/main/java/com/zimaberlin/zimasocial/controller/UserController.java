@@ -3,7 +3,6 @@ import com.zimaberlin.zimasocial.service.Users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.Users.UserService;
 import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +40,7 @@ public class UserController {
 
     @PatchMapping(path = "/me/upload-image")
     ResponseEntity<BasicUserView> uploadProfileImage(MultipartFile image){
-        BasicUserView user = userService.uploadImage(image);
+        BasicUserView user = userService.updateProfileImage(image);
         return ResponseEntity.ok(user);
     }
 

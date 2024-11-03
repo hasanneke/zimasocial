@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -35,10 +36,16 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public BasicUserView uploadImage(@NotNull(message = "Image cannot be null") MultipartFile image)  {
-        String url = s3Service.uploadImage(image);
+    public BasicUserView updateProfileImage(@NotNull(message = "Image cannot be null") MultipartFile image)  {
+//        String url = s3Service.uploadImage(image);
         UserEntity user = CurrentUser.getCurrentUserProfile();
-        user.setAvatarUrl(url);
+//        if(user.getAvatarUrl() != null){
+//            String fileName = Arrays.stream(user.getAvatarUrl().split("/")).toList().getLast();
+//            s3Service.deleteImage(fileName);
+//        }
+//        user.setAvatarUrl(url);
+//        userRepository.save(user);
+
         return CustomUserMapper.entityToDomain(user);
     }
 
