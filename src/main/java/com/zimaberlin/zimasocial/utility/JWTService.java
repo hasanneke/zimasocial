@@ -1,15 +1,21 @@
 package com.zimaberlin.zimasocial.utility;
 
 
-import com.zimaberlin.zimasocial.domain.TokenResponse;
+import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
+import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +23,11 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
+    private RefreshTokenRepository refreshTokenRepository;
+    @Autowired
+    public JWTService(RefreshTokenRepository refreshTokenRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @Value("${jwt.secret}")
     private String secret;
@@ -49,17 +60,18 @@ public class JWTService {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
-    public TokenResponse generateToken(Long id, String email, String provider) {
-        return createToken(id, email, provider);
+    public TokenResponse generateToken(Long id, String email, String provider,  UserEntity user) {
+        return createToken(id, email, provider, user);
     }
 
-    public TokenResponse createToken(Long id, String email, String provider) {
+    public TokenResponse createToken(Long id, String email, String provider, UserEntity user) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-
+        LocalDateTime tokenExpirationDate = LocalDateTime.now().plusHours(1);
+        LocalDateTime refreshTokenExpirationDate = LocalDateTime.now().plusDays(1);
         String token = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
@@ -68,18 +80,29 @@ public class JWTService {
                 .signWith(getSigningKey())
                 .compact();
 
-        TokenResponse refreshToken = TokenResponse.builder().token(Jwts.builder()
+        String hashedRefreshToken = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 2))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
                 .signWith(getSigningKey())
-                .compact())
-                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)).build();
+                .compact();
+
+        RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
+        tokenEntity.setToken(hashedRefreshToken);
+        tokenEntity.setExpiresAt(refreshTokenExpirationDate);
+        tokenEntity.setUser(user);
+
+        TokenResponse refreshToken = TokenResponse.builder()
+                .token(hashedRefreshToken)
+                .expireDate(LocalDateTime.now().plusHours(2))
+                .build();
+
+        refreshTokenRepository.save(tokenEntity);
 
         return TokenResponse.builder()
                 .token(token)
-                .expireDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expireDate(tokenExpirationDate)
                 .refreshToken(refreshToken)
                 .build();
     }

@@ -1,7 +1,7 @@
-package com.zimaberlin.zimasocial.domain;
+package com.zimaberlin.zimasocial.views.post;
 
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Post {
+public class PostView {
     private Long id;
     private String content;
     private String url;
@@ -19,7 +19,7 @@ public class Post {
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;
-    private User user;
+    private BasicUserView user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

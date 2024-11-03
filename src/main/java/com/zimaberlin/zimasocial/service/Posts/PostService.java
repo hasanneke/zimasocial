@@ -1,28 +1,27 @@
 package com.zimaberlin.zimasocial.service.Posts;
 
-import com.zimaberlin.zimasocial.domain.Comment;
-import com.zimaberlin.zimasocial.domain.Post;
+import com.zimaberlin.zimasocial.views.comment.CommentView;
+import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.Posts.Payload.CommentPayload;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 
 interface PostService {
     // GET POSTS FOR SLUG
-    Page<Post> getPosts(int page, int size, String slug, PostType type);
+    Page<PostView> getPosts(int page, int size, String slug, PostType type);
     // GET POSTS FOR TYPE
-    Page<Post> getPosts(int page, int size, PostType type);
+    Page<PostView> getPosts(int page, int size, PostType type);
     // GET COMMENTS
-    Page<Comment> getComments(int page, int size, Long postId);
+    Page<CommentView> getComments(int page, int size, Long postId);
     // GET COMMENT REPLIES
-    Page<Comment> getCommentReplies(int page, int size, Long postId, Long commentId);
+    Page<CommentView> getCommentReplies(int page, int size, Long postId, Long commentId);
     // GET POST
-    Post getPost(Long id);
+    PostView getPost(Long id);
     // CREATE POST
-    Post createPost(@Valid PostPayload payload);
+    PostView createPost(@Valid PostPayload payload);
     // DELETE POST
     void deletePost(Long id);
     // LIKE POST
@@ -30,7 +29,7 @@ interface PostService {
     // UNLIKE POST
     void unlikePost(Long postId) throws BadRequestException;
     // COMMENT POST
-    Comment commentPost(Long postId, CommentPayload payload);
+    CommentView commentPost(Long postId, CommentPayload payload);
     // DELETE COMMENT
     void deleteComment(Long postId, Long commentId);
     // LIKE COMMENT
@@ -38,7 +37,7 @@ interface PostService {
     // UNLIKE COMMENT
     void unlikeComment(Long postId, Long commentId);
     // REPLY COMMENT
-    Comment replyComment(Long postId, Long commentId, CommentPayload payload);
+    CommentView replyComment(Long postId, Long commentId, CommentPayload payload);
     // DELETE REPLY COMMENT
-    Comment deleteReplyComment(Long postId, Long commentId, Long replyCommentId);
+    CommentView deleteReplyComment(Long postId, Long commentId, Long replyCommentId);
 }

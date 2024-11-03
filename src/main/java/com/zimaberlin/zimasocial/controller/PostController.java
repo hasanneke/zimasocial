@@ -1,127 +1,215 @@
 package com.zimaberlin.zimasocial.controller;
 
-import com.zimaberlin.zimasocial.domain.Comment;
-import com.zimaberlin.zimasocial.domain.Post;
+import com.zimaberlin.zimasocial.views.comment.CommentView;
+import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.service.Posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.service.Posts.PostServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Method;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
+@RestController
 @RequestMapping("/api/v1/posts")
-public interface PostController {
-    @Operation(
-            summary = "Get posts",
-            description = "Users can get posts",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Post are fetched successfully"
-                    )
-            }
-    )
+@Tag(name = "Posts Management", description = "APIs for managing posts")
+public class PostController {
+    private final PostServiceImpl postService;
+
+    @Autowired
+    public PostController(PostServiceImpl postService) {
+        this.postService = postService;
+    }
+
     @GetMapping
-    HttpEntity<PagedModel<Post>> getPosts(
+    public HttpEntity<PagedModel<PostView>> getPosts(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
             @RequestParam(name = "type", defaultValue = "any") PostType type,
-            @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException;
+            @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException {
 
+        Page<PostView> postPage;
+        if(slug != null){
+            postPage = postService.getPosts(page, size, slug, type);
+        } else {
+            postPage = postService.getPosts(page, size, type);
+        }
 
+        PagedModel<PostView> pagedModel = PagedModel.of(
+                postPage.getContent(),
+                new PagedModel.PageMetadata(postPage.getSize(),
+                        postPage.getNumber(),
+                        postPage.getTotalElements(),
+                        postPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("getPosts",
+                Integer.class,
+                Integer.class,
+                PostType.class,
+                String.class);
+
+        if(page < postPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, type, slug).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, type, slug).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+
+        return new HttpEntity<>(pagedModel);
+    }
 
     @GetMapping(path = "/{postId}")
-    ResponseEntity<Post> getPost(@PathVariable Long postId);
+    public ResponseEntity<PostView> getPost(@PathVariable Long postId) {
+        PostView postView = postService.getPost(postId);
+        return ResponseEntity.ok(postView);
+    }
 
-    @Operation(
-            summary = "Create a post",
-            description = "Users can create posts",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Post is created successfully"),
-                    @ApiResponse(responseCode = "400", description = "Bad Request")
-            }
-    )
     @PostMapping
-    ResponseEntity<Post> createPost(@Valid @RequestBody PostPayload payload);
+    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) {
+        PostView postView = postService.createPost(payload);
+        return ResponseEntity.status(HttpStatus.CREATED).body(postView);
+    }
 
-    @Operation(
-            summary = "Delete a post",
-            description = "Users can delete post",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Post is deleted succesfully"),
-                    @ApiResponse(responseCode = "404", description = "Post not found"),
-                    @ApiResponse(responseCode = "403", description = "User is not owner of the post")
-            }
-    )
     @DeleteMapping(path = "/{postId}")
-    ResponseEntity<Post> deletePost(@PathVariable Long postId);
+    public ResponseEntity<PostView> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 
-    @Operation(
-            summary = "Like a post",
-            description = "Users can like post",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Post liked succesfully"),
-                    @ApiResponse(responseCode = "409", description = "Post is already liked"),
-                    @ApiResponse(responseCode = "404", description = "Post not found")
-            }
-    )
     @PostMapping(path = "/{postId}/likes")
-    ResponseEntity<Void> likePost(@PathVariable Long postId);
+    public ResponseEntity<Void> likePost(@PathVariable Long postId) {
+        postService.likePost(postId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
-    @Operation(
-            summary = "Unlike a post",
-            description = "Users can unlike post",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Post unliked succesfully"),
-                    @ApiResponse(responseCode = "409", description = "Post is already unliked"),
-                    @ApiResponse(responseCode = "404", description = "Post not found")
-            }
-    )
     @DeleteMapping(path = "/{postId}/likes")
-    ResponseEntity<Void> unlikePost(@PathVariable Long postId) throws BadRequestException;
+    public ResponseEntity<Void> unlikePost(@PathVariable Long postId) throws BadRequestException {
+        postService.unlikePost(postId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @GetMapping(path = "/{postId}/comments")
-    HttpEntity<PagedModel<Comment>> getComments(
+    public HttpEntity<PagedModel<CommentView>> getComments(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @PathVariable Long postId) throws NoSuchMethodException;
+            @PathVariable Long postId) throws NoSuchMethodException {
 
+        Page<CommentView> commentsPage = postService.getComments(page, size, postId);
+        PagedModel<CommentView> pagedModel = PagedModel.of(
+                commentsPage.getContent(),
+                new PagedModel.PageMetadata(commentsPage.getSize(),
+                        commentsPage.getNumber(),
+                        commentsPage.getTotalElements(),
+                        commentsPage.getTotalPages()));
 
-    @Operation(summary = "Users make comments on Posts")
+        Method method = this.getClass().getMethod("getComments", Integer.class, Integer.class, Long.class);
+        if(page < commentsPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, postId).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, postId).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return new HttpEntity<>(pagedModel);
+    }
+
     @PostMapping(path = "/{postId}/comments")
-    ResponseEntity<CommentEntity> makeComment(@PathVariable Long postId, @Valid @RequestBody CommentPayload payload);
+    public ResponseEntity<CommentEntity> makeComment(
+            @PathVariable Long postId,
+            @Valid @RequestBody CommentPayload payload) {
+        postService.commentPost(postId, payload);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
-    @Operation(summary = "Users deletes comment")
     @DeleteMapping(path = "/{postId}/comments/{commentId}")
-    ResponseEntity<CommentEntity> deleteComment(@PathVariable Long postId, @PathVariable Long commentId);
+    public ResponseEntity<CommentEntity> deleteComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId) {
+        postService.deleteComment(postId, commentId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
-    @Operation(summary = "Users reply to comments")
     @PostMapping(path = "/{postId}/comments/{commentId}/replies")
-    ResponseEntity<Comment> replyComment(@PathVariable Long postId,
-                                         @PathVariable Long commentId,
-                                         @Valid @RequestBody CommentPayload payload);
+    public ResponseEntity<CommentView> replyComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody CommentPayload payload) {
+        CommentView commentView = postService.replyComment(postId, commentId, payload);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentView);
+    }
 
     @PostMapping(path = "/{postId}/comments/{commentId}/likes")
-    HttpEntity<Void> likeComment(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId);
+    public HttpEntity<Void> likeComment(
+            @PathVariable(name = "postId") Long postId,
+            @PathVariable(name = "commentId") Long commentId) {
+        postService.likeComment(postId, commentId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     @DeleteMapping(path = "/{postId}/comments/{commentId}/likes")
-    HttpEntity<Void> unlikeComment(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId);
+    public HttpEntity<Void> unlikeComment(
+            @PathVariable(name = "postId") Long postId,
+            @PathVariable(name = "commentId") Long commentId) {
+        postService.unlikeComment(postId, commentId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @GetMapping(path = "/{postId}/comments/{commentId}/replies")
-    HttpEntity<PagedModel<Comment>> getCommentReplies(
-            @RequestParam(name = "page", defaultValue="0") Integer page,
+    public HttpEntity<PagedModel<CommentView>> getCommentReplies(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
             @PathVariable(name = "postId") Long postId,
-            @PathVariable(name = "commentId") Long commentId) throws NoSuchMethodException;
+            @PathVariable(name = "commentId") Long commentId) throws NoSuchMethodException {
+
+        Page<CommentView> commentPage = postService.getCommentReplies(page, size, postId, commentId);
+        PagedModel<CommentView> pagedModel = PagedModel.of(
+                commentPage.getContent(),
+                new PagedModel.PageMetadata(commentPage.getSize(),
+                        commentPage.getNumber(),
+                        commentPage.getTotalElements(),
+                        commentPage.getTotalPages())
+        );
+
+        Method method = this.getClass().getMethod("getCommentReplies", Integer.class, Integer.class, Long.class, Long.class);
+        if(page < commentPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, postId, commentId).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, postId, commentId).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+
+        return new HttpEntity<>(pagedModel);
+    }
 
     @DeleteMapping(path = "/{postId}/comments/{commentId}/replies/{replyId}")
-    ResponseEntity<Comment> deleteReply(@PathVariable(name = "postId") Long postId,
-                                        @PathVariable(name = "commentId") Long commentId,
-                                        @PathVariable(name = "replyId") Long replyId);
+    public ResponseEntity<CommentView> deleteReply(
+            @PathVariable(name = "postId") Long postId,
+            @PathVariable(name = "commentId") Long commentId,
+            @PathVariable(name = "replyId") Long replyId) {
+        CommentView commentView = postService.deleteReplyComment(postId, commentId, replyId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(commentView);
+    }
 }

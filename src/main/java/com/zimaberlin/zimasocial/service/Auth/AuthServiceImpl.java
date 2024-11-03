@@ -2,16 +2,18 @@ package com.zimaberlin.zimasocial.service.Auth;
 
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
-import com.zimaberlin.zimasocial.domain.TokenResponse;
+import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
+import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
+import com.zimaberlin.zimasocial.utility.TokenResponse;
 import com.zimaberlin.zimasocial.entity.UserEntity;
 import com.zimaberlin.zimasocial.entity.UserRole;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRepository;
-import com.zimaberlin.zimasocial.service.Auth.AuthService;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Random;
@@ -23,11 +25,13 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private JWTService jwtService;
     private final Random random = new Random();
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, JWTService jwtService) {
+    public AuthServiceImpl(UserRepository userRepository, JWTService jwtService, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
@@ -61,11 +65,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public TokenResponse refreshToken(String refreshToken) throws TokenVerifier.VerificationException {
         boolean expired = jwtService.isTokenExpired(refreshToken);
         if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
+
+        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByTokenAndRevoked(refreshToken, false)
+                .orElseThrow(()->new ResourceNotFoundException("Refresh token not found"));
+        refreshTokenEntity.setRevoked(true);
+        refreshTokenRepository.save(refreshTokenEntity);
+
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
-        UserEntity user = userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         return createToken(user);
     }
 
@@ -77,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
         int attempt = 0;
         while (userRepository.findBySlug(slug).isPresent()) {
             attempt++;
-            slug = baseSlug + random.nextInt(1000);  // Add random number between 0-999
+            slug = baseSlug + random.nextInt(10000);
         }
 
         return slug;
@@ -100,6 +112,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private TokenResponse createToken(UserEntity profile){
-        return jwtService.generateToken(profile.getId(), profile.getEmail(), profile.getAuthProvider());
+        return jwtService.generateToken(profile.getId(), profile.getEmail(), profile.getAuthProvider(), profile);
     }
 }

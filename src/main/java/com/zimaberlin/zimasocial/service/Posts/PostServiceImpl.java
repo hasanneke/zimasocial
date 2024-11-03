@@ -1,13 +1,12 @@
 package com.zimaberlin.zimasocial.service.Posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
-import com.zimaberlin.zimasocial.domain.Comment;
-import com.zimaberlin.zimasocial.domain.Post;
+import com.zimaberlin.zimasocial.views.comment.CommentView;
+import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
 import com.zimaberlin.zimasocial.events.CommentLikedEvent;
 import com.zimaberlin.zimasocial.events.CommentUnlikedEvent;
 import com.zimaberlin.zimasocial.events.PostLikedEvent;
-import com.zimaberlin.zimasocial.events.PostUnlikedEvent;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.repository.CommentRepository;
 import com.zimaberlin.zimasocial.repository.UserRepository;
@@ -17,23 +16,18 @@ import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.repository.LikeRepository;
 import com.zimaberlin.zimasocial.repository.PostRepository;
 import com.zimaberlin.zimasocial.service.Posts.Payload.CommentPayload;
-import com.zimaberlin.zimasocial.utility.CommentMapper;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomCommentMapper;
 import com.zimaberlin.zimasocial.utility.PostMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -57,7 +51,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getPosts(int page, int size, String slug, PostType type) {
+    public Page<PostView> getPosts(int page, int size, String slug, PostType type) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
         Pageable pageable = PageRequest.of(page, size);
         Page<PostEntity> postsPage;
@@ -68,13 +62,13 @@ public class PostServiceImpl implements PostService {
             postsPage = postRepository.findByUser(pageable, user);
         }
 
-        List<Post> posts = fillWithIsLiked(postsPage);
+        List<PostView> postViews = fillWithIsLiked(postsPage);
 
-        return new PageImpl<>(posts, pageable, postsPage.getTotalElements());
+        return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
 
     @Override
-    public Page<Post> getPosts(int page, int size, PostType type) {
+    public Page<PostView> getPosts(int page, int size, PostType type) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostEntity> postsPage;
         if(type == null){
@@ -82,32 +76,32 @@ public class PostServiceImpl implements PostService {
         }else{
             postsPage = postRepository.findByType(pageable, type);
         }
-        List<Post> posts = fillWithIsLiked(postsPage);
-        return new PageImpl<>(posts, pageable, postsPage.getTotalElements());
+        List<PostView> postViews = fillWithIsLiked(postsPage);
+        return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
 
     @Override
-    public Page<Comment> getComments(int page, int size, Long postId) {
+    public Page<CommentView> getComments(int page, int size, Long postId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CommentEntity> commentEntities = commentRepository.findByPostIdAndParentId(pageable, postId, null);
         return commentEntities.map(CustomCommentMapper::entityToDomain);
     }
 
     @Override
-    public Page<Comment> getCommentReplies(int page, int size, Long postId, Long commentId) {
+    public Page<CommentView> getCommentReplies(int page, int size, Long postId, Long commentId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CommentEntity> commentEntities = commentRepository.findByParentId(commentId, pageable);
         return commentEntities.map(CustomCommentMapper:: entityToDomain);
     }
 
     @Override
-    public Post getPost(Long postId) {
+    public PostView getPost(Long postId) {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         return fillWithIsLiked(post);
     }
 
     @Override
-    public Post createPost(@Valid PostPayload payload) {
+    public PostView createPost(@Valid PostPayload payload) {
         UserEntity user = getCurrentUserProfile();
         PostEntity postEntity = postMapper.payloadToPostEntity(payload);
         postEntity.setUser(user);
@@ -152,7 +146,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Comment commentPost(Long postId, CommentPayload payload) {
+    public CommentView commentPost(Long postId, CommentPayload payload) {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         CommentEntity comment = new CommentEntity();
         comment.setPost(post);
@@ -209,7 +203,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Comment replyComment(Long postId, Long commentId, CommentPayload payload) {
+    public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
         CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
         CommentEntity reply = new CommentEntity();
@@ -227,7 +221,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @HasCommentAccess(idParameterName = "replyCommentId")
-    public Comment deleteReplyComment(Long postId, Long commentId, Long replyCommentId) {
+    public CommentView deleteReplyComment(Long postId, Long commentId, Long replyCommentId) {
         CommentEntity reply = commentRepository.findById(replyCommentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
         reply.getParent().decrementReplyCount();
 
@@ -235,29 +229,29 @@ public class PostServiceImpl implements PostService {
         return CustomCommentMapper.entityToDomain(reply);
     }
 
-    private List<Post> fillWithIsLiked(Page<PostEntity> postsPage) {
-        List<Post> posts = postsPage.getContent().stream().map(postMapper::postEntityToPost).toList();
+    private List<PostView> fillWithIsLiked(Page<PostEntity> postsPage) {
+        List<PostView> postViews = postsPage.getContent().stream().map(postMapper::postEntityToPost).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
             UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
-            for (int i = 0; i < posts.size(); i++) {
+            for (int i = 0; i < postViews.size(); i++) {
                 LikeEntity like = likeRepository.findByUserAndPost(profile, postsPage.getContent().get(i)).orElse(null);
                 if(like != null){
-                    posts.get(i).setLiked(true);
+                    postViews.get(i).setLiked(true);
                 }
             }
         }
-        return posts;
+        return postViews;
     }
 
-    private Post fillWithIsLiked(PostEntity post){
+    private PostView fillWithIsLiked(PostEntity post){
         UserEntity profile = CurrentUser.getCurrentUserProfile();
         LikeEntity like = likeRepository.findByUserAndPost(profile, post).orElse(null);
-        Post domainPost = postMapper.postEntityToPost(post);
+        PostView domainPostView = postMapper.postEntityToPost(post);
         if(like != null){
-            domainPost.setLiked(true);;
+            domainPostView.setLiked(true);;
         }
-        return domainPost;
+        return domainPostView;
     }
 
     private UserEntity getCurrentUserProfile(){

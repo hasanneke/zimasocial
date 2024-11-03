@@ -1,6 +1,11 @@
 spring:
   application:
     name: zimasocial
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1mb
+      max-request-size: 1mb
   datasource:
     url: jdbc:postgresql://localhost:5432/zimasocial
     username: zimaadmin
@@ -8,7 +13,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,7 +35,7 @@ spring:
               scope: openid,profile,email
   flyway:
     locations: classpath:db/migrations
-    enabled: false
+    enabled: true
     baseline-on-migrate: true
     default-schema: zimasocial
 server:
@@ -48,3 +53,5 @@ logging:
         descriptor:
           sql:
             BasicBinder: TRACE
+
+

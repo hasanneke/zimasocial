@@ -1,11 +1,11 @@
-package com.zimaberlin.zimasocial.domain;
+package com.zimaberlin.zimasocial.utility;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +13,6 @@ import java.util.Date;
 @Builder
 public class TokenResponse {
     private String token;
-    private Date expireDate;
+    private LocalDateTime expireDate;
     private TokenResponse refreshToken;
 }

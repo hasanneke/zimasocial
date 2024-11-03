@@ -1,20 +1,17 @@
-package com.zimaberlin.zimasocial.domain;
-import com.zimaberlin.zimasocial.entity.CommentEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+package com.zimaberlin.zimasocial.views.comment;
+import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Comment {
+public class CommentView {
     private Long id;
     private String content;
-    private User user;
+    private BasicUserView basicUserView;
     private Integer replyCount = 0;
     private Integer likeCount = 0;
     private LocalDateTime createdAt;
