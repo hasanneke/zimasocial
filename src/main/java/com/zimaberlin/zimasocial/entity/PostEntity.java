@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,6 +1,5 @@
-package com.zimaberlin.zimasocial.service.Users.Payload;
+package com.zimaberlin.zimasocial.service.users.Payload;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;

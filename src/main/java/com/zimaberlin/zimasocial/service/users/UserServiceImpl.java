@@ -1,11 +1,11 @@
-package com.zimaberlin.zimasocial.service.Users;
+package com.zimaberlin.zimasocial.service.users;
 
 import com.zimaberlin.zimasocial.entity.UserEntity;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRepository;
-import com.zimaberlin.zimasocial.service.ImageService.S3Service;
-import com.zimaberlin.zimasocial.service.Users.Payload.UserUpdatePayload;
+import com.zimaberlin.zimasocial.service.imageService.S3Service;
+import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomUserMapper;
 import com.zimaberlin.zimasocial.views.user.BasicUserView;
@@ -13,16 +13,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.AbstractAuditable_;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor

@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.controller;
 
 import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.utility.TokenResponse;
-import com.zimaberlin.zimasocial.service.Auth.AuthService;
+import com.zimaberlin.zimasocial.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

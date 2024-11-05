@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service.Posts.Payload;
+package com.zimaberlin.zimasocial.service.posts.Payload;
 
 import com.zimaberlin.zimasocial.entity.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -2,13 +2,11 @@ package com.zimaberlin.zimasocial.controller;
 
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
-import com.zimaberlin.zimasocial.service.Posts.Payload.CommentPayload;
-import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
+import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
+import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.service.Posts.PostServiceImpl;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import com.zimaberlin.zimasocial.service.posts.PostServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;

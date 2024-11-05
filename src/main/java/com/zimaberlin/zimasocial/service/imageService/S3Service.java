@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service.ImageService;
+package com.zimaberlin.zimasocial.service.imageService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

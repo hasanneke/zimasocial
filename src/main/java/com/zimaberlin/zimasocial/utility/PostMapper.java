@@ -4,7 +4,7 @@ import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.UserEntity;
-import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
+import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import org.hibernate.Hibernate;
 import org.mapstruct.*;
 

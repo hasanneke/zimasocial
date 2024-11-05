@@ -1,6 +1,6 @@
-package com.zimaberlin.zimasocial.service.Users;
+package com.zimaberlin.zimasocial.service.users;
 
-import com.zimaberlin.zimasocial.service.Users.Payload.UserUpdatePayload;
+import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import org.springframework.web.multipart.MultipartFile;
 

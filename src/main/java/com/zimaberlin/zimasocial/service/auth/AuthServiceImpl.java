@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service.Auth;
+package com.zimaberlin.zimasocial.service.auth;
 
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;

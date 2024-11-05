@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.config;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,7 +30,8 @@ public class SecurityConfig {
             "/api/v1/public/**",
             "/api/v1/auth/**",
             "swagger-ui/**", "swagger-ui**",
-            "/v3/api-docs/**", "/v3/api-docs**"
+            "/v3/api-docs/**", "/v3/api-docs**",
+            "/actuator/**"
     };
 
     @Autowired
@@ -43,6 +45,7 @@ public class SecurityConfig {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(AUTH_WHITELIST)
                                 .permitAll()
+
                                 .requestMatchers(HttpMethod.GET, "/api/v1/posts")
                                 .permitAll()
                                 .anyRequest()
@@ -53,5 +56,9 @@ public class SecurityConfig {
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
+    }
+    @Bean
+    public InMemoryHttpExchangeRepository createTraceRepository() {
+        return new InMemoryHttpExchangeRepository();
     }
 }

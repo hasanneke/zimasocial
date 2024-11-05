@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.controller;
-import com.zimaberlin.zimasocial.service.Users.Payload.UserUpdatePayload;
-import com.zimaberlin.zimasocial.service.Users.UserService;
+import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
+import com.zimaberlin.zimasocial.service.users.UserService;
 import com.zimaberlin.zimasocial.views.user.BasicUserView;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

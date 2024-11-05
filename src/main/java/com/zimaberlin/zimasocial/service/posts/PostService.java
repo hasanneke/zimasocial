@@ -1,10 +1,10 @@
-package com.zimaberlin.zimasocial.service.Posts;
+package com.zimaberlin.zimasocial.service.posts;
 
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
-import com.zimaberlin.zimasocial.service.Posts.Payload.PostPayload;
+import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.service.Posts.Payload.CommentPayload;
+import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;

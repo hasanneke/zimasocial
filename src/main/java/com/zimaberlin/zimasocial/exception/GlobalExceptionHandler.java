@@ -61,13 +61,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ResponseError> handleExpiredJWTException(ExpiredJwtException exception){
         return new ResponseEntity<>(ResponseError.builder()
                 .timeStamp(System.currentTimeMillis())
                 .errorCode("token_expired")
                 .message("JWT Token expired")
-                .build(), HttpStatus.FORBIDDEN);
+                .build(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

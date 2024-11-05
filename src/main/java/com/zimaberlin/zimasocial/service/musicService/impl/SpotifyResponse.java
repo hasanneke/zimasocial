@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service.MusicService.DTOs;
+package com.zimaberlin.zimasocial.service.musicService.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,6 +64,7 @@ public class SpotifyResponse {
         private String release_date;
         private String type;
         private ExternalUrls external_urls;
+        private String uri;
     }
 
     @Getter
