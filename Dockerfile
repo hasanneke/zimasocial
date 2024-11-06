@@ -4,5 +4,5 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:21-jdk-slim
 COPY --from=build /target/zimasocial-0.0.1-SNAPSHOT.jar zimasocial.jar
-EXPOSE 8081
+EXPOSE 8081:8081
 ENTRYPOINT ["java", "-jar", "zimasocial.jar", "--spring.profiles.active=dev"]

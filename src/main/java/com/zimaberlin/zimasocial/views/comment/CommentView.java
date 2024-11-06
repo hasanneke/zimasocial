@@ -1,5 +1,5 @@
 package com.zimaberlin.zimasocial.views.comment;
-import com.zimaberlin.zimasocial.views.user.BasicUserView;
+import com.zimaberlin.zimasocial.views.user.UserView;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentView {
     private Long id;
     private String content;
-    private BasicUserView basicUserView;
+    private UserView userView;
     private Integer replyCount = 0;
     private Integer likeCount = 0;
     private LocalDateTime createdAt;

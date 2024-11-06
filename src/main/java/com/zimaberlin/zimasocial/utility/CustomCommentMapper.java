@@ -17,7 +17,7 @@ public class CustomCommentMapper {
         // Set domain values
         commentView.setContent(entity.getContent());
         commentView.setId(entity.getId());
-        commentView.setBasicUserView(CustomUserMapper.entityToDomain(user));
+        commentView.setUserView(CustomUserMapper.entityToDomain(user));
         commentView.setUpdatedAt(entity.getUpdatedAt());
         commentView.setCreatedAt(entity.getCreatedAt());
         commentView.setLikeCount(entity.getLikeCount());

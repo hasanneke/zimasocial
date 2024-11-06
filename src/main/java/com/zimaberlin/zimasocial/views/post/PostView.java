@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.views.post;
 
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.views.user.BasicUserView;
+import com.zimaberlin.zimasocial.views.user.UserView;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public class PostView {
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;
-    private BasicUserView user;
+    private UserView user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

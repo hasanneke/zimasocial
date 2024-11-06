@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasicUserView {
+public class UserView {
     private String slug;
     private String name;
     private String familyName;

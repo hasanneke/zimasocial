@@ -1,13 +1,23 @@
 package com.zimaberlin.zimasocial.controller;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.UserService;
-import com.zimaberlin.zimasocial.views.user.BasicUserView;
+import com.zimaberlin.zimasocial.views.user.UserView;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.lang.reflect.Method;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
@@ -21,32 +31,32 @@ public class UserController {
     }
 
     @GetMapping(path = "/me")
-    ResponseEntity<BasicUserView> getMe(){
-        BasicUserView basicUserView = userService.getUserMe();
-        return ResponseEntity.ok(basicUserView);
+    ResponseEntity<UserView> getMe(){
+        UserView userView = userService.getUserMe();
+        return ResponseEntity.ok(userView);
     }
 
     @GetMapping(path = "/{slug}")
-    ResponseEntity<BasicUserView> getUser(@PathVariable(name = "slug") String slug){
-        BasicUserView basicUserView = userService.getUser(slug);
-        return ResponseEntity.ok(basicUserView);
+    ResponseEntity<UserView> getUser(@PathVariable(name = "slug") String slug){
+        UserView userView = userService.getUser(slug);
+        return ResponseEntity.ok(userView);
     }
 
     @PatchMapping(path = "/me")
-    ResponseEntity<BasicUserView> updateUser(@RequestBody UserUpdatePayload payload){
-        BasicUserView basicUserView = userService.updateUser(payload);
-        return ResponseEntity.ok(basicUserView);
+    ResponseEntity<UserView> updateUser(@RequestBody UserUpdatePayload payload){
+        UserView userView = userService.updateUser(payload);
+        return ResponseEntity.ok(userView);
     }
 
     @PatchMapping(path = "/me/upload-image")
-    ResponseEntity<BasicUserView> uploadProfileImage(MultipartFile image){
-        BasicUserView user = userService.updateProfileImage(image);
+    ResponseEntity<UserView> uploadProfileImage(MultipartFile image){
+        UserView user = userService.updateProfileImage(image);
         return ResponseEntity.ok(user);
     }
 
     @PatchMapping("/me/change-username")
-    ResponseEntity<BasicUserView> changeUsername(@NotBlank @RequestParam(name = "slug") String slug){
-        BasicUserView userView = userService.updateUsername(slug);
+    ResponseEntity<UserView> changeUsername(@NotBlank @RequestParam(name = "slug") String slug){
+        UserView userView = userService.updateUsername(slug);
         return ResponseEntity.ok(userView);
     }
 
@@ -54,5 +64,79 @@ public class UserController {
     ResponseEntity<Boolean> checkUsernameExists(@NotBlank @RequestParam(name = "slug") String slug){
         boolean usernameExists = userService.checkUsernameExists(slug);
         return ResponseEntity.ok(usernameExists);
+    }
+
+    @PostMapping(path = "/{slug}/follow")
+    ResponseEntity<Void> followUser(@RequestParam(name = "slug") String slug) {
+        userService.followUser(slug);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(path = "/{slug}/unfollow")
+    ResponseEntity<Void> unfollowUser(@RequestParam(name = "slug") String slug) throws BadRequestException {
+        userService.unfollowUser(slug);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(path = "/{slug}/followers")
+    HttpEntity<PagedModel<UserView>> getFollowers(
+            @RequestParam(name = "slug") String slug,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Page followersPage = userService.getFollowers(slug, page, size);
+
+        PagedModel<UserView> pagedModel = PagedModel.of(
+                followersPage.getContent(),
+                new PagedModel.PageMetadata(followersPage.getSize(),
+                        followersPage.getNumber(),
+                        followersPage.getTotalElements(),
+                        followersPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("getPosts",
+                String.class,
+                Integer.class,
+                Integer.class);
+
+        if(page < followersPage.getTotalPages()){
+            Link link = linkTo(method, slug,page + 1, size).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, slug, page - 1, size).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return new  HttpEntity<>(pagedModel);
+    }
+
+    @GetMapping(path = "/{slug}/followings")
+    HttpEntity<PagedModel<UserView>> getFollowing(
+            @RequestParam(name = "slug") String slug,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Page followingsPage = userService.getFollowing(slug, page, size);
+
+        PagedModel<UserView> pagedModel = PagedModel.of(
+                followingsPage.getContent(),
+                new PagedModel.PageMetadata(followingsPage.getSize(),
+                        followingsPage.getNumber(),
+                        followingsPage.getTotalElements(),
+                        followingsPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("getPosts",
+                String.class,
+                Integer.class,
+                Integer.class);
+
+        if(page < followingsPage.getTotalPages()){
+            Link link = linkTo(method, slug,page + 1, size).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, slug, page - 1, size).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return new  HttpEntity<>(pagedModel);
     }
 }

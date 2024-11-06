@@ -82,6 +82,17 @@ public class UserEntity {
     @JsonIgnore
     private Set<RefreshTokenEntity> refreshTokens = new HashSet<>();
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinTable(
+            name = "followers",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    private Set<UserEntity> followers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "followers", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private Set<UserEntity> following = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -95,5 +106,16 @@ public class UserEntity {
         return Objects.hash(id);
     }
 
-
+    public void incrementFollowingCount(){
+        followingCount = getFollowingCount() + 1;
+    }
+    public void decrementFollowingCount(){
+        followingCount = getFollowingCount() - 1;
+    }
+    public void incrementFollowerCount(){
+        followersCount = getFollowersCount() + 1;
+    }
+    public void decrementFollowerCount(){
+        followersCount = getFollowingCount() - 1;
+    }
 }

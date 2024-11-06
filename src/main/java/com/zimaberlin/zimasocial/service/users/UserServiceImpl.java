@@ -8,15 +8,20 @@ import com.zimaberlin.zimasocial.service.imageService.S3Service;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomUserMapper;
-import com.zimaberlin.zimasocial.views.user.BasicUserView;
+import com.zimaberlin.zimasocial.views.user.UserView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -30,21 +35,21 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public BasicUserView updateProfileImage(@NotNull(message = "Image cannot be null") MultipartFile image)  {
-//        String url = s3Service.uploadImage(image);
+    public UserView updateProfileImage(@NotNull(message = "Image cannot be null") MultipartFile image)  {
+        String url = s3Service.uploadImage(image);
         UserEntity user = CurrentUser.getCurrentUserProfile();
-//        if(user.getAvatarUrl() != null){
-//            String fileName = Arrays.stream(user.getAvatarUrl().split("/")).toList().getLast();
-//            s3Service.deleteImage(fileName);
-//        }
-//        user.setAvatarUrl(url);
-//        userRepository.save(user);
+        if(user.getAvatarUrl() != null){
+            String fileName = Arrays.stream(user.getAvatarUrl().split("/")).toList().getLast();
+            s3Service.deleteImage(fileName);
+        }
+        user.setAvatarUrl(url);
+        userRepository.save(user);
 
         return CustomUserMapper.entityToDomain(user);
     }
 
     @Override
-    public BasicUserView updateUser(@Valid UserUpdatePayload payload) {
+    public UserView updateUser(@Valid UserUpdatePayload payload) {
         UserEntity user = CurrentUser.getCurrentUserProfile();
         if(payload.getBio() != null){
             user.setBio(payload.getBio());
@@ -57,7 +62,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public BasicUserView updateUsername(@NotBlank @Max(20) String slug) {
+    public UserView updateUsername(@NotBlank @Max(20) String slug) {
         boolean isSlugExists = checkUsernameExists(slug);
         if(isSlugExists){
             throw new ConflictException("Username already exists");
@@ -73,13 +78,64 @@ public class UserServiceImpl implements UserService{
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         return user != null;
     }
+
     @Override
-    public BasicUserView getUserMe() {
+    public void followUser(String slug) {
+        UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        UserEntity me = CurrentUser.getCurrentUserProfile();
+
+        if(me.getFollowers().contains(followedUser)){
+            throw new ConflictException("You are already following the user");
+        }
+
+        me.getFollowing().add(followedUser);
+        me.incrementFollowingCount();
+
+        userRepository.save(me);
+    }
+
+    @Override
+    public void unfollowUser(String slug) throws BadRequestException {
+        UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        UserEntity me = CurrentUser.getCurrentUserProfile();
+
+        if(me.getFollowing().contains(followedUser)){
+            me.getFollowing().remove(followedUser);
+            me.decrementFollowingCount();
+
+            userRepository.save(me);
+        }else{
+            throw new BadRequestException("You are not following the user");
+        }
+    }
+
+    @Override
+    public Page<UserView> getFollowers(String slug, int page, int size) {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
+
+        PageRequest requestPage = PageRequest.of(page, size);
+        Page<UserEntity> getFollowers = userRepository.findFollowersByUserId(user.getId(), requestPage);
+
+        return getFollowers.map(CustomUserMapper::entityToDomain);
+    }
+
+    @Override
+    public Page<UserView> getFollowing(String slug, int page, int size) {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
+
+        PageRequest requestPage = PageRequest.of(page, size);
+        Page<UserEntity> getFollowers = userRepository.findFollowingsByUserId(user.getId(), requestPage);
+
+        return getFollowers.map(CustomUserMapper::entityToDomain);
+    }
+
+    @Override
+    public UserView getUserMe() {
         return CustomUserMapper.entityToDomain(CurrentUser.getCurrentUserProfile());
     }
 
     @Override
-    public BasicUserView getUser(String slug) {
+    public UserView getUser(String slug) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
         return CustomUserMapper.entityToDomain(user);
     }

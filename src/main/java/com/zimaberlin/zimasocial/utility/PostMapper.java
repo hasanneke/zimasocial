@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.views.post.PostView;
-import com.zimaberlin.zimasocial.views.user.BasicUserView;
+import com.zimaberlin.zimasocial.views.user.UserView;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.UserEntity;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
@@ -15,7 +15,7 @@ public interface PostMapper {
     PostView postEntityToPost(PostEntity postEntity);
 
     @Named("mapUser")
-    default BasicUserView mapUser(UserEntity userEntity) {
+    default UserView mapUser(UserEntity userEntity) {
         userEntity = Hibernate.unproxy(userEntity, UserEntity.class);
         return CustomUserMapper.entityToDomain(userEntity);
     }
