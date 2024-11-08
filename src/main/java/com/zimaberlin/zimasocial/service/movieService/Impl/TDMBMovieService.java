@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
@@ -64,32 +65,42 @@ public class TDMBMovieService implements SearchMovieService {
         movieResponseView.setTotalPages(response.getTotal_pages());
         movieResponseView.setTotalResults(response.getTotal_results());
 
-        List<MovieResponseView.Movie> movieResults = response.getResults().stream().map((e)->{
-            MovieResponseView.Movie movie = new MovieResponseView.Movie();
-            movie.setId(e.getId());
-            movie.setTitle(e.getTitle());
-            movie.setReleaseDate(e.getRelease_date());
-            movie.setOverview(e.getOverview());
-            String imageUrl = String.format("https://image.tmdb.org/t/p/w500/%s", e.getPoster_path());
-            movie.setPosterUrl(imageUrl);
-
-//            try {
-//                Method getMovieMethod = SearchMultimediaController.class.getMethod("getMovie", Integer.class);
-//                Link link = linkTo(getMovieMethod, movie.getId()).withRel(LinkRelation.of("href"));
-//                movie.setHref(link.getHref());
-//            } catch (NoSuchMethodException ex) {
-//                throw new RuntimeException(ex);
-//            }
-            return movie;
-        }).toList();
+        List<MovieResponseView.Movie> movieResults = response.getResults().stream().map(TDMBMovieService::convertTDMBMovieToDomain).toList();
 
         movieResponseView.setResults(movieResults);
         movieResponseView.setProvider("tmdb");
         return movieResponseView;
     }
 
+    private static MovieResponseView.Movie convertTDMBMovieToDomain(TDMBMovieResponse.MovieResult e) {
+        MovieResponseView.Movie movie = new MovieResponseView.Movie();
+        movie.setId(e.getId());
+        movie.setTitle(e.getTitle());
+        movie.setReleaseDate(e.getRelease_date());
+        movie.setOverview(e.getOverview());
+        String imageUrl = String.format("https://image.tmdb.org/t/p/w500/%s", e.getPoster_path());
+        movie.setPosterUrl(imageUrl);
+        return movie;
+    }
+
     @Override
-    public MovieResponseView.Movie getMovie(int movieId) {
-        return null;
+    public MovieResponseView.Movie getMovie(Integer movieId, String language) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + apiKey);
+        HttpEntity entity = new HttpEntity<>(headers);
+
+        UriComponentsBuilder uriComponentsBuilder =
+                UriComponentsBuilder
+                        .fromHttpUrl(String.format("%s/movie/%s", baseUrl, movieId.toString()))
+                        .queryParam("language", language);
+
+        ResponseEntity<TDMBMovieResponse.MovieResult> result = restTemplate.exchange(
+                uriComponentsBuilder.toUriString(),
+                HttpMethod.GET,
+                entity,
+                TDMBMovieResponse.MovieResult.class
+        );
+
+        return convertTDMBMovieToDomain(result.getBody());
     }
 }

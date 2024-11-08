@@ -26,30 +26,34 @@ public class SearchMultimediaController {
         this.searchBookService = searchBookService;
     }
 
-    @GetMapping(path = "/music")
+    @GetMapping(path = "/musics/search")
    public ResponseEntity<MusicResponseView> searchTracks(
             @RequestParam(name = "q") String query,
             @RequestParam(name = "offset", defaultValue = "0") int offset,
-            @RequestParam(name = "limit", defaultValue = "20")  int limit
-    ){
+            @RequestParam(name = "limit", defaultValue = "20")  int limit){
         MusicResponseView music = spotifyMusicService.searchMusic(query, offset, limit);
-
         return ResponseEntity.ok(music);
     }
 
-    @GetMapping(path = "/movie")
+    @GetMapping(path = "/musics/{musicId}")
+    public ResponseEntity<MusicResponseView.MusicView> searchTracks(
+            String musicId){
+        MusicResponseView.MusicView music = spotifyMusicService.getMusic(musicId);
+        return ResponseEntity.ok(music);
+    }
+
+    @GetMapping(path = "/movies/search")
     public ResponseEntity<MovieResponseView> searchMovies(
             @RequestParam(name = "query") String query,
             @RequestParam(name = "language", defaultValue = "en") String language,
-            @RequestParam(name = "page", defaultValue = "1") int page
-    ){
+            @RequestParam(name = "page", defaultValue = "1") int page){
         MovieResponseView responseView = movieService.searchMovie(query, page, language);
         return ResponseEntity.ok(responseView);
     }
 
-    @GetMapping(path = "/movie/{moveId}")
-    public ResponseEntity<MovieResponseView.Movie> getMovie(@PathVariable(name = "movieId") Integer movieId){
-        MovieResponseView.Movie movie= movieService.getMovie(movieId);
+    @GetMapping(path = "/movies/{movieId}")
+    public ResponseEntity<MovieResponseView.Movie> getMovie(@PathVariable(name = "movieId") Integer movieId, @RequestParam(name = "language") String language){
+        MovieResponseView.Movie movie= movieService.getMovie(movieId, language);
         return ResponseEntity.ok(movie);
     }
 
@@ -58,5 +62,11 @@ public class SearchMultimediaController {
         BookResponseView bookResponseView = searchBookService.searchBook(query);
 
         return ResponseEntity.ok(bookResponseView);
+    }
+
+    @GetMapping(path = "/books/{bookId}")
+    public ResponseEntity<BookResponseView.Book> getBook(@PathVariable(name = "bookId") String bookId){
+        BookResponseView.Book book= searchBookService.getBook(bookId);
+        return ResponseEntity.ok(book);
     }
 }

@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.service.musicService.impl;
 
+import com.google.gson.internal.NonNullElementWrapperList;
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
 import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +88,20 @@ public class SpotifyMusicService implements SearchMusicService {
         musicResponseView.setItems(domainTracks);
         musicResponseView.setProvider("spotify");
         return musicResponseView;
+    }
+
+    @Override
+    public MusicResponseView.MusicView getMusic(String id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth("your-spotify-access-token");
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<MusicResponseView.MusicView> response = restTemplate.exchange(  // Note: changed to exchange
+                "https://api.spotify.com/v1/tracks/{id}",
+                HttpMethod.GET,
+                request,
+                MusicResponseView.MusicView.class,
+                id
+        );
+        return response.getBody();
     }
 }

@@ -8,11 +8,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.time.Instant;
-import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
-import java.util.Date;
 
 @Service
 public class GoogleSearchBookService implements SearchBookService {
@@ -54,27 +50,41 @@ public class GoogleSearchBookService implements SearchBookService {
         GoogleBookSearchResult googleBooks = searchGoogleBook(query);
         BookResponseView bookResponseView = new BookResponseView();
         bookResponseView.setTotalCount(googleBooks.getTotalItems());
-        bookResponseView.setItems(googleBooks.getItems().stream().map((e)->{
-
-            BookResponseView.Book book = new BookResponseView.Book();
-            book.setId(e.getId());
-            book.setAuthor(e.getVolumeInfo().getAuthors().getFirst());
-            book.setDescription(e.getVolumeInfo().getDescription());
-            book.setPublisher(e.getVolumeInfo().getPublisher());
-            book.setPublishedDate(e.getVolumeInfo().getPublishedDate());
-            book.setPageCount(e.getVolumeInfo().getPageCount());
-            book.setPrintType(e.getVolumeInfo().getPrintType());
-            book.setTitle(e.getVolumeInfo().getTitle());
-
-            if(e.getVolumeInfo().getImageLinks() != null){
-                book.setThumbnail(e.getVolumeInfo().getImageLinks().getThumbnail());
-            }
-            book.setPreviewLink(e.getVolumeInfo().getPreviewLink());
-            book.setSelfUrl(e.getSelfLink());
-
-            return book;
-        }).toList());
+        bookResponseView.setItems(googleBooks.getItems().stream().map(GoogleSearchBookService::createDomainBookFromGoogleResultBook).toList());
 
         return bookResponseView;
+    }
+
+    private static BookResponseView.Book createDomainBookFromGoogleResultBook(GoogleBookSearchResult.Book e) {
+        BookResponseView.Book book = new BookResponseView.Book();
+        book.setId(e.getId());
+        book.setAuthor(e.getVolumeInfo().getAuthors().getFirst());
+        book.setDescription(e.getVolumeInfo().getDescription());
+        book.setPublisher(e.getVolumeInfo().getPublisher());
+        book.setPublishedDate(e.getVolumeInfo().getPublishedDate());
+        book.setPageCount(e.getVolumeInfo().getPageCount());
+        book.setPrintType(e.getVolumeInfo().getPrintType());
+        book.setTitle(e.getVolumeInfo().getTitle());
+
+        if(e.getVolumeInfo().getImageLinks() != null){
+            book.setThumbnail(e.getVolumeInfo().getImageLinks().getThumbnail());
+        }
+        book.setPreviewLink(e.getVolumeInfo().getPreviewLink());
+        book.setSelfUrl(e.getSelfLink());
+
+        return book;
+    }
+
+    @Override
+    public BookResponseView.Book getBook(String id) {
+        GoogleBookSearchResult.Book book = restTemplate
+                .getForObject(String.format("%s/books/v1/volumes/%s", baseUrl, id),
+                GoogleBookSearchResult.Book.class);
+
+        if(book != null){
+            return createDomainBookFromGoogleResultBook(book);
+        }else{
+            return null;
+        }
     }
 }
