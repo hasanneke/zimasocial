@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.service.musicService.impl;
 
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
 import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class SpotifyMusicService implements SearchMusicService {
     private final RestTemplate restTemplate;
     String baseUrl;
 
+    @Autowired
     public SpotifyMusicService(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
         this.baseUrl = "https://api.spotify.com/v1/search";
@@ -36,9 +38,7 @@ public class SpotifyMusicService implements SearchMusicService {
         HttpEntity<SpotifyResponse> request = new HttpEntity<>(headers);
 
         ResponseEntity<SpotifyResponse> response = restTemplate.exchange(uriBuilder.toUriString(), HttpMethod.GET,request, SpotifyResponse.class);
-//        System.out.println(response);
-       return response.getBody().getTracks();
-
+        return response.getBody().getTracks();
     }
 
     @Override

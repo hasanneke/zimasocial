@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
+import com.zimaberlin.zimasocial.utility.CustomPostMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
@@ -18,7 +19,6 @@ import com.zimaberlin.zimasocial.repository.PostRepository;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomCommentMapper;
-import com.zimaberlin.zimasocial.utility.PostMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,15 +38,13 @@ public class PostServiceImpl implements PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final PostMapper postMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    public PostServiceImpl(PostRepository postRepository, LikeRepository likeRepository, CommentRepository commentRepository, UserRepository userRepository, PostMapper postMapper, ApplicationEventPublisher eventPublisher) {
+    public PostServiceImpl(PostRepository postRepository, LikeRepository likeRepository, CommentRepository commentRepository, UserRepository userRepository,  ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
-        this.postMapper = postMapper;
         this.eventPublisher = eventPublisher;
     }
 
@@ -103,12 +101,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostView createPost(@Valid PostPayload payload) {
         UserEntity user = getCurrentUserProfile();
-        PostEntity postEntity = postMapper.payloadToPostEntity(payload);
+        PostEntity postEntity = CustomPostMapper.payloadToPostEntity(payload);
         postEntity.setUser(user);
 
         PostEntity createdPost = postRepository.save(postEntity);
 
-        return postMapper.postEntityToPost(createdPost);
+        return CustomPostMapper.postEntityToPost(createdPost);
     }
 
     @Override
@@ -230,7 +228,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private List<PostView> fillWithIsLiked(Page<PostEntity> postsPage) {
-        List<PostView> postViews = postsPage.getContent().stream().map(postMapper::postEntityToPost).toList();
+        List<PostView> postViews = postsPage.getContent().stream().map(CustomPostMapper::postEntityToPost).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
             UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
@@ -247,7 +245,7 @@ public class PostServiceImpl implements PostService {
     private PostView fillWithIsLiked(PostEntity post){
         UserEntity profile = CurrentUser.getCurrentUserProfile();
         LikeEntity like = likeRepository.findByUserAndPost(profile, post).orElse(null);
-        PostView domainPostView = postMapper.postEntityToPost(post);
+        PostView domainPostView = CustomPostMapper.postEntityToPost(post);
         if(like != null){
             domainPostView.setLiked(true);;
         }

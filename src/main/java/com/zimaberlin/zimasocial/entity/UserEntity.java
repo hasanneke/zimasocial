@@ -116,6 +116,6 @@ public class UserEntity {
         followersCount = getFollowersCount() + 1;
     }
     public void decrementFollowerCount(){
-        followersCount = getFollowingCount() - 1;
+        followersCount = getFollowersCount() - 1;
     }
 }

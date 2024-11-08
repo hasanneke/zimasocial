@@ -14,18 +14,14 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmailAndAuthProvider(String email, String authProvider);
     Optional<UserEntity> findBySlug(String slug);
-    @Query(value = "SELECT u.* FROM users u " +
-            "INNER JOIN followers f ON u.id = f.following_id " +
-            "WHERE f.follower_id = :userId", nativeQuery = true)
-    Page<UserEntity> findFollowersByUserIdWithNativeQuery(String userId);
 
-    @Query("SELECT u FROM User u " +
+    @Query("SELECT u FROM UserEntity u " +
             "INNER JOIN u.followers f " +
             "WHERE f.id = :userId")
     Page<UserEntity> findFollowersByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT u FROM users "
+    @Query("SELECT u FROM UserEntity u "
             + "INNER JOIN followers f "
-            + "WHERE f.id = :userid")
+            + "WHERE f.id = :userId")
     Page<UserEntity> findFollowingsByUserId(@Param("userId") Long userId, Pageable pageable);
 }

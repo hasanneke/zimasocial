@@ -1,0 +1,53 @@
+package com.zimaberlin.zimasocial.service.bookService.impl;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
+@Getter
+@Setter
+public class GoogleBookSearchResult {
+    @JsonProperty("totalItems")
+    private int totalItems;
+    private List<Book> items = List.of();
+    @Getter
+    @Setter
+    public static class Book {
+        private String id;
+        @JsonProperty("selfLink")
+        private String selfLink;
+        @JsonProperty("volumeInfo")
+        private BookVolumeInfo volumeInfo;
+        @Getter
+        @Setter
+        public static class BookVolumeInfo {
+            @JsonProperty("title")
+            private String title;
+            @JsonProperty("authors")
+            private List<String> authors = List.of();
+            @JsonProperty("publisher")
+            private String publisher;
+            @JsonProperty("pageCount")
+            private int pageCount;
+            @JsonProperty("printType")
+            private String printType;
+            @JsonProperty("imageLinks")
+            private BookImageLink imageLinks;
+            @JsonProperty("description")
+            private String description;
+            @JsonProperty("publishedDate")
+            private String publishedDate;
+            @JsonProperty("previewLink")
+            private String previewLink;
+            @Getter
+            @Setter
+            public static class BookImageLink {
+                @JsonProperty("smallThumbnail")
+                private String smallThumbnail;
+                private String thumbnail;
+            }
+        }
+    }
+}

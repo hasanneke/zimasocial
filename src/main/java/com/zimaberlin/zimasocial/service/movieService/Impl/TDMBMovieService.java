@@ -73,13 +73,13 @@ public class TDMBMovieService implements SearchMovieService {
             String imageUrl = String.format("https://image.tmdb.org/t/p/w500/%s", e.getPoster_path());
             movie.setPosterUrl(imageUrl);
 
-            try {
-                Method getMovieMethod = SearchMultimediaController.class.getMethod("getMovie", Integer.class);
-                Link link = linkTo(getMovieMethod, movie.getId()).withRel(LinkRelation.of("href"));
-                movie.setHref(link.getHref());
-            } catch (NoSuchMethodException ex) {
-                throw new RuntimeException(ex);
-            }
+//            try {
+//                Method getMovieMethod = SearchMultimediaController.class.getMethod("getMovie", Integer.class);
+//                Link link = linkTo(getMovieMethod, movie.getId()).withRel(LinkRelation.of("href"));
+//                movie.setHref(link.getHref());
+//            } catch (NoSuchMethodException ex) {
+//                throw new RuntimeException(ex);
+//            }
             return movie;
         }).toList();
 
@@ -89,7 +89,7 @@ public class TDMBMovieService implements SearchMovieService {
     }
 
     @Override
-    public MovieResponseView.Movie getMovie(int id) {
+    public MovieResponseView.Movie getMovie(int movieId) {
         return null;
     }
 }

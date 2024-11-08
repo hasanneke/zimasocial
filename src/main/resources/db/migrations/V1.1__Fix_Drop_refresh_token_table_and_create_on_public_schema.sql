@@ -1,4 +1,4 @@
-DROP TABLE zimasocial.refresh_token;
+DROP TABLE public.refresh_token;
 
 CREATE TABLE public.refresh_token (
     id UUID primary key,

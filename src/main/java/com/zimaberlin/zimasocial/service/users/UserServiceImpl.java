@@ -19,12 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
     private S3Service s3Service;
@@ -82,25 +84,29 @@ public class UserServiceImpl implements UserService{
     @Override
     public void followUser(String slug) {
         UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-        UserEntity me = CurrentUser.getCurrentUserProfile();
+        UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
-        if(me.getFollowers().contains(followedUser)){
+        if(me.getFollowing().contains(followedUser)){
             throw new ConflictException("You are already following the user");
         }
 
+        followedUser.getFollowers().add(me);
         me.getFollowing().add(followedUser);
         me.incrementFollowingCount();
+        followedUser.incrementFollowerCount();
 
         userRepository.save(me);
     }
 
     @Override
     public void unfollowUser(String slug) throws BadRequestException {
-        UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-        UserEntity me = CurrentUser.getCurrentUserProfile();
+        UserEntity unfollowedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
-        if(me.getFollowing().contains(followedUser)){
-            me.getFollowing().remove(followedUser);
+        if(me.getFollowing().contains(unfollowedUser)){
+            me.getFollowing().remove(unfollowedUser);
+            unfollowedUser.getFollowers().remove(me);
+            unfollowedUser.decrementFollowerCount();
             me.decrementFollowingCount();
 
             userRepository.save(me);

@@ -1,4 +1,4 @@
-CREATE TABLE refresh_token (
+CREATE TABLE public.refresh_token (
     id UUID primary key,
     user_id BIGINT not null,
     token_hash VARCHAR(255) NOT NULL,
