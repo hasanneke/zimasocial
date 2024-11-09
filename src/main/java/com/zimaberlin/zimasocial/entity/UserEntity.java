@@ -84,7 +84,7 @@ public class UserEntity {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinTable(
-            name = "followers",
+            name = "follower",
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
@@ -92,6 +92,10 @@ public class UserEntity {
 
     @ManyToMany(mappedBy = "followers", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private Set<UserEntity> following = new HashSet<>();
+
+    @OneToMany(mappedBy = "receiverUser")
+    @JsonIgnore
+    private Set<NotificationEntity> notifications = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
