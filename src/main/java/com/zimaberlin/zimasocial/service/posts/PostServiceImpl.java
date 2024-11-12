@@ -1,27 +1,23 @@
 package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
+import com.zimaberlin.zimasocial.events.*;
+import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.utility.CustomPostMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
-import com.zimaberlin.zimasocial.events.CommentLikedEvent;
-import com.zimaberlin.zimasocial.events.CommentUnlikedEvent;
-import com.zimaberlin.zimasocial.events.PostLikedEvent;
 import com.zimaberlin.zimasocial.exception.ConflictException;
-import com.zimaberlin.zimasocial.repository.CommentRepository;
-import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
-import com.zimaberlin.zimasocial.repository.LikeRepository;
-import com.zimaberlin.zimasocial.repository.PostRepository;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomCommentMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,12 +36,18 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public PostServiceImpl(PostRepository postRepository, LikeRepository likeRepository, CommentRepository commentRepository, UserRepository userRepository,  ApplicationEventPublisher eventPublisher) {
+
+    public PostServiceImpl(PostRepository postRepository,
+                           LikeRepository likeRepository,
+                           CommentRepository commentRepository,
+                           UserRepository userRepository,
+                           ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
+
     }
 
     @Override
@@ -105,7 +107,6 @@ public class PostServiceImpl implements PostService {
         postEntity.setUser(user);
 
         PostEntity createdPost = postRepository.save(postEntity);
-
         return CustomPostMapper.postEntityToPost(createdPost);
     }
 
@@ -116,18 +117,23 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void likePost(Long postId)  {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         boolean isAlreadyLiked = likeRepository.existsByUserAndPost(getCurrentUserProfile(), post);
+        UserEntity currentUser = getCurrentUserProfile();
         if(!isAlreadyLiked){
             LikeEntity like = new LikeEntity();
             like.setPost(post);
-            like.setUser(getCurrentUserProfile());
-
+            like.setUser(currentUser);
             post.incrementLikeCount();
-
             likeRepository.save(like);
-            eventPublisher.publishEvent(new PostLikedEvent(this, post));
+
+            boolean selfLiked = post.getUser().equals(currentUser);
+
+            if(!selfLiked){
+                eventPublisher.publishEvent(new PostLikedEvent(this, post));
+            }
         }else{
             throw new ConflictException("Post is already liked");
         }
@@ -145,16 +151,23 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public CommentView commentPost(Long postId, CommentPayload payload) {
+        UserEntity currentUser = getCurrentUserProfile();
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         CommentEntity comment = new CommentEntity();
         comment.setPost(post);
-        comment.setUser(getCurrentUserProfile());
+        comment.setUser(currentUser);
         comment.setContent(payload.getContent());
 
         post.getComments().add(comment);
         post.incrementCommentCount();
 
         CommentEntity commentEntity = commentRepository.save(comment);
+        boolean selfCommented = currentUser.equals(post.getUser());
+
+        if (!selfCommented){
+            eventPublisher.publishEvent(new PostCommentedEvent(this, post, commentEntity));
+        }
+
         return CustomCommentMapper.entityToDomain(commentEntity);
     }
 
@@ -171,16 +184,21 @@ public class PostServiceImpl implements PostService {
     public void likeComment(Long postId, Long commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
         boolean isAlreadyLiked = likeRepository.existsByUserAndComment(getCurrentUserProfile(), comment);
+        UserEntity currentUser = getCurrentUserProfile();
+
         if(!isAlreadyLiked){
             LikeEntity like = new LikeEntity();
             like.setComment(comment);
             like.setPost(comment.getPost());
-            like.setUser(getCurrentUserProfile());
+            like.setUser(currentUser);
 
             comment.incrementLikeCount();
 
             likeRepository.save(like);
-            eventPublisher.publishEvent(new CommentLikedEvent(this, comment));
+            boolean selfLiked = getCurrentUserProfile().equals(comment.getUser());
+            if(!selfLiked){
+                eventPublisher.publishEvent(new CommentLikedEvent(this, comment));
+            }
         }else{
             throw new ConflictException("Comment is already liked");
         }
@@ -204,16 +222,20 @@ public class PostServiceImpl implements PostService {
     public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
         CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
+        UserEntity currentUser = getCurrentUserProfile();
+
         CommentEntity reply = new CommentEntity();
 
         reply.setContent(payload.getContent());
         reply.setParent(parent);
-        reply.setUser(CurrentUser.getCurrentUserProfile());
+        reply.setUser(currentUser);
         reply.setPost(post);
 
         parent.incrementReplyCount();
         CommentEntity comment = commentRepository.save(reply);
-
+        if(currentUser.equals(parent.getUser())){
+            eventPublisher.publishEvent(new CommentRepliedEvent(this, parent));
+        }
         return CustomCommentMapper.entityToDomain(comment);
     }
 
@@ -253,6 +275,8 @@ public class PostServiceImpl implements PostService {
     }
 
     private UserEntity getCurrentUserProfile(){
-        return CurrentUser.getCurrentUserProfile();
+        UserEntity userObject = CurrentUser.getCurrentUserProfile();
+
+        return userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
     }
 }

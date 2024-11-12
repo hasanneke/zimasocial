@@ -41,7 +41,6 @@ public class PostController {
             @RequestParam(name = "size", defaultValue = "20") Integer size,
             @RequestParam(name = "type", defaultValue = "any") PostType type,
             @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException {
-
         Page<PostView> postPage;
         if(slug != null){
             postPage = postService.getPosts(page, size, slug, type);

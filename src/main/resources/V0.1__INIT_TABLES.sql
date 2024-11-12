@@ -97,6 +97,9 @@ CREATE TABLE public.notification (
     receiver_user_id BIGINT NOT NULL,
     type VARCHAR(64) NOT NULL,
     sender_user_id BIGINT,
+    target_collection VARCHAR(64),
+    target_it BIGINT,
+    post_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );

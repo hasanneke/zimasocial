@@ -14,8 +14,8 @@ import java.util.UUID;
 @Setter
 public class RefreshTokenEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

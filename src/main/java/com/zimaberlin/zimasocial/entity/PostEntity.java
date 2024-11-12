@@ -38,7 +38,7 @@ public class PostEntity {
     @Column(name = "comment_count")
     private int commentCount = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;

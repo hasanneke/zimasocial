@@ -2,10 +2,7 @@ package com.zimaberlin.zimasocial.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,9 +10,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notification", schema = "public")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -29,9 +27,9 @@ public class NotificationEntity {
     @Column(name = "url", length = 512)
     private String url;
 
-    @Size(max = 64)
-    @Column(name = "type", length = 64, nullable = false)
-    private String type;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private NotificationType type;
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
@@ -48,4 +46,14 @@ public class NotificationEntity {
     @ManyToOne
     @JoinColumn(name = "sender_user_id")
     private UserEntity senderUser;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "target_collection")
+    private TargetCollection targetCollection;
+
+    @Column(name = "target_id")
+    private Long targetId;
+
+    @Column(name = "post_id")
+    private Long postId;
 }
