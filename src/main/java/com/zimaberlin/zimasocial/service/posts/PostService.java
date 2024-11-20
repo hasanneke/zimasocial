@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 
-interface PostService {
+public interface PostService {
     // GET POSTS FOR SLUG
     Page<PostView> getPosts(int page, int size, String slug, PostType type);
     // GET POSTS FOR TYPE

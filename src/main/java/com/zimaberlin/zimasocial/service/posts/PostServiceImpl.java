@@ -3,6 +3,8 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.repository.*;
+import com.zimaberlin.zimasocial.service.notification.NotificationService;
+import com.zimaberlin.zimasocial.service.notification.NotificationServiceImpl;
 import com.zimaberlin.zimasocial.utility.CustomPostMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
@@ -16,6 +18,7 @@ import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomCommentMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -28,26 +31,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Transactional
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
-
+    @Autowired
     public PostServiceImpl(PostRepository postRepository,
                            LikeRepository likeRepository,
                            CommentRepository commentRepository,
                            UserRepository userRepository,
-                           ApplicationEventPublisher eventPublisher) {
+                           ApplicationEventPublisher eventPublisher,
+                           NotificationService notificationService) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
-
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -101,12 +105,22 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public PostView createPost(@Valid PostPayload payload) {
-        UserEntity user = getCurrentUserProfile();
-        PostEntity postEntity = CustomPostMapper.payloadToPostEntity(payload);
-        postEntity.setUser(user);
+        UserEntity userObject = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
+        UserEntity user = userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
 
-        PostEntity createdPost = postRepository.save(postEntity);
+        if ( payload == null ) {
+            return null;
+        }
+
+        PostEntity.PostEntityBuilder postEntity = PostEntity.builder();
+        postEntity.content( payload.getContent() );
+        postEntity.url( payload.getUrl() );
+        postEntity.type( payload.getType() );
+        postEntity.user(user);
+
+        PostEntity createdPost = postRepository.save(postEntity.build());
         return CustomPostMapper.postEntityToPost(createdPost);
     }
 
@@ -132,7 +146,7 @@ public class PostServiceImpl implements PostService {
             boolean selfLiked = post.getUser().equals(currentUser);
 
             if(!selfLiked){
-                eventPublisher.publishEvent(new PostLikedEvent(this, post));
+                notificationService.sendPostLikedNotification(like);
             }
         }else{
             throw new ConflictException("Post is already liked");
@@ -150,6 +164,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public CommentView commentPost(Long postId, CommentPayload payload) {
         UserEntity currentUser = getCurrentUserProfile();
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
@@ -165,7 +180,7 @@ public class PostServiceImpl implements PostService {
         boolean selfCommented = currentUser.equals(post.getUser());
 
         if (!selfCommented){
-            eventPublisher.publishEvent(new PostCommentedEvent(this, post, commentEntity));
+            notificationService.sendPostCommentedNotification(commentEntity);
         }
 
         return CustomCommentMapper.entityToDomain(commentEntity);
@@ -173,6 +188,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @HasCommentAccess(idParameterName = "commentId")
+    @Transactional
     public void deleteComment(Long postId, Long commentId) {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         CommentEntity commentEntity = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
@@ -181,6 +197,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void likeComment(Long postId, Long commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
         boolean isAlreadyLiked = likeRepository.existsByUserAndComment(getCurrentUserProfile(), comment);
@@ -197,7 +214,7 @@ public class PostServiceImpl implements PostService {
             likeRepository.save(like);
             boolean selfLiked = getCurrentUserProfile().equals(comment.getUser());
             if(!selfLiked){
-                eventPublisher.publishEvent(new CommentLikedEvent(this, comment));
+                notificationService.sendCommentLikedNotification(comment);
             }
         }else{
             throw new ConflictException("Comment is already liked");
@@ -205,6 +222,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void unlikeComment(Long postId, Long commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
 
@@ -219,6 +237,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
         CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
@@ -234,7 +253,7 @@ public class PostServiceImpl implements PostService {
         parent.incrementReplyCount();
         CommentEntity comment = commentRepository.save(reply);
         if(currentUser.equals(parent.getUser())){
-            eventPublisher.publishEvent(new CommentRepliedEvent(this, parent));
+            notificationService.sendCommentRepliedNotification(reply);
         }
         return CustomCommentMapper.entityToDomain(comment);
     }

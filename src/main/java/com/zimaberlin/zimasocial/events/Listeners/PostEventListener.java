@@ -44,7 +44,7 @@ public class PostEventListener {
 
         notificationEntity.setTargetCollection(TargetCollection.post);
         notificationEntity.setTargetId(event.getPost().getId());
-        notificationEntity.setPostId(event.getPost().getId());
+        notificationEntity.setPost(event.getPost());
 
         String message = liker.getName() + " paylaşımını beğendi";
         notificationEntity.setContent(message);
@@ -66,7 +66,7 @@ public class PostEventListener {
 
         notificationEntity.setTargetCollection(TargetCollection.comment);
         notificationEntity.setTargetId(event.getComment().getId());
-        notificationEntity.setPostId(event.getComment().getPost().getId());
+        notificationEntity.setPost(event.getComment().getPost());
 
         String message = liker.getName() + " yorumunu beğendi";
         notificationEntity.setContent(message);
@@ -88,7 +88,7 @@ public class PostEventListener {
 
         notificationEntity.setTargetCollection(TargetCollection.comment);
         notificationEntity.setTargetId(event.getComment().getId());
-        notificationEntity.setPostId(event.getPost().getId());
+        notificationEntity.setPost(event.getPost());
 
         String message = commenter.getName() + " paylaşımına yorum yaptı";
 
@@ -110,7 +110,7 @@ public class PostEventListener {
 
         notificationEntity.setTargetCollection(TargetCollection.comment);
         notificationEntity.setTargetId(event.getComment().getId());
-        notificationEntity.setPostId(event.getComment().getPost().getId());
+        notificationEntity.setPost(event.getComment().getPost());
 
         String message = commenter.getName() + "yorumuna yanıt verdi";
 
