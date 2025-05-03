@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void unfollowUser(String slug) throws BadRequestException {
+    public void unfollowUser(String slug) throws BadRequestException{
         UserEntity unfollowedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
 

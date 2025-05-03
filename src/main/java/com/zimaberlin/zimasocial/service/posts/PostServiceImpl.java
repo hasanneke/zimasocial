@@ -4,7 +4,6 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;
-import com.zimaberlin.zimasocial.service.notification.NotificationServiceImpl;
 import com.zimaberlin.zimasocial.utility.CustomPostMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
@@ -20,7 +19,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -66,7 +64,7 @@ public class PostServiceImpl implements PostService {
             postsPage = postRepository.findByUser(pageable, user);
         }
 
-        List<PostView> postViews = fillWithIsLiked(postsPage);
+        List<PostView> postViews = fillPostsWithIsLiked(postsPage);
 
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
@@ -80,7 +78,7 @@ public class PostServiceImpl implements PostService {
         }else{
             postsPage = postRepository.findByType(pageable, type);
         }
-        List<PostView> postViews = fillWithIsLiked(postsPage);
+        List<PostView> postViews = fillPostsWithIsLiked(postsPage);
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
 
@@ -101,7 +99,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostView getPost(Long postId) {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        return fillWithIsLiked(post);
+        return fillPostsWithIsLiked(post);
     }
 
     @Override
@@ -142,9 +140,7 @@ public class PostServiceImpl implements PostService {
             like.setUser(currentUser);
             post.incrementLikeCount();
             likeRepository.save(like);
-
             boolean selfLiked = post.getUser().equals(currentUser);
-
             if(!selfLiked){
                 notificationService.sendPostLikedNotification(like);
             }
@@ -268,7 +264,7 @@ public class PostServiceImpl implements PostService {
         return CustomCommentMapper.entityToDomain(reply);
     }
 
-    private List<PostView> fillWithIsLiked(Page<PostEntity> postsPage) {
+    private List<PostView> fillPostsWithIsLiked(Page<PostEntity> postsPage) {
         List<PostView> postViews = postsPage.getContent().stream().map(CustomPostMapper::postEntityToPost).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
@@ -283,7 +279,7 @@ public class PostServiceImpl implements PostService {
         return postViews;
     }
 
-    private PostView fillWithIsLiked(PostEntity post){
+    private PostView fillPostsWithIsLiked(PostEntity post){
         UserEntity profile = CurrentUser.getCurrentUserProfile();
         LikeEntity like = likeRepository.findByUserAndPost(profile, post).orElse(null);
         PostView domainPostView = CustomPostMapper.postEntityToPost(post);
@@ -295,7 +291,6 @@ public class PostServiceImpl implements PostService {
 
     private UserEntity getCurrentUserProfile(){
         UserEntity userObject = CurrentUser.getCurrentUserProfile();
-
         return userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
     }
 }

@@ -24,7 +24,6 @@ public class UserView extends RepresentationModel<UserView> {
                         WebMvcLinkBuilder.methodOn(UserController.class)
                                 .getUser(this.slug))
                 .withSelfRel());
-
         // Add link to followers
         try {
             this.add(WebMvcLinkBuilder.linkTo(
@@ -38,7 +37,6 @@ public class UserView extends RepresentationModel<UserView> {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-
         return this;
     }
 }

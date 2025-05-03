@@ -26,7 +26,6 @@ public class PostView extends RepresentationModel<PostView> {
     private UserView user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    // Static builder class that overrides the Lombok builder
 
     public PostView addLinks() {
         this.add(WebMvcLinkBuilder.linkTo(

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -130,5 +131,13 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handlePageNotFound(NoResourceFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+        return ResponseEntity.notFound().build();
     }
 }

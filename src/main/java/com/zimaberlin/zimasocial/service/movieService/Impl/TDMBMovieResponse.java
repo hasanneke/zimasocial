@@ -9,6 +9,7 @@ import java.util.List;
 
 @Getter
 public class TDMBMovieResponse {
+
     private int page;
     private List<MovieResult> results;
     private int total_pages;

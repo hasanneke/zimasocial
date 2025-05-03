@@ -26,13 +26,13 @@ import java.util.List;
 @EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/public/**",
             "/api/v1/auth/**",
             "swagger-ui/**", "swagger-ui**",
             "/v3/api-docs/**", "/v3/api-docs**",
-            "/actuator/**"
+            "/actuator/**",
+            "/metrics"
     };
 
     @Autowired
@@ -82,7 +82,7 @@ public class SecurityConfig {
                 "Content-Type"
         ));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // 1 hour
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
