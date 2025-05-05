@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
+//    Page<PostEntity> findByOrderByCreatedAt(Pageable pageable);
     Page<PostEntity> findByType(Pageable page,  PostType type);
-    Page<PostEntity> findByUser(Pageable page,  UserEntity user);
-    Page<PostEntity> findByUserAndType(Pageable page,  UserEntity user, PostType type);
+    Page<PostEntity> findByUserOrderByCreatedAt(Pageable page,  UserEntity user);
+    Page<PostEntity> findByUserAndTypeOrderByCreatedAt(Pageable page,  UserEntity user, PostType type);
 }

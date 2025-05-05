@@ -10,6 +10,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserView extends RepresentationModel<UserView> {
+    private Long id;
     private String slug;
     private String name;
     private String familyName;

@@ -12,9 +12,10 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     Optional<LikeEntity> findByUserAndPost(UserEntity user, PostEntity postEntity);
+    Optional<LikeEntity> findByUserAndComment(UserEntity user, CommentEntity comment);
 
     boolean existsByUserAndPost(UserEntity user,  PostEntity post);
     boolean existsByUserAndComment(UserEntity user, CommentEntity comment);
-    Optional<LikeEntity> findByUserIdAndPostIdAndCommentId(Long userId, Long postId, Long commentId);
+    Optional<LikeEntity> findByUserIdAndCommentId(Long userId, Long commentId);
     Optional<LikeEntity> findByUserIdAndPostId(Long userId, Long postId);
 }

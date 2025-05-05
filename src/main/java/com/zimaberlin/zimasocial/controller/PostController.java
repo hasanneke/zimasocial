@@ -92,13 +92,13 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(path = "/{postId}/likes")
+    @GetMapping(path = "/{postId}/like")
     public ResponseEntity<Void> likePost(@PathVariable Long postId) {
         postService.likePost(postId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping(path = "/{postId}/likes")
+    @DeleteMapping(path = "/{postId}/unlike")
     public ResponseEntity<Void> unlikePost(@PathVariable Long postId) throws BadRequestException {
         postService.unlikePost(postId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -155,7 +155,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentView);
     }
 
-    @PostMapping(path = "/{postId}/comments/{commentId}/likes")
+    @GetMapping(path = "/{postId}/comments/{commentId}/like")
     public HttpEntity<Void> likeComment(
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId) {
@@ -163,7 +163,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping(path = "/{postId}/comments/{commentId}/likes")
+    @DeleteMapping(path = "/{postId}/comments/{commentId}/unlike")
     public HttpEntity<Void> unlikeComment(
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId) {

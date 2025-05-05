@@ -16,4 +16,5 @@ public class CommentView {
     private Integer likeCount = 0;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean isLiked;
 }

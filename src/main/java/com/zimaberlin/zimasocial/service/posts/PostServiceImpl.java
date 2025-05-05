@@ -19,10 +19,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -59,9 +56,9 @@ public class PostServiceImpl implements PostService {
         Page<PostEntity> postsPage;
 
         if(type != null){
-            postsPage = postRepository.findByUserAndType(pageable, user, type);
+            postsPage = postRepository.findByUserAndTypeOrderByCreatedAt(pageable, user, type);
         }else{
-            postsPage = postRepository.findByUser(pageable, user);
+            postsPage = postRepository.findByUserOrderByCreatedAt(pageable, user);
         }
 
         List<PostView> postViews = fillPostsWithIsLiked(postsPage);
@@ -71,7 +68,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostView> getPosts(int page, int size, PostType type) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<PostEntity> postsPage;
         if(type == null){
           postsPage = postRepository.findAll(pageable);
@@ -84,9 +81,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<CommentView> getComments(int page, int size, Long postId) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<CommentEntity> commentEntities = commentRepository.findByPostIdAndParentId(pageable, postId, null);
-        return commentEntities.map(CustomCommentMapper::entityToDomain);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<CommentEntity> commentsPage = commentRepository.findByPostIdAndParentId(pageable, postId, null);
+        List<CommentView> commentViews = fillCommentsWithIsLiked(commentsPage);
+        return new PageImpl<>(commentViews, pageable, commentsPage.getTotalElements());
     }
 
     @Override
@@ -202,7 +200,6 @@ public class PostServiceImpl implements PostService {
         if(!isAlreadyLiked){
             LikeEntity like = new LikeEntity();
             like.setComment(comment);
-            like.setPost(comment.getPost());
             like.setUser(currentUser);
 
             comment.incrementLikeCount();
@@ -220,10 +217,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void unlikeComment(Long postId, Long commentId) {
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
-
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
         LikeEntity like = likeRepository
-                .findByUserIdAndPostIdAndCommentId(getCurrentUserProfile().getId(), postId, commentId)
+                .findByUserIdAndCommentId(getCurrentUserProfile().getId(), commentId)
                 .orElseThrow(()-> new ResourceNotFoundException("Comment not liked"));
 
         like.getComment().decrementLikeCount();
@@ -273,6 +269,20 @@ public class PostServiceImpl implements PostService {
                 LikeEntity like = likeRepository.findByUserAndPost(profile, postsPage.getContent().get(i)).orElse(null);
                 if(like != null){
                     postViews.get(i).setLiked(true);
+                }
+            }
+        }
+        return postViews;
+    }
+    private List<CommentView> fillCommentsWithIsLiked(Page<CommentEntity> commentsPage) {
+        List<CommentView> postViews = commentsPage.getContent().stream().map(CustomCommentMapper::entityToDomain).toList();
+        Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(authenticationPrincipal != "anonymousUser"){
+            UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
+            for (int i = 0; i < postViews.size(); i++) {
+                LikeEntity like = likeRepository.findByUserAndComment(profile, commentsPage.getContent().get(i)).orElse(null);
+                if(like != null){
+                    postViews.get(i).setIsLiked(true);
                 }
             }
         }
