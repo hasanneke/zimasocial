@@ -66,7 +66,7 @@ public class UserController {
         return ResponseEntity.ok(usernameExists);
     }
 
-    @PostMapping(path = "/{slug}/follow")
+    @GetMapping(path = "/{slug}/follow")
     public ResponseEntity<Void> followUser(@PathVariable(name = "slug") String slug) {
         userService.followUser(slug);
         return ResponseEntity.ok().build();

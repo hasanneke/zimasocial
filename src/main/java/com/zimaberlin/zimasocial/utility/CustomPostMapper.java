@@ -34,12 +34,12 @@ public class CustomPostMapper {
             return null;
         }
 
-        PostEntity.PostEntityBuilder postEntity = PostEntity.builder();
+        PostEntity postEntity = new PostEntity();
 
-        postEntity.content( payload.getContent() );
-        postEntity.url( payload.getUrl() );
-        postEntity.type( payload.getType() );
+        postEntity.setContent( payload.getContent() );
+        postEntity.setUrl( payload.getUrl() );
+        postEntity.setType( payload.getType() );
 
-        return postEntity.build();
+        return postEntity;
     }
 }

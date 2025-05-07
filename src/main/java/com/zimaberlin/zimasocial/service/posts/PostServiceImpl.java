@@ -4,6 +4,7 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;
+import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.utility.CustomPostMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
@@ -105,25 +106,25 @@ public class PostServiceImpl implements PostService {
     public PostView createPost(@Valid PostPayload payload) {
         UserEntity userObject = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
         UserEntity user = userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
-
         if ( payload == null ) {
             return null;
         }
+        PostEntity post = new PostEntity();
+        post.setContent( payload.getContent() );
+        post.setUrl( payload.getUrl() );
+        post.setType( payload.getType() == null ? PostType.any : payload.getType() );
+        post.setUser(user);
 
-        PostEntity.PostEntityBuilder postEntity = PostEntity.builder();
-        postEntity.content( payload.getContent() );
-        postEntity.url( payload.getUrl() );
-        postEntity.type( payload.getType() );
-        postEntity.user(user);
-
-        PostEntity createdPost = postRepository.save(postEntity.build());
+        PostEntity createdPost = postRepository.save(post);
         return CustomPostMapper.postEntityToPost(createdPost);
     }
 
     @Override
     @HasPostAccess(idParameterName = "id")
     public void deletePost(Long id){
-        postRepository.deleteById(id);
+        PostEntity post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        post.setIsDeleted(true);
+        postRepository.save(post);
     }
 
     @Override

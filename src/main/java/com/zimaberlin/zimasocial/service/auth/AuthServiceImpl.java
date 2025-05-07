@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -50,16 +51,15 @@ public class AuthServiceImpl implements AuthService {
 
         String slug = generateUniqueSlug(name);
 
-        UserEntity profileDto = UserEntity.builder()
-                .email(email)
-                .name(name)
-                .familyName(familyName)
-                .authProvider("google")
-                .roles(Set.of(UserRole.regular))
-                .slug(slug)
-                .build();
+        UserEntity user = new UserEntity();
+        user.setEmail(email);
+        user.setName(name);
+        user.setFamilyName(familyName);
+        user.setAuthProvider("google");
+        user.setRoles(Set.of(UserRole.regular));
+        user.setSlug(slug);
 
-        UserEntity createdProfile = saveUser(profileDto);
+        UserEntity createdProfile = saveUser(user);
 
         return createToken(createdProfile);
     }
@@ -82,14 +82,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String generateUniqueSlug(String name) {
-        String baseSlug = getTrimmedName(name);
-        String slug = baseSlug;
+        String slug = getTrimmedName(name);
 
         // Keep trying until we find a unique slug
         int attempt = 0;
-        while (userRepository.findBySlug(slug).isPresent()) {
+        while (userRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
             attempt++;
-            slug = baseSlug + random.nextInt(10000);
+            slug = slug + random.nextInt(10000);
         }
 
         return slug;
@@ -100,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
             return "";
         }
 
-        return name.trim();
+        return name.replaceAll("\\s+", "").toLowerCase();
     }
 
     private Optional<UserEntity> checkUser(String email, String provider) {

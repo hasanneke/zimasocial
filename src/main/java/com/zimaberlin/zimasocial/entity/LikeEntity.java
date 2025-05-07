@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -14,6 +16,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
+@SQLRestriction(value = "IS_DELETED IS FALSE")
 public class LikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

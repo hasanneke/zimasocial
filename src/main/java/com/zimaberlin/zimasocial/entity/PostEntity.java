@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,9 +17,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 @Table(name = "post")
-public class PostEntity {
+@SQLRestriction(value = "IS_DELETED IS FALSE")
+public class PostEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

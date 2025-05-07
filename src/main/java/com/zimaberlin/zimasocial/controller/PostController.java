@@ -61,7 +61,7 @@ public class PostController {
                 PostType.class,
                 String.class);
 
-        if(page < postPage.getTotalPages()){
+        if(page + 1 < postPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, type, slug).withRel(LinkRelation.of("next"));
             pagedModel.add(link);
         }
@@ -119,7 +119,7 @@ public class PostController {
                         commentsPage.getTotalPages()));
 
         Method method = this.getClass().getMethod("getComments", Integer.class, Integer.class, Long.class);
-        if(page < commentsPage.getTotalPages()){
+        if(page + 1 < commentsPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, postId).withRel(LinkRelation.of("next"));
             pagedModel.add(link);
         }
@@ -131,11 +131,11 @@ public class PostController {
     }
 
     @PostMapping(path = "/{postId}/comments")
-    public ResponseEntity<CommentEntity> makeComment(
+    public ResponseEntity<CommentView> makeComment(
             @PathVariable Long postId,
             @Valid @RequestBody CommentPayload payload) {
-        postService.commentPost(postId, payload);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        CommentView commentView = postService.commentPost(postId, payload);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentView);
     }
 
     @DeleteMapping(path = "/{postId}/comments/{commentId}")
