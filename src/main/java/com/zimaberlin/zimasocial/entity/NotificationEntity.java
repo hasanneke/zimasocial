@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "notification", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
-@Setter
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)

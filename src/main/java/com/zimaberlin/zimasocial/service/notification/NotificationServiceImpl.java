@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.service.notification;
 
 import com.zimaberlin.zimasocial.entity.*;
-import com.zimaberlin.zimasocial.events.Listeners.PostEventListener;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfile;
 
@@ -44,15 +42,15 @@ public class NotificationServiceImpl implements NotificationService{
         UserEntity liker = getCurrentUserProfile();
         String message = liker.getName() + " paylaşımını beğendi";
 
-        NotificationEntity notification = new NotificationEntity();
-        notification.setPost(like.getPost());
-        notification.setContent(message);
-        notification.setSenderUser(liker);
-        notification.setReceiverUser(like.getPost().getUser());
-
-        notification.setTargetCollection(TargetCollection.post);
-        notification.setTargetId(like.getPost().getId());
-        notification.setPost(like.getPost());
+        NotificationEntity notification = NotificationEntity.builder()
+                .type(NotificationType.POST_LIKED)
+                .senderUser(liker)
+                .receiverUser(like.getPost().getUser())
+                .targetCollection(TargetCollection.post)
+                .targetId(like.getPost().getId())
+                .post(like.getPost())
+                .content(message)
+                .build();
 
         notificationRepository.save(notification);
     }
@@ -63,38 +61,34 @@ public class NotificationServiceImpl implements NotificationService{
         UserEntity commenter = getCurrentUserProfile();
         UserEntity postOwner = comment.getPost().getUser();
         String message = commenter.getName() + " paylaşımına yorum yaptı";
-        NotificationEntity notificationEntity = new NotificationEntity();
 
-        notificationEntity.setType(NotificationType.POST_COMMENTED);
-        notificationEntity.setSenderUser(commenter);
-        notificationEntity.setReceiverUser(postOwner);
-        notificationEntity.setTargetCollection(TargetCollection.comment);
-        notificationEntity.setTargetId(comment.getId());
-        notificationEntity.setPost(comment.getPost());
-        notificationEntity.setContent(message);
-
+        NotificationEntity notificationEntity = NotificationEntity.builder()
+                .type(NotificationType.POST_COMMENTED)
+                .senderUser(commenter)
+                .receiverUser(postOwner)
+                .targetCollection(TargetCollection.comment)
+                .targetId(comment.getId())
+                .post(comment.getPost())
+                .content(message)
+                .build();
         notificationRepository.save(notificationEntity);
     }
 
     @Override
     public void sendCommentLikedNotification(CommentEntity comment) {
         logger.info(String.format("Comment %d liked", comment.getId()));
-
         UserEntity postOwner = comment.getUser();
         UserEntity liker = getCurrentUserProfile();
-
-        NotificationEntity notificationEntity = new NotificationEntity();
-        notificationEntity.setType(NotificationType.COMMENT_LIKED);
-        notificationEntity.setSenderUser(liker);
-        notificationEntity.setReceiverUser(postOwner);
-
-        notificationEntity.setTargetCollection(TargetCollection.comment);
-        notificationEntity.setTargetId(comment.getId());
-        notificationEntity.setPost(comment.getPost());
-
         String message = liker.getName() + " yorumunu beğendi";
-        notificationEntity.setContent(message);
-
+        NotificationEntity notificationEntity = NotificationEntity.builder()
+                .type(NotificationType.COMMENT_LIKED)
+                .senderUser(liker)
+                .receiverUser(postOwner)
+                .targetCollection(TargetCollection.comment)
+                .targetId(comment.getId())
+                .post(comment.getPost())
+                .content(message)
+                .build();
         notificationRepository.save(notificationEntity);
     }
 
@@ -104,19 +98,18 @@ public class NotificationServiceImpl implements NotificationService{
 
         UserEntity commentOwner = reply.getParent().getUser();
         UserEntity commenter = getCurrentUserProfile();
-
-        NotificationEntity notificationEntity = new NotificationEntity();
-        notificationEntity.setType(NotificationType.POST_COMMENTED);
-        notificationEntity.setSenderUser(commenter);
-        notificationEntity.setReceiverUser(commentOwner);
-
-        notificationEntity.setTargetCollection(TargetCollection.comment);
-        notificationEntity.setTargetId(reply.getId());
-        notificationEntity.setPost(reply.getPost());
-
         String message = commenter.getName() + "yorumuna yanıt verdi";
 
-        notificationEntity.setContent(message);
+        NotificationEntity notificationEntity = NotificationEntity.builder()
+                .type(NotificationType.POST_COMMENTED)
+                .senderUser(commenter)
+                .receiverUser(commentOwner)
+                .targetCollection(TargetCollection.comment)
+                .targetId(reply.getId())
+                .post(reply.getPost())
+                .content(message)
+                .build();
+
         notificationRepository.save(notificationEntity);
     }
 }
