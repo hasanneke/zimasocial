@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

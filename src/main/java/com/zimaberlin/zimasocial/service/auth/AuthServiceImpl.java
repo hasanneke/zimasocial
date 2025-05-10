@@ -5,7 +5,7 @@ import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
 import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
 import com.zimaberlin.zimasocial.utility.TokenResponse;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.UserRole;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zimaberlin.zimasocial.entity.postReport.PostReportEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -51,10 +51,6 @@ public class PostEntity extends BaseEntity{
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<PostReportEntity> reports = new HashSet<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
     private Set<LikeEntity> likes =  new HashSet<>();
 
     @CreationTimestamp
@@ -89,9 +85,6 @@ public class PostEntity extends BaseEntity{
     }
     public void decrementCommentCount(){
         commentCount = commentCount - 1;
-    }
-    public void report(PostReportEntity report) {
-        reports.add(report);
     }
 }
 

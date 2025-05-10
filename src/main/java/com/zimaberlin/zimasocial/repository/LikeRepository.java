@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.repository;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

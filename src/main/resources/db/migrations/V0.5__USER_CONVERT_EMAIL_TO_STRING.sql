@@ -1,0 +1,3 @@
+ALTER TABLE public.users
+DROP COLUMN email,
+ADD COLUMN email VARCHAR(255);

@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_token")

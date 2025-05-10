@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;

@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.aop.ResourceAcess;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.exception.UnauthorizedException;
 import com.zimaberlin.zimasocial.repository.CommentRepository;

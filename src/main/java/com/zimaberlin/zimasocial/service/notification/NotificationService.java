@@ -2,8 +2,6 @@ package com.zimaberlin.zimasocial.service.notification;
 
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
-import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

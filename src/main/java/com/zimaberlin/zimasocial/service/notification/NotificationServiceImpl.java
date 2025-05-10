@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.service.notification;
 
 import com.zimaberlin.zimasocial.entity.*;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.slf4j.Logger;

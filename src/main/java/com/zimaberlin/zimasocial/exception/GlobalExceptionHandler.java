@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseError> resourceNotFoundException(ResourceNotFoundException ex) {
         return new ResponseEntity<>(ResponseError.builder()
-                .errorCode("not_found")
+                .errorCode(ex.getCode())
                 .message(ex.getMessage())
                 .timeStamp(System.currentTimeMillis())
                 .build(), HttpStatus.NOT_FOUND);

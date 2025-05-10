@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import org.hibernate.Hibernate;
 
 public class CustomCommentMapper {

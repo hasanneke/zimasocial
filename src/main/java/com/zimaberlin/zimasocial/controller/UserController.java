@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/{slug}/follow")
-    public ResponseEntity<Void> followUser(@PathVariable(name = "slug") String slug) {
+    public ResponseEntity<Void> followUser(@PathVariable(name = "slug") String slug) throws BadRequestException {
         userService.followUser(slug);
         return ResponseEntity.ok().build();
     }

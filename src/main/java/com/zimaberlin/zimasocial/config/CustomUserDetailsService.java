@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.config;
 
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

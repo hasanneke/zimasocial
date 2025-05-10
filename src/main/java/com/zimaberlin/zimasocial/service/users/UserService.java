@@ -13,7 +13,7 @@ public interface UserService {
     UserView getUserMe();
     UserView getUser(String slug);
     boolean checkUsernameExists(String slug);
-    void followUser(String slug);
+    void followUser(String slug) throws BadRequestException;
     void unfollowUser(String slug) throws BadRequestException;
     Page<UserView> getFollowers(String slug, int page, int size);
     Page<UserView> getFollowing(String slug, int page, int size);

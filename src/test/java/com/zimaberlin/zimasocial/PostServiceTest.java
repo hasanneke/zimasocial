@@ -3,7 +3,7 @@
 //import com.zimaberlin.zimasocial.config.CustomUserDetails;
 //import com.zimaberlin.zimasocial.entity.PostEntity;
 //import com.zimaberlin.zimasocial.entity.PostType;
-//import com.zimaberlin.zimasocial.entity.UserEntity;
+//import com.zimaberlin.zimasocial.entity.user.UserEntity;
 //import com.zimaberlin.zimasocial.repository.CommentRepository;
 //import com.zimaberlin.zimasocial.repository.LikeRepository;
 //import com.zimaberlin.zimasocial.repository.PostRepository;

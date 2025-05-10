@@ -1,8 +1,9 @@
 package com.zimaberlin.zimasocial.service.users;
 
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
+import com.zimaberlin.zimasocial.repository.UserRelationRepository;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.service.imageService.S3Service;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
@@ -29,10 +30,13 @@ import java.util.Arrays;
 @Transactional
 public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
+    private UserRelationRepository userRelationRepository;
     private S3Service s3Service;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, S3Service s3Service) {
+    public UserServiceImpl(UserRepository userRepository, UserRelationRepository userRelationRepository, S3Service s3Service) {
         this.userRepository = userRepository;
+        this.userRelationRepository = userRelationRepository;
         this.s3Service = s3Service;
     }
 
@@ -82,19 +86,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void followUser(String slug) {
+    public void followUser(String slug) throws BadRequestException {
         UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-
-        if(me.getFollowing().contains(followedUser)){
-            throw new ConflictException("You are already following the user");
-        }
-
-        followedUser.getFollowers().add(me);
-        me.getFollowing().add(followedUser);
-        me.incrementFollowingCount();
-        followedUser.incrementFollowerCount();
-
+        followedUser.follow(me);
         userRepository.save(me);
     }
 
@@ -102,17 +97,8 @@ public class UserServiceImpl implements UserService{
     public void unfollowUser(String slug) throws BadRequestException{
         UserEntity unfollowedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-
-        if(me.getFollowing().contains(unfollowedUser)){
-            me.getFollowing().remove(unfollowedUser);
-            unfollowedUser.getFollowers().remove(me);
-            unfollowedUser.decrementFollowerCount();
-            me.decrementFollowingCount();
-
-            userRepository.save(me);
-        }else{
-            throw new BadRequestException("You are not following the user");
-        }
+        me.unfollowUser(unfollowedUser);
+        userRepository.save(me);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;

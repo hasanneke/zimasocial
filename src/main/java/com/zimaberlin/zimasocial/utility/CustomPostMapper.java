@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import org.hibernate.Hibernate;

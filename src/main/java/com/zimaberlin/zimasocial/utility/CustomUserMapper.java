@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.views.user.UserView;
-import com.zimaberlin.zimasocial.entity.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 
 public class CustomUserMapper {
     public static UserView entityToDomain(UserEntity entity)  {
