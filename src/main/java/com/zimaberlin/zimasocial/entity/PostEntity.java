@@ -40,7 +40,7 @@ public class PostEntity extends BaseEntity{
     @Column(name = "comment_count")
     private int commentCount = 0;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;

@@ -39,7 +39,7 @@ public class PostController {
     public HttpEntity<PagedModel<PostView>> getPosts(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @RequestParam(name = "type", defaultValue = "any") PostType type,
+            @RequestParam(name = "type", required = false) PostType type,
             @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException {
         Page<PostView> postPage;
         if(slug != null){

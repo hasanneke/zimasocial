@@ -4,4 +4,5 @@ public enum ReportReason {
     spam,
     offensive,
     badLanguage,
+    other
 }

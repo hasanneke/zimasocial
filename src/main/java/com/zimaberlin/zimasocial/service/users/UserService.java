@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.service.users;
 
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.views.user.UserView;
 import org.apache.coyote.BadRequestException;
@@ -17,4 +18,6 @@ public interface UserService {
     void unfollowUser(String slug) throws BadRequestException;
     Page<UserView> getFollowers(String slug, int page, int size);
     Page<UserView> getFollowing(String slug, int page, int size);
+    void blockUser(String slug);
+    void unblockUser(String slug);
 }

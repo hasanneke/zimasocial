@@ -1,12 +1,14 @@
 package com.zimaberlin.zimasocial.service.users;
 
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRelationRepository;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.service.imageService.S3Service;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
+import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.CustomUserMapper;
 import com.zimaberlin.zimasocial.views.user.UserView;
@@ -27,16 +29,15 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
-    private UserRelationRepository userRelationRepository;
+    private CustomUserMapper userMapper;
     private S3Service s3Service;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserRelationRepository userRelationRepository, S3Service s3Service) {
+    public UserServiceImpl(UserRepository userRepository, CustomUserMapper userMapper, S3Service s3Service) {
+        this.userMapper = userMapper;
         this.userRepository = userRepository;
-        this.userRelationRepository = userRelationRepository;
         this.s3Service = s3Service;
     }
 
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService{
         user.setAvatarUrl(url);
         userRepository.save(user);
 
-        return CustomUserMapper.entityToDomain(user);
+        return userMapper.entityToDomain(user);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService{
             user.setName(payload.getName());
         }
         userRepository.save(user);
-        return CustomUserMapper.entityToDomain(user);
+        return userMapper.entityToDomain(user);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService{
         UserEntity user = CurrentUser.getCurrentUserProfile();
         user.setSlug(slug);
         userRepository.save(user);
-        return CustomUserMapper.entityToDomain(user);
+        return userMapper.entityToDomain(user);
     }
 
     @Override
@@ -86,18 +87,20 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void followUser(String slug) throws BadRequestException {
+    @Transactional
+    public void followUser(String slug) {
         UserEntity followedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         followedUser.follow(me);
-        userRepository.save(me);
+        userRepository.save(followedUser);
     }
 
     @Override
-    public void unfollowUser(String slug) throws BadRequestException{
+    @Transactional
+    public void unfollowUser(String slug) {
         UserEntity unfollowedUser = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserEntity me = userRepository.findById(CurrentUser.getCurrentUserProfile().getId()).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-        me.unfollowUser(unfollowedUser);
+        unfollowedUser.unfollowUser(me);
         userRepository.save(me);
     }
 
@@ -106,9 +109,9 @@ public class UserServiceImpl implements UserService{
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
 
         PageRequest requestPage = PageRequest.of(page, size);
-        Page<UserEntity> getFollowers = userRepository.findFollowersByUserId(user.getId(), requestPage);
+        Page<UserEntity> getFollowers = userRepository.findFollowersByUserAndRelation(user, requestPage);
 
-        return getFollowers.map(CustomUserMapper::entityToDomain);
+        return getFollowers.map(userMapper::entityToDomain);
     }
 
     @Override
@@ -116,19 +119,34 @@ public class UserServiceImpl implements UserService{
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
 
         PageRequest requestPage = PageRequest.of(page, size);
-        Page<UserEntity> getFollowers = userRepository.findFollowingsByUserId(user.getId(), requestPage);
+        Page<UserEntity> getFollowers = userRepository.findFollowingsByUserAndRelation(user, requestPage);
 
-        return getFollowers.map(CustomUserMapper::entityToDomain);
+        return getFollowers.map(userMapper::entityToDomain);
+    }
+
+    @Override
+    @Transactional
+    public void blockUser(String slug) {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
+        user.block(CurrentUser.getCurrentUserProfile());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unblockUser(String slug) {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
+        user.unblock(CurrentUser.getCurrentUserProfile());
+        userRepository.save(user);
     }
 
     @Override
     public UserView getUserMe() {
-        return CustomUserMapper.entityToDomain(CurrentUser.getCurrentUserProfile());
+        return userMapper.entityToDomain(CurrentUser.getCurrentUserProfile());
     }
 
     @Override
     public UserView getUser(String slug) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
-        return CustomUserMapper.entityToDomain(user);
+        return userMapper.entityToDomain(user);
     }
 }

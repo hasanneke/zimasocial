@@ -18,6 +18,7 @@ public class UserView extends RepresentationModel<UserView> {
     private String bio;
     private int followerCount;
     private int followingCount;
+    private boolean isFollowed;
 
     public UserView addLinks() {
         // Add self link to user details

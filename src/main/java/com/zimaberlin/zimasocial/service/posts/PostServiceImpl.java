@@ -2,11 +2,14 @@ package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
+import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.utility.CustomPostMapper;
+import com.zimaberlin.zimasocial.utility.CustomUserMapper;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
@@ -26,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -35,6 +39,9 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
+    private final UserRelationRepository userRelationRepository;
+    private final CustomPostMapper postMapper;
+    private final CustomCommentMapper commentMapper;
 
     @Autowired
     public PostServiceImpl(PostRepository postRepository,
@@ -42,13 +49,19 @@ public class PostServiceImpl implements PostService {
                            CommentRepository commentRepository,
                            UserRepository userRepository,
                            ApplicationEventPublisher eventPublisher,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           UserRelationRepository userRelationRepository,
+                           CustomPostMapper postMapper,
+                           CustomCommentMapper commentMapper) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
         this.notificationService = notificationService;
+        this.userRelationRepository = userRelationRepository;
+        this.postMapper = postMapper;
+        this.commentMapper = commentMapper;
     }
 
     @Override
@@ -63,7 +76,7 @@ public class PostServiceImpl implements PostService {
             postsPage = postRepository.findByUserOrderByCreatedAt(pageable, user);
         }
 
-        List<PostView> postViews = fillPostsWithIsLiked(postsPage);
+        List<PostView> postViews = toDtoWithPopulatedFields(postsPage);
 
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
@@ -72,12 +85,12 @@ public class PostServiceImpl implements PostService {
     public Page<PostView> getPosts(int page, int size, PostType type) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<PostEntity> postsPage;
-        if(type == null){
+        if(type == PostType.any){
           postsPage = postRepository.findAll(pageable);
         }else{
             postsPage = postRepository.findByType(pageable, type);
         }
-        List<PostView> postViews = fillPostsWithIsLiked(postsPage);
+        List<PostView> postViews = toDtoWithPopulatedFields(postsPage);
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
 
@@ -93,13 +106,13 @@ public class PostServiceImpl implements PostService {
     public Page<CommentView> getCommentReplies(int page, int size, Long postId, Long commentId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CommentEntity> commentEntities = commentRepository.findByParentId(commentId, pageable);
-        return commentEntities.map(CustomCommentMapper:: entityToDomain);
+        return commentEntities.map(commentMapper::entityToDomain);
     }
 
     @Override
     public PostView getPost(Long postId) {
-        PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        return fillPostsWithIsLiked(post);
+        PostEntity post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+        return  postMapper.postEntityToPost(post);
     }
 
     @Override
@@ -117,7 +130,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
 
         PostEntity createdPost = postRepository.save(post);
-        return CustomPostMapper.postEntityToPost(createdPost);
+        return postMapper.postEntityToPost(createdPost);
     }
 
     @Override
@@ -132,8 +145,8 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void likePost(Long postId)  {
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        boolean isAlreadyLiked = likeRepository.existsByUserAndPost(getCurrentUserProfile(), post);
-        UserEntity currentUser = getCurrentUserProfile();
+        boolean isAlreadyLiked = likeRepository.existsByUserAndPost(CurrentUser.getCurrentUserProfile(), post);
+        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         if(!isAlreadyLiked){
             LikeEntity like = new LikeEntity();
             like.setPost(post);
@@ -150,8 +163,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void unlikePost(Long postId) {
-        LikeEntity likeEntity = likeRepository.findByUserIdAndPostId(getCurrentUserProfile().getId(), postId)
+        LikeEntity likeEntity = likeRepository.findByUserIdAndPostId(CurrentUser.getCurrentUserProfile().getId(), postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post is not liked"));
 
         likeEntity.getPost().decrementLikeCount();
@@ -162,7 +176,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public CommentView commentPost(Long postId, CommentPayload payload) {
-        UserEntity currentUser = getCurrentUserProfile();
+        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
         CommentEntity comment = new CommentEntity();
         comment.setPost(post);
@@ -179,7 +193,7 @@ public class PostServiceImpl implements PostService {
             notificationService.sendPostCommentedNotification(commentEntity);
         }
 
-        return CustomCommentMapper.entityToDomain(commentEntity);
+        return commentMapper.entityToDomain(commentEntity);
     }
 
     @Override
@@ -196,8 +210,8 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void likeComment(Long postId, Long commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
-        boolean isAlreadyLiked = likeRepository.existsByUserAndComment(getCurrentUserProfile(), comment);
-        UserEntity currentUser = getCurrentUserProfile();
+        boolean isAlreadyLiked = likeRepository.existsByUserAndComment(CurrentUser.getCurrentUserProfile(), comment);
+        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
 
         if(!isAlreadyLiked){
             LikeEntity like = new LikeEntity();
@@ -207,7 +221,7 @@ public class PostServiceImpl implements PostService {
             comment.incrementLikeCount();
 
             likeRepository.save(like);
-            boolean selfLiked = getCurrentUserProfile().equals(comment.getUser());
+            boolean selfLiked = currentUser.equals(comment.getUser());
             if(!selfLiked){
                 notificationService.sendCommentLikedNotification(comment);
             }
@@ -221,7 +235,7 @@ public class PostServiceImpl implements PostService {
     public void unlikeComment(Long postId, Long commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
         LikeEntity like = likeRepository
-                .findByUserIdAndCommentId(getCurrentUserProfile().getId(), commentId)
+                .findByUserIdAndCommentId(CurrentUser.getCurrentUserProfile().getId(), commentId)
                 .orElseThrow(()-> new ResourceNotFoundException("Comment not liked"));
 
         like.getComment().decrementLikeCount();
@@ -235,7 +249,7 @@ public class PostServiceImpl implements PostService {
     public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
         CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
-        UserEntity currentUser = getCurrentUserProfile();
+        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
 
         CommentEntity reply = new CommentEntity();
 
@@ -246,10 +260,11 @@ public class PostServiceImpl implements PostService {
 
         parent.incrementReplyCount();
         CommentEntity comment = commentRepository.save(reply);
-        if(currentUser.equals(parent.getUser())){
+        boolean selfReplied = currentUser.equals(parent.getUser());
+        if(!selfReplied){
             notificationService.sendCommentRepliedNotification(reply);
         }
-        return CustomCommentMapper.entityToDomain(comment);
+        return commentMapper.entityToDomain(comment);
     }
 
     @Override
@@ -259,11 +274,11 @@ public class PostServiceImpl implements PostService {
         reply.getParent().decrementReplyCount();
 
         commentRepository.delete(reply);
-        return CustomCommentMapper.entityToDomain(reply);
+        return commentMapper.entityToDomain(reply);
     }
 
-    private List<PostView> fillPostsWithIsLiked(Page<PostEntity> postsPage) {
-        List<PostView> postViews = postsPage.getContent().stream().map(CustomPostMapper::postEntityToPost).toList();
+    private List<PostView> toDtoWithPopulatedFields(Page<PostEntity> postsPage) {
+        List<PostView> postViews = postsPage.getContent().stream().map(postMapper::postEntityToPost).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
             UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
@@ -277,7 +292,7 @@ public class PostServiceImpl implements PostService {
         return postViews;
     }
     private List<CommentView> fillCommentsWithIsLiked(Page<CommentEntity> commentsPage) {
-        List<CommentView> postViews = commentsPage.getContent().stream().map(CustomCommentMapper::entityToDomain).toList();
+        List<CommentView> postViews = commentsPage.getContent().stream().map(commentMapper::entityToDomain).toList();
         Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(authenticationPrincipal != "anonymousUser"){
             UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
@@ -289,20 +304,5 @@ public class PostServiceImpl implements PostService {
             }
         }
         return postViews;
-    }
-
-    private PostView fillPostsWithIsLiked(PostEntity post){
-        UserEntity profile = CurrentUser.getCurrentUserProfile();
-        LikeEntity like = likeRepository.findByUserAndPost(profile, post).orElse(null);
-        PostView domainPostView = CustomPostMapper.postEntityToPost(post);
-        if(like != null){
-            domainPostView.setLiked(true);;
-        }
-        return domainPostView;
-    }
-
-    private UserEntity getCurrentUserProfile(){
-        UserEntity userObject = CurrentUser.getCurrentUserProfile();
-        return userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
     }
 }

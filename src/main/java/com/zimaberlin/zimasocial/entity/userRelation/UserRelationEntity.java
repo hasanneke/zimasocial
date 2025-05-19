@@ -4,16 +4,16 @@ import com.zimaberlin.zimasocial.entity.BaseEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@SuperBuilder(toBuilder = true)
 @Table(name = "user_relation")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 public class UserRelationEntity extends BaseEntity {
@@ -36,4 +36,24 @@ public class UserRelationEntity extends BaseEntity {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserRelationEntity that = (UserRelationEntity) o;
+        return Objects.equals(initiatedUser, that.getInitiatedUser())
+                && Objects.equals(receiverUser, that.getReceiverUser())
+                && Objects.equals(relation, that.getRelation())
+                && Objects.equals(getIsDeleted(), that.getIsDeleted());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(initiatedUser, receiverUser, relation, getIsDeleted());
+    }
+
+    public void markAsDeleted(){
+        setIsDeleted(true);
+    }
 }

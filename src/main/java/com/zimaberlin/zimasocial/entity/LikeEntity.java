@@ -52,6 +52,6 @@ public class LikeEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(user.getId(), post.getId());
+        return Objects.hash(id);
     }
 }

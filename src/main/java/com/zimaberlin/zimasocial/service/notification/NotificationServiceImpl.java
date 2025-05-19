@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.service.notification;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.utility.CustomUserMapper;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,23 +18,27 @@ import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfil
 public class NotificationServiceImpl implements NotificationService{
     Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private NotificationRepository notificationRepository;
+    private CustomUserMapper userMapper;
 
     @Autowired
-    public NotificationServiceImpl(NotificationRepository notificationRepository) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository, CustomUserMapper userMapper) {
         this.notificationRepository = notificationRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
     public Page<NotificationView> getNotifications(Long userId, Pageable page) {
         Page<NotificationEntity> notificationEntities = notificationRepository.findByReceiverUserIdOrderByCreatedAt(userId, page);
         return notificationEntities.map((e)->NotificationView.builder()
+                .id(e.getId())
                 .url(e.getUrl())
                 .type(e.getType())
                 .content(e.getContent())
                 .targetId(e.getTargetId())
                 .targetCollection(e.getTargetCollection())
-                .postId(e.getPost().getId())
+                .postId(e.getPost() != null ? e.getPost().getId() : null)
                 .createdAt(e.getCreatedAt())
+                .actor(userMapper.entityToDomain(e.getSenderUser()))
                 .build());
     }
 

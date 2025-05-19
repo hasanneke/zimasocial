@@ -83,7 +83,7 @@ public class UserController {
             @PathVariable(name = "slug") String slug,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Page followersPage = userService.getFollowers(slug, page, size);
+        Page<UserView> followersPage = userService.getFollowers(slug, page, size);
 
         PagedModel<UserView> pagedModel = PagedModel.of(
                 followersPage.getContent(),
@@ -114,7 +114,7 @@ public class UserController {
             @PathVariable(name = "slug") String slug,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Page followingsPage = userService.getFollowing(slug, page, size);
+        Page<UserView> followingsPage = userService.getFollowing(slug, page, size);
 
         PagedModel<UserView> pagedModel = PagedModel.of(
                 followingsPage.getContent(),
@@ -138,5 +138,15 @@ public class UserController {
             pagedModel.add(link);
         }
         return new  HttpEntity<>(pagedModel);
+    }
+    @GetMapping("/{userId}/block")
+    public ResponseEntity<Void> blockUser(@PathVariable(name = "slug") String slug) {
+        userService.blockUser(slug);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/{userId}/unblock")
+    public ResponseEntity<Void> unblockUser(@PathVariable(name = "userId") String slug) {
+        userService.unblockUser(slug);
+        return ResponseEntity.ok().build();
     }
 }

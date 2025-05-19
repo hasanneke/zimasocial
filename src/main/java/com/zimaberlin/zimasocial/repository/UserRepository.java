@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.repository;
 
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,13 +19,17 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query(value = "SELECT * FROM users WHERE slug = :slug", nativeQuery = true)
     Optional<UserEntity> findBySlugWithDeletedUsers(String slug);
     Optional<UserEntity> findBySlug(String slug);
-    @Query("SELECT u FROM UserEntity u " +
-            "INNER JOIN u.followers f " +
-            "WHERE f.id = :userId")
-    Page<UserEntity> findFollowersByUserId(@Param("userId") Long userId, Pageable pageable);
+    @Query("""
+            SELECT u FROM UserEntity u
+            INNER JOIN u.initiatedRelations ir
+            WHERE ir.receiverUser = :user AND ir.relation = Relation.followed
+            """)
+    Page<UserEntity> findFollowersByUserAndRelation(UserEntity user, Pageable pageable);
 
-    @Query("SELECT u FROM UserEntity u "
-            + "INNER JOIN followers f "
-            + "WHERE f.id = :userId")
-    Page<UserEntity> findFollowingsByUserId(@Param("userId") Long userId, Pageable pageable);
+    @Query("""
+            SELECT u FROM UserEntity u
+            INNER JOIN u.receivedRelations ir
+            WHERE ir.initiatedUser = :user AND ir.relation = Relation.followed
+            """)
+    Page<UserEntity> findFollowingsByUserAndRelation(UserEntity user, Pageable pageable);
 }

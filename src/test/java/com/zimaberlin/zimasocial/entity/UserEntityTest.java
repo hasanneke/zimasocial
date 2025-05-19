@@ -4,10 +4,15 @@ import com.zimaberlin.zimasocial.entity.user.exceptions.CircularFollowException;
 import com.zimaberlin.zimasocial.entity.user.exceptions.CircularUnfollowException;
 import com.zimaberlin.zimasocial.entity.user.exceptions.UserAlreadyFollowed;
 import com.zimaberlin.zimasocial.entity.user.exceptions.UserNotFollowed;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
+import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -23,7 +28,6 @@ public class UserEntityTest {
         Assertions.assertEquals(followed.getFollowersCount(), 1);
         Assertions.assertEquals(follower.getFollowingCount(), 1);
         Assertions.assertTrue(followed.getFollowers().contains(follower));
-        Assertions.assertTrue(follower.getFollowings().contains(followed));
     }
 
     @Test
@@ -38,8 +42,13 @@ public class UserEntityTest {
         followed.unfollowUser(follower);
         Assertions.assertEquals(followed.getFollowersCount(), 0);
         Assertions.assertEquals(follower.getFollowingCount(), 0);
-        Assertions.assertFalse(followed.getFollowers().contains(follower));
-        Assertions.assertFalse(follower.getFollowings().contains(followed));
+        Assertions.assertTrue(followed.getReceivedRelations().contains(UserRelationEntity.builder()
+                .initiatedUser(follower)
+                .receiverUser(followed)
+                .relation(Relation.followed)
+                .isDeleted(true)
+                .build()
+        ));
     }
 
     @Test
@@ -79,5 +88,50 @@ public class UserEntityTest {
         followed.setId(1L);
 
         Assertions.assertThrows(UserNotFollowed.class, () -> followed.unfollowUser(follower));
+    }
+
+    @Test
+    void blockUser() {
+        UserEntity blocker = new UserEntity();
+        blocker.setId(0L);
+        UserEntity blocked = new UserEntity();
+        blocked.setId(1L);
+
+        blocked.block(blocker);
+
+        Assertions.assertTrue(blocked
+                .beingBlockedRelations().contains(
+                        UserRelationEntity.builder()
+                                .receiverUser(blocked)
+                                .initiatedUser(blocker)
+                                .relation(Relation.blocked)
+                                .build()
+                ));
+    }
+
+    @Test
+    void unblockUser() {
+        UserEntity blocker = new UserEntity();
+        blocker.setId(0L);
+        UserEntity blocked = new UserEntity();
+        blocked.setId(1L);
+        blocked.setReceivedRelations(Set.of( UserRelationEntity.builder()
+                .receiverUser(blocked)
+                .initiatedUser(blocker)
+                .relation(Relation.blocked)
+                .build()));
+
+        blocked.unblock(blocker);
+
+        Assertions.assertTrue(blocked
+                .beingBlockedRelations().contains(
+                        UserRelationEntity.builder()
+                                .receiverUser(blocked)
+                                .initiatedUser(blocker)
+                                .isDeleted(true)
+                                .relation(Relation.blocked)
+
+                                .build()
+                ));
     }
 }
