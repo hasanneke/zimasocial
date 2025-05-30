@@ -1,5 +1,5 @@
 package com.zimaberlin.zimasocial.entity.report;
 
-public enum ReportType {
+public enum ResourceType {
     post, comment, profile
 }

@@ -22,14 +22,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("""
             SELECT u FROM UserEntity u
             INNER JOIN u.initiatedRelations ir
-            WHERE ir.receiverUser = :user AND ir.relation = Relation.followed
+            WHERE ir.receiver = :user AND ir.relation = Relation.followed
             """)
     Page<UserEntity> findFollowersByUserAndRelation(UserEntity user, Pageable pageable);
 
     @Query("""
             SELECT u FROM UserEntity u
             INNER JOIN u.receivedRelations ir
-            WHERE ir.initiatedUser = :user AND ir.relation = Relation.followed
+            WHERE ir.actor = :user AND ir.relation = Relation.followed
             """)
     Page<UserEntity> findFollowingsByUserAndRelation(UserEntity user, Pageable pageable);
 }

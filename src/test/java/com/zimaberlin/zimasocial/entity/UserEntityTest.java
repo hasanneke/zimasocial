@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.entity.user.UserFactory;
 import com.zimaberlin.zimasocial.entity.user.exceptions.CircularFollowException;
 import com.zimaberlin.zimasocial.entity.user.exceptions.CircularUnfollowException;
 import com.zimaberlin.zimasocial.entity.user.exceptions.UserAlreadyFollowed;
@@ -11,18 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 
 @ExtendWith(MockitoExtension.class)
 public class UserEntityTest {
     @Test
     void followUser_WhenUserIsNotFollower() {
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(1L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(1L);
         followed.follow(follower);
 
         Assertions.assertEquals(followed.getFollowersCount(), 1);
@@ -32,10 +28,8 @@ public class UserEntityTest {
 
     @Test
     void unfollowUser_WhenUserIsNotFollower() {
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(1L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(1L);
         // SEED FOLLOWER
         followed.follow(follower);
         // UNFOLLOW
@@ -43,8 +37,8 @@ public class UserEntityTest {
         Assertions.assertEquals(followed.getFollowersCount(), 0);
         Assertions.assertEquals(follower.getFollowingCount(), 0);
         Assertions.assertTrue(followed.getReceivedRelations().contains(UserRelationEntity.builder()
-                .initiatedUser(follower)
-                .receiverUser(followed)
+                .actor(follower)
+                .receiver(followed)
                 .relation(Relation.followed)
                 .isDeleted(true)
                 .build()
@@ -53,28 +47,22 @@ public class UserEntityTest {
 
     @Test
     void followUser_WhenUserFollowSelf_ThrowCircularFollowException(){
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(0L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(0L);
         Assertions.assertThrows(CircularFollowException.class, () -> followed.follow(follower));
     }
 
     @Test
     void unfollowUser_WhenUserUnfollowSelf_ThrowCircularUnfollowException(){
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(0L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(0L);
         Assertions.assertThrows(CircularUnfollowException.class, () -> followed.unfollowUser(follower));
     }
 
     @Test
     void followUser_WhenUserIsAlreadyFollower_ThrowAlreadyFollowedException() {
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(1L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(1L);
         followed.follow(follower);
 
         Assertions.assertThrows(UserAlreadyFollowed.class, () -> followed.follow(follower));
@@ -82,28 +70,24 @@ public class UserEntityTest {
 
     @Test
     void unfollowUser_WhenUserIsNotFollowed_ThrowUserNotFollowedException() {
-        UserEntity follower = new UserEntity();
-        follower.setId(0L);
-        UserEntity followed = new UserEntity();
-        followed.setId(1L);
+        UserEntity follower = UserFactory.createUser(0L);
+        UserEntity followed = UserFactory.createUser(1L);
 
         Assertions.assertThrows(UserNotFollowed.class, () -> followed.unfollowUser(follower));
     }
 
     @Test
     void blockUser() {
-        UserEntity blocker = new UserEntity();
-        blocker.setId(0L);
-        UserEntity blocked = new UserEntity();
-        blocked.setId(1L);
+        UserEntity blocker = UserFactory.createUser(0L);
+        UserEntity blocked = UserFactory.createUser(1L);
 
         blocked.block(blocker);
 
         Assertions.assertTrue(blocked
                 .beingBlockedRelations().contains(
                         UserRelationEntity.builder()
-                                .receiverUser(blocked)
-                                .initiatedUser(blocker)
+                                .receiver(blocked)
+                                .actor(blocker)
                                 .relation(Relation.blocked)
                                 .build()
                 ));
@@ -111,23 +95,17 @@ public class UserEntityTest {
 
     @Test
     void unblockUser() {
-        UserEntity blocker = new UserEntity();
-        blocker.setId(0L);
-        UserEntity blocked = new UserEntity();
-        blocked.setId(1L);
-        blocked.setReceivedRelations(Set.of( UserRelationEntity.builder()
-                .receiverUser(blocked)
-                .initiatedUser(blocker)
-                .relation(Relation.blocked)
-                .build()));
+        UserEntity blocker = UserFactory.createUser(0L);
+        UserEntity blocked = UserFactory.createUser(1L);
+        blocked.block(blocker);
 
         blocked.unblock(blocker);
 
         Assertions.assertTrue(blocked
                 .beingBlockedRelations().contains(
                         UserRelationEntity.builder()
-                                .receiverUser(blocked)
-                                .initiatedUser(blocker)
+                                .receiver(blocked)
+                                .actor(blocker)
                                 .isDeleted(true)
                                 .relation(Relation.blocked)
 

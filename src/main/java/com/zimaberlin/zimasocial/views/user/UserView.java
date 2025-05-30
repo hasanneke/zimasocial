@@ -6,7 +6,6 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserView extends RepresentationModel<UserView> {
@@ -19,6 +18,7 @@ public class UserView extends RepresentationModel<UserView> {
     private int followerCount;
     private int followingCount;
     private boolean isFollowed;
+    private Boolean isPrivate;
 
     public UserView addLinks() {
         // Add self link to user details

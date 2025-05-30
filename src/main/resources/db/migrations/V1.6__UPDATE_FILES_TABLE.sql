@@ -1,0 +1,2 @@
+ALTER TABLE files
+RENAME TO file;

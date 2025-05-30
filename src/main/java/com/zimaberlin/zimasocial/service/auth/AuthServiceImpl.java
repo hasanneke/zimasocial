@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.service.auth;
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
+import com.zimaberlin.zimasocial.entity.user.UserFactory;
 import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
 import com.zimaberlin.zimasocial.utility.TokenResponse;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
@@ -41,25 +42,13 @@ public class AuthServiceImpl implements AuthService {
         String email = (String) jsonWebSignature.getPayload().get("email");
         String name = (String) jsonWebSignature.getPayload().get("name");
         String familyName = (String) jsonWebSignature.getPayload().get("family_name");
-
         Optional<UserEntity> profile = checkUser(email, "google");
-
         if(profile.isPresent()){
             return createToken(profile.get());
         }
-
         String slug = generateUniqueSlug(name);
-
-        UserEntity user = new UserEntity();
-        user.setEmail(email);
-        user.setName(name);
-        user.setFamilyName(familyName);
-        user.setAuthProvider("google");
-        user.setRoles(Set.of(UserRole.regular));
-        user.setSlug(slug);
-
-        UserEntity createdProfile = saveUser(user);
-
+        UserEntity newUser = UserFactory.createUser(email, name, familyName, "google", Set.of(UserRole.regular), slug);
+        UserEntity createdProfile = saveUser(newUser);
         return createToken(createdProfile);
     }
 

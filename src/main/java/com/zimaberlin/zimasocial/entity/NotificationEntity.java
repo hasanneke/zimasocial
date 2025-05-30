@@ -57,7 +57,6 @@ public class NotificationEntity {
     @Column(name = "target_id")
     private Long targetId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private PostEntity post;
+    @Column(name = "post_id")
+    private Long postId;
 }

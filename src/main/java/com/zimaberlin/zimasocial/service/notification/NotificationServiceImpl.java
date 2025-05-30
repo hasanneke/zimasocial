@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.service.notification;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
-import com.zimaberlin.zimasocial.utility.CustomUserMapper;
+import com.zimaberlin.zimasocial.utility.UserViewFactory;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,17 +18,17 @@ import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfil
 public class NotificationServiceImpl implements NotificationService{
     Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private NotificationRepository notificationRepository;
-    private CustomUserMapper userMapper;
+    private UserViewFactory userMapper;
 
     @Autowired
-    public NotificationServiceImpl(NotificationRepository notificationRepository, CustomUserMapper userMapper) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository, UserViewFactory userMapper) {
         this.notificationRepository = notificationRepository;
         this.userMapper = userMapper;
     }
 
     @Override
     public Page<NotificationView> getNotifications(Long userId, Pageable page) {
-        Page<NotificationEntity> notificationEntities = notificationRepository.findByReceiverUserIdOrderByCreatedAt(userId, page);
+        Page<NotificationEntity> notificationEntities = notificationRepository.findByReceiverUserIdOrderByCreatedAtDesc(userId, page);
         return notificationEntities.map((e)->NotificationView.builder()
                 .id(e.getId())
                 .url(e.getUrl())
@@ -36,9 +36,9 @@ public class NotificationServiceImpl implements NotificationService{
                 .content(e.getContent())
                 .targetId(e.getTargetId())
                 .targetCollection(e.getTargetCollection())
-                .postId(e.getPost() != null ? e.getPost().getId() : null)
+                .postId(e.getPostId())
                 .createdAt(e.getCreatedAt())
-                .actor(userMapper.entityToDomain(e.getSenderUser()))
+                .actor(userMapper.populated(e.getSenderUser()))
                 .build());
     }
 
@@ -54,7 +54,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .receiverUser(like.getPost().getUser())
                 .targetCollection(TargetCollection.post)
                 .targetId(like.getPost().getId())
-                .post(like.getPost())
+                .postId(like.getPost().getId())
                 .content(message)
                 .build();
 
@@ -74,7 +74,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .receiverUser(postOwner)
                 .targetCollection(TargetCollection.comment)
                 .targetId(comment.getId())
-                .post(comment.getPost())
+                .postId(comment.getPost().getId())
                 .content(message)
                 .build();
         notificationRepository.save(notificationEntity);
@@ -92,7 +92,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .receiverUser(postOwner)
                 .targetCollection(TargetCollection.comment)
                 .targetId(comment.getId())
-                .post(comment.getPost())
+                .postId(comment.getPost().getId())
                 .content(message)
                 .build();
         notificationRepository.save(notificationEntity);
@@ -104,15 +104,15 @@ public class NotificationServiceImpl implements NotificationService{
 
         UserEntity commentOwner = reply.getParent().getUser();
         UserEntity commenter = getCurrentUserProfile();
-        String message = commenter.getName() + "yorumuna yanıt verdi";
+        String message = commenter.getName() + " yorumuna yanıt verdi";
 
         NotificationEntity notificationEntity = NotificationEntity.builder()
-                .type(NotificationType.POST_COMMENTED)
+                .type(NotificationType.COMMENT_REPLIED)
                 .senderUser(commenter)
                 .receiverUser(commentOwner)
                 .targetCollection(TargetCollection.comment)
                 .targetId(reply.getId())
-                .post(reply.getPost())
+                .postId(reply.getPost().getId())
                 .content(message)
                 .build();
 

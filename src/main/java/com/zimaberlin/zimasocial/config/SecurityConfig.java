@@ -32,7 +32,8 @@ public class SecurityConfig {
             "swagger-ui/**", "swagger-ui**",
             "/v3/api-docs/**", "/v3/api-docs**",
             "/actuator/**",
-            "/metrics"
+            "/metrics",
+            "/api/v1/files/images/**",
     };
 
     @Autowired

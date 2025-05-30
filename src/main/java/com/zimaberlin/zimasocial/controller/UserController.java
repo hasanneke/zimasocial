@@ -1,8 +1,12 @@
 package com.zimaberlin.zimasocial.controller;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.UserService;
+import com.zimaberlin.zimasocial.views.user.DetailedUserView;
 import com.zimaberlin.zimasocial.views.user.UserView;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -31,8 +36,8 @@ public class UserController {
     }
 
     @GetMapping(path = "/me")
-    ResponseEntity<UserView> getMe(){
-        UserView userView = userService.getUserMe();
+    ResponseEntity<DetailedUserView> getMe(){
+        DetailedUserView userView = userService.getUserMe();
         return ResponseEntity.ok(userView);
     }
 
@@ -49,19 +54,45 @@ public class UserController {
     }
 
     @PatchMapping(path = "/me/upload-image")
-    public  ResponseEntity<UserView> uploadProfileImage(MultipartFile image){
+    public ResponseEntity<UserView> uploadProfileImage(MultipartFile image) throws IOException {
         UserView user = userService.updateProfileImage(image);
         return ResponseEntity.ok(user);
     }
 
-    @PatchMapping("/me/change-username")
-    public ResponseEntity<UserView> changeUsername(@NotBlank @RequestParam(name = "slug") String slug){
-        UserView userView = userService.updateUsername(slug);
+    @DeleteMapping(path = "/me/remove-profile")
+    public ResponseEntity<Void> deleteProfileImage() {
+        userService.removeMyProfileImage();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/update-slug")
+    public ResponseEntity<UserView> updateSlug(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "slug") String slug){
+        UserView userView = userService.updateSlug(slug);
+        return ResponseEntity.ok(userView);
+    }
+    @PatchMapping("/me/update-bio")
+    public ResponseEntity<UserView> updateBio(@Valid @NotBlank @Size(max= 128) @RequestParam(name = "bio") String bio){
+        UserView userView = userService.updateBio(bio);
         return ResponseEntity.ok(userView);
     }
 
+    @PatchMapping("/me/update-name")
+    public ResponseEntity<UserView> updateName(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "name") String name){
+        UserView userView = userService.updateName(name);
+        return ResponseEntity.ok(userView);
+    }
+    @PatchMapping("/me/make-account-public")
+    public ResponseEntity<UserView> makeAccountPublic(){
+        UserView userView = userService.makeAccountPublic();
+        return ResponseEntity.ok(userView);
+    }
+    @PatchMapping("/me/make-account-private")
+    public ResponseEntity<UserView> makeAccountPrivate(){
+        UserView userView = userService.makeAccountPrivate();
+        return ResponseEntity.ok(userView);
+    }
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
-    public ResponseEntity<Boolean> checkUsernameExists(@NotBlank @RequestParam(name = "slug") String slug){
+    public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
         boolean usernameExists = userService.checkUsernameExists(slug);
         return ResponseEntity.ok(usernameExists);
     }
@@ -139,13 +170,13 @@ public class UserController {
         }
         return new  HttpEntity<>(pagedModel);
     }
-    @GetMapping("/{userId}/block")
+    @GetMapping("/{slug}/block")
     public ResponseEntity<Void> blockUser(@PathVariable(name = "slug") String slug) {
         userService.blockUser(slug);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/{userId}/unblock")
-    public ResponseEntity<Void> unblockUser(@PathVariable(name = "userId") String slug) {
+    @GetMapping("/{slug}/unblock")
+    public ResponseEntity<Void> unblockUser(@PathVariable(name = "slug") String slug) {
         userService.unblockUser(slug);
         return ResponseEntity.ok().build();
     }

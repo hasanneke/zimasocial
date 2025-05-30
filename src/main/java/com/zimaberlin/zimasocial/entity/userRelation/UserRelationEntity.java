@@ -13,6 +13,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Table(name = "user_relation")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
@@ -23,11 +24,11 @@ public class UserRelationEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "initiated_id")
-    private UserEntity initiatedUser;
+    private UserEntity actor;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private UserEntity receiverUser;
+    private UserEntity receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "relation")
@@ -42,18 +43,14 @@ public class UserRelationEntity extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserRelationEntity that = (UserRelationEntity) o;
-        return Objects.equals(initiatedUser, that.getInitiatedUser())
-                && Objects.equals(receiverUser, that.getReceiverUser())
+        return Objects.equals(actor, that.getActor())
+                && Objects.equals(receiver, that.getReceiver())
                 && Objects.equals(relation, that.getRelation())
                 && Objects.equals(getIsDeleted(), that.getIsDeleted());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(initiatedUser, receiverUser, relation, getIsDeleted());
-    }
-
-    public void markAsDeleted(){
-        setIsDeleted(true);
+        return Objects.hash(actor, receiver, relation, getIsDeleted());
     }
 }

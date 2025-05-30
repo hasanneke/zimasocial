@@ -26,7 +26,8 @@ public class PostView extends RepresentationModel<PostView> {
     private UserView user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    private Boolean isReported;
+    private Boolean isVisible;
     public PostView addLinks() {
         this.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class)

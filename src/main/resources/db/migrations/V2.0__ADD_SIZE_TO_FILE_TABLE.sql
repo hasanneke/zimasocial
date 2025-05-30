@@ -1,0 +1,2 @@
+ALTER TABLE public.file
+ADD COLUMN size BIGINT;

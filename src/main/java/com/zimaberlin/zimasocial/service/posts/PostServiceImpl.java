@@ -2,14 +2,12 @@ package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.entity.userRelation.Relation;
-import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.events.*;
+import com.zimaberlin.zimasocial.factory.CommentViewFactory;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
-import com.zimaberlin.zimasocial.utility.CustomPostMapper;
-import com.zimaberlin.zimasocial.utility.CustomUserMapper;
+import com.zimaberlin.zimasocial.utility.PostViewFactory;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.config.CustomUserDetails;
@@ -19,19 +17,19 @@ import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
-import com.zimaberlin.zimasocial.utility.CustomCommentMapper;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
@@ -39,31 +37,8 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
-    private final UserRelationRepository userRelationRepository;
-    private final CustomPostMapper postMapper;
-    private final CustomCommentMapper commentMapper;
-
-    @Autowired
-    public PostServiceImpl(PostRepository postRepository,
-                           LikeRepository likeRepository,
-                           CommentRepository commentRepository,
-                           UserRepository userRepository,
-                           ApplicationEventPublisher eventPublisher,
-                           NotificationService notificationService,
-                           UserRelationRepository userRelationRepository,
-                           CustomPostMapper postMapper,
-                           CustomCommentMapper commentMapper) {
-        this.postRepository = postRepository;
-        this.likeRepository = likeRepository;
-        this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
-        this.eventPublisher = eventPublisher;
-        this.notificationService = notificationService;
-        this.userRelationRepository = userRelationRepository;
-        this.postMapper = postMapper;
-        this.commentMapper = commentMapper;
-    }
-
+    private final CommentViewFactory commentViewFactory;
+    private final PostViewFactory postFactory;
     @Override
     public Page<PostView> getPosts(int page, int size, String slug, PostType type) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
@@ -76,7 +51,7 @@ public class PostServiceImpl implements PostService {
             postsPage = postRepository.findByUserOrderByCreatedAt(pageable, user);
         }
 
-        List<PostView> postViews = toDtoWithPopulatedFields(postsPage);
+        List<PostView> postViews = postFactory.populated(postsPage.getContent());
 
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
@@ -90,7 +65,7 @@ public class PostServiceImpl implements PostService {
         }else{
             postsPage = postRepository.findByType(pageable, type);
         }
-        List<PostView> postViews = toDtoWithPopulatedFields(postsPage);
+        List<PostView> postViews = postFactory.populated(postsPage.getContent());
         return new PageImpl<>(postViews, pageable, postsPage.getTotalElements());
     }
 
@@ -98,21 +73,22 @@ public class PostServiceImpl implements PostService {
     public Page<CommentView> getComments(int page, int size, Long postId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<CommentEntity> commentsPage = commentRepository.findByPostIdAndParentId(pageable, postId, null);
-        List<CommentView> commentViews = fillCommentsWithIsLiked(commentsPage);
+        List<CommentView> commentViews = commentViewFactory.populated(commentsPage.getContent());
         return new PageImpl<>(commentViews, pageable, commentsPage.getTotalElements());
     }
 
     @Override
     public Page<CommentView> getCommentReplies(int page, int size, Long postId, Long commentId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<CommentEntity> commentEntities = commentRepository.findByParentId(commentId, pageable);
-        return commentEntities.map(commentMapper::entityToDomain);
+        Page<CommentEntity> repliesPage = commentRepository.findByParentIdOrderByCreatedAtDesc(commentId, pageable);
+        List<CommentView> commentViews = commentViewFactory.populated(repliesPage.getContent());
+        return new PageImpl<>(commentViews, pageable, repliesPage.getTotalElements());
     }
 
     @Override
     public PostView getPost(Long postId) {
         PostEntity post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
-        return  postMapper.postEntityToPost(post);
+        return  postFactory.populated(post);
     }
 
     @Override
@@ -130,7 +106,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
 
         PostEntity createdPost = postRepository.save(post);
-        return postMapper.postEntityToPost(createdPost);
+        return postFactory.populated(createdPost);
     }
 
     @Override
@@ -193,7 +169,7 @@ public class PostServiceImpl implements PostService {
             notificationService.sendPostCommentedNotification(commentEntity);
         }
 
-        return commentMapper.entityToDomain(commentEntity);
+        return commentViewFactory.plain(commentEntity);
     }
 
     @Override
@@ -247,7 +223,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
-        CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
+        CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
 
@@ -264,7 +240,7 @@ public class PostServiceImpl implements PostService {
         if(!selfReplied){
             notificationService.sendCommentRepliedNotification(reply);
         }
-        return commentMapper.entityToDomain(comment);
+        return commentViewFactory.plain(comment);
     }
 
     @Override
@@ -274,35 +250,9 @@ public class PostServiceImpl implements PostService {
         reply.getParent().decrementReplyCount();
 
         commentRepository.delete(reply);
-        return commentMapper.entityToDomain(reply);
+        return commentViewFactory.plain(reply);
     }
 
-    private List<PostView> toDtoWithPopulatedFields(Page<PostEntity> postsPage) {
-        List<PostView> postViews = postsPage.getContent().stream().map(postMapper::postEntityToPost).toList();
-        Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(authenticationPrincipal != "anonymousUser"){
-            UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
-            for (int i = 0; i < postViews.size(); i++) {
-                LikeEntity like = likeRepository.findByUserAndPost(profile, postsPage.getContent().get(i)).orElse(null);
-                if(like != null){
-                    postViews.get(i).setLiked(true);
-                }
-            }
-        }
-        return postViews;
-    }
-    private List<CommentView> fillCommentsWithIsLiked(Page<CommentEntity> commentsPage) {
-        List<CommentView> postViews = commentsPage.getContent().stream().map(commentMapper::entityToDomain).toList();
-        Object authenticationPrincipal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(authenticationPrincipal != "anonymousUser"){
-            UserEntity profile =  ((CustomUserDetails) authenticationPrincipal).getProfile();
-            for (int i = 0; i < postViews.size(); i++) {
-                LikeEntity like = likeRepository.findByUserAndComment(profile, commentsPage.getContent().get(i)).orElse(null);
-                if(like != null){
-                    postViews.get(i).setIsLiked(true);
-                }
-            }
-        }
-        return postViews;
-    }
+
+
 }

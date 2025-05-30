@@ -19,10 +19,18 @@ import java.util.stream.Collectors;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "users")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 public class UserEntity extends BaseEntity {
+    protected UserEntity() {}
+    protected UserEntity(String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug){
+        this.email = email;
+        this.name = name;
+        this.familyName = familyName;
+        this.authProvider = authProvider;
+        this.roles = roles;
+        this.slug = slug;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,8 +61,8 @@ public class UserEntity extends BaseEntity {
     @Column(name = "following_count")
     private int followingCount = 0;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+    @Column(name = "avatar_file_name")
+    private String avatarFileName;
 
     @Column(name = "auth_provider")
     private String authProvider;
@@ -101,87 +109,29 @@ public class UserEntity extends BaseEntity {
     @JsonIgnore
     private Set<NotificationEntity> notifications = new HashSet<>();
 
-    @OneToMany(mappedBy = "initiatedUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserRelationEntity> initiatedRelations = new HashSet<>();
 
-    @OneToMany(mappedBy = "receiverUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserRelationEntity> receivedRelations = new HashSet<>();
     public Set<UserEntity> getFollowers() {
-        return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getInitiatedUser).collect(Collectors.toSet());
+        return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getActor).collect(Collectors.toSet());
     }
 
     public Set<UserEntity> getFollowings() {
-        return initiatedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getReceiverUser).collect(Collectors.toSet());
+        return initiatedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getReceiver).collect(Collectors.toSet());
     }
-
-    public void unfollowUser(UserEntity follower) {
-        if(follower.equals(this)){
-            throw new CircularUnfollowException();
-        }
-        Optional<UserRelationEntity> relation = followRelationWith(follower);
-        if(relation.isPresent()){
-            relation.get().setIsDeleted(true);
-            decrementFollowerCount();
-            follower.decrementFollowingCount();
-        }else{
-            throw new UserNotFollowed("You are not following the user");
-        }
-    }
-    public void follow(UserEntity follower)  {
-        if(follower.equals(this)){
-            throw new CircularFollowException();
-        }
-        Optional<UserRelationEntity> relation = followedByRelationWith(follower);
-        if(relation.isEmpty()){
-          UserRelationEntity relationEntity = UserRelationEntity.builder()
-                    .initiatedUser(follower)
-                    .receiverUser(this)
-                    .relation(Relation.followed)
-                    .isDeleted(false)
-                    .build();
-            receivedRelations.add(relationEntity);
-            follower.incrementFollowingCount();
-            incrementFollowerCount();
-        }else{
-            throw new UserAlreadyFollowed("You are already following the user");
-        }
-    }
-
-    public void block(UserEntity blocker) {
-        Optional<UserRelationEntity> checkRelation = beingBlockedRelations().stream().filter(e->e.getInitiatedUser().equals(blocker)).toList().stream().findFirst();
-        if(checkRelation.isEmpty()){
-            UserRelationEntity blockRelation = UserRelationEntity.builder()
-                    .relation(Relation.blocked)
-                    .initiatedUser(blocker)
-                    .receiverUser(this)
-                    .build();
-            receivedRelations.add(blockRelation);
-        }else{
-            throw new UserIsAlreadyBlockedException();
-        }
-    }
-
-    public void unblock(UserEntity blocker){
-        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getInitiatedUser().equals(blocker)).toList().stream().findFirst();
-        if(blockRelation.isPresent()){
-            blockRelation.get().setIsDeleted(true);
-        }else{
-            throw new UserIsNotBlockedException();
-        }
-    }
-
     boolean isBlocked(UserEntity blocker){
-        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getInitiatedUser().equals(blocker)).toList().stream().findFirst();
+        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
         return blockRelation.isPresent();
     }
-
     private Optional<UserRelationEntity> followRelationWith(UserEntity user) {
-        return receivedRelations.stream().filter(e-> user.equals(e.getInitiatedUser()) && e.getRelation().equals(Relation.followed)).findFirst();
+        return receivedRelations.stream().filter(e-> user.equals(e.getActor()) && e.getRelation().equals(Relation.followed)).findFirst();
     }
     private Optional<UserRelationEntity> followedByRelationWith(UserEntity user) {
-        return receivedRelations.stream().filter(e-> user.equals(e.getInitiatedUser()) && e.getRelation().equals(Relation.followed)).findFirst();
+        return receivedRelations.stream().filter(e-> user.equals(e.getActor()) && e.getRelation().equals(Relation.followed)).findFirst();
     }
     private Set<UserRelationEntity> blockedRelations() {
         return initiatedRelations.stream().filter(e->e.getRelation().equals(Relation.blocked)).collect(Collectors.toSet());
@@ -202,16 +152,114 @@ public class UserEntity extends BaseEntity {
         return Objects.hash(id);
     }
 
-    void incrementFollowingCount(){
+    protected void incrementFollowingCount(){
         followingCount = getFollowingCount() + 1;
     }
-    void decrementFollowingCount(){
+    protected void decrementFollowingCount(){
         followingCount = getFollowingCount() - 1;
     }
-    void incrementFollowerCount(){
+    protected void incrementFollowerCount(){
         followersCount = getFollowersCount() + 1;
     }
-    void decrementFollowerCount(){
+    protected void decrementFollowerCount(){
         followersCount = getFollowersCount() - 1;
+    }
+
+    protected void setReceivedRelations(Set<UserRelationEntity> relations) {
+        this.receivedRelations = relations;
+    }
+    protected void setId(Long id){
+        this.id = id;
+    }
+    public void attachFileName(String avatarFileName) {
+        this.avatarFileName = avatarFileName;
+    }
+    public void updateBio(String bio){
+        if(bio.length() > 128) {
+            throw new BioLengthExceededException();
+        }
+        this.bio = bio;
+    }
+    public void updateName(String name) {
+        if(name.length() > 32){
+            throw new NameLengthExceededException();
+        }
+        this.name = name;
+    }
+    public void updateSlug(String slug){
+        if(name.length() > 32){
+            throw new NameLengthExceededException();
+        }
+        this.slug = slug;
+    }
+    public void removeProfilePhoto() {
+        avatarFileName = null;
+    }
+    public void unfollowUser(UserEntity follower) {
+        if(follower.equals(this)){
+            throw new CircularUnfollowException();
+        }
+        Optional<UserRelationEntity> relation = followRelationWith(follower);
+        if(relation.isPresent()){
+            relation.get().setIsDeleted(true);
+            decrementFollowerCount();
+            follower.decrementFollowingCount();
+        }else{
+            throw new UserNotFollowed("You are not following the user");
+        }
+    }
+    public void follow(UserEntity follower)  {
+        if(follower.equals(this)){
+            throw new CircularFollowException();
+        }
+        Optional<UserRelationEntity> relation = followedByRelationWith(follower);
+        if(relation.isEmpty()){
+            UserRelationEntity relationEntity = UserRelationEntity.builder()
+                    .actor(follower)
+                    .receiver(this)
+                    .relation(Relation.followed)
+                    .isDeleted(false)
+                    .build();
+            receivedRelations.add(relationEntity);
+            follower.incrementFollowingCount();
+            incrementFollowerCount();
+        }else{
+            throw new UserAlreadyFollowed("You are already following the user");
+        }
+    }
+
+    public void block(UserEntity blocker) {
+        Optional<UserRelationEntity> checkRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
+        if(checkRelation.isEmpty()){
+            UserRelationEntity blockRelation = UserRelationEntity.builder()
+                    .relation(Relation.blocked)
+                    .actor(blocker)
+                    .receiver(this)
+                    .build();
+            receivedRelations.add(blockRelation);
+        }else{
+            throw new UserIsAlreadyBlockedException();
+        }
+    }
+
+    public void unblock(UserEntity blocker){
+        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
+        if(blockRelation.isPresent()){
+            blockRelation.get().setIsDeleted(true);
+        }else{
+            throw new UserIsNotBlockedException();
+        }
+    }
+    public void makeAccountPrivate() {
+        if(isPrivate){
+            throw new AccountIsAlreadyPrivateException();
+        }
+        this.isPrivate = true;
+    }
+    public void makeAccountPublic() {
+        if(!isPrivate){
+            throw new AccountIsAlreadyPublicException();
+        }
+        this.isPrivate = false;
     }
 }

@@ -2,7 +2,6 @@ package com.zimaberlin.zimasocial.service.imageService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -13,20 +12,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Service
 @Slf4j
-public class S3Service {
+public class S3ImageService implements ImageService {
     private final S3Client s3Client;
     private final String bucketName;
     private final String region;
-    public S3Service(S3Client s3Client,
+    public S3ImageService(S3Client s3Client,
                      @Value("${aws.s3.bucket}") String bucketName, @Value("${aws.s3.region}") String region) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.region = region;
     }
 
-    public String uploadImage(MultipartFile file) {
+    @Override
+    public String uploadProfileImage(MultipartFile file) {
+        return null;
+    }
+
+    public String uploadFile(MultipartFile file) {
         try {
             String fileName = generateFileName(file);
 
@@ -61,20 +64,23 @@ public class S3Service {
         }
     }
 
-    public void deleteImage(String fileKey) {
+    public void deleteFile(String key) {
         try {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileKey)
+                    .key(key)
                     .build();
-
             s3Client.deleteObject(deleteObjectRequest);
-            log.info("Successfully deleted file: {}", fileKey);
-
+            log.info("Successfully deleted file: {}", key);
         } catch (S3Exception e) {
             log.error("Error deleting file from S3: {}", e.getMessage());
             throw new RuntimeException("Failed to delete file from S3", e);
         }
+    }
+
+    @Override
+    public byte[] getFile(String key) {
+        return new byte[0];
     }
 
     private String generateFileName(MultipartFile file) {

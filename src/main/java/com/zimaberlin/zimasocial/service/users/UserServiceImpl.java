@@ -1,23 +1,18 @@
 package com.zimaberlin.zimasocial.service.users;
 
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.entity.userRelation.Relation;
-import com.zimaberlin.zimasocial.exception.ConflictException;
+import com.zimaberlin.zimasocial.entity.user.exceptions.SlugAlreadyExistException;
 import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
-import com.zimaberlin.zimasocial.repository.UserRelationRepository;
 import com.zimaberlin.zimasocial.repository.UserRepository;
-import com.zimaberlin.zimasocial.service.imageService.S3Service;
+import com.zimaberlin.zimasocial.service.imageService.ImageService;
 import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
-import com.zimaberlin.zimasocial.utility.CustomUserMapper;
+import com.zimaberlin.zimasocial.utility.UserViewFactory;
+import com.zimaberlin.zimasocial.views.user.DetailedUserView;
 import com.zimaberlin.zimasocial.views.user.UserView;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,67 +20,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
-    private CustomUserMapper userMapper;
-    private S3Service s3Service;
-
+    private UserViewFactory userMapper;
+    private ImageService imageService;
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, CustomUserMapper userMapper, S3Service s3Service) {
+    public UserServiceImpl(UserRepository userRepository, UserViewFactory userMapper, ImageService imageService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
-        this.s3Service = s3Service;
+        this.imageService = imageService;
     }
-
     @Override
-    public UserView updateProfileImage(@NotNull(message = "Image cannot be null") MultipartFile image)  {
-        String url = s3Service.uploadImage(image);
+    @Transactional
+    public UserView updateProfileImage(MultipartFile image) throws IOException {
+        String avatarFileName = imageService.uploadProfileImage(image);
         UserEntity user = CurrentUser.getCurrentUserProfile();
-        if(user.getAvatarUrl() != null){
-            String fileName = Arrays.stream(user.getAvatarUrl().split("/")).toList().getLast();
-            s3Service.deleteImage(fileName);
+        if(user.getAvatarFileName() != null){
+            imageService.deleteFile(user.getAvatarFileName());
         }
-        user.setAvatarUrl(url);
+        user.attachFileName(avatarFileName);
         userRepository.save(user);
 
-        return userMapper.entityToDomain(user);
+        return userMapper.populated(user);
     }
-
     @Override
     public UserView updateUser(@Valid UserUpdatePayload payload) {
         UserEntity user = CurrentUser.getCurrentUserProfile();
         if(payload.getBio() != null){
-            user.setBio(payload.getBio());
+            user.updateBio(payload.getBio());
         }
         if(payload.getName() != null){
-            user.setName(payload.getName());
+            user.updateName(payload.getName());
         }
         userRepository.save(user);
-        return userMapper.entityToDomain(user);
+        return userMapper.populated(user);
     }
-
     @Override
-    public UserView updateUsername(@NotBlank @Max(20) String slug) {
-        boolean isSlugExists = checkUsernameExists(slug);
-        if(isSlugExists){
-            throw new ConflictException("Username already exists");
-        }
-        UserEntity user = CurrentUser.getCurrentUserProfile();
-        user.setSlug(slug);
-        userRepository.save(user);
-        return userMapper.entityToDomain(user);
+    public boolean checkUsernameExists(String slug) {
+        userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        return true;
     }
-
-    @Override
-    public boolean checkUsernameExists( String slug) {
-        UserEntity user = userRepository.findBySlug(slug).orElseThrow(()-> new ResourceNotFoundException("User not found"));
-        return user != null;
-    }
-
     @Override
     @Transactional
     public void followUser(String slug) {
@@ -94,7 +73,6 @@ public class UserServiceImpl implements UserService{
         followedUser.follow(me);
         userRepository.save(followedUser);
     }
-
     @Override
     @Transactional
     public void unfollowUser(String slug) {
@@ -103,7 +81,6 @@ public class UserServiceImpl implements UserService{
         unfollowedUser.unfollowUser(me);
         userRepository.save(me);
     }
-
     @Override
     public Page<UserView> getFollowers(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
@@ -111,9 +88,8 @@ public class UserServiceImpl implements UserService{
         PageRequest requestPage = PageRequest.of(page, size);
         Page<UserEntity> getFollowers = userRepository.findFollowersByUserAndRelation(user, requestPage);
 
-        return getFollowers.map(userMapper::entityToDomain);
+        return getFollowers.map(userMapper::populated);
     }
-
     @Override
     public Page<UserView> getFollowing(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
@@ -121,9 +97,8 @@ public class UserServiceImpl implements UserService{
         PageRequest requestPage = PageRequest.of(page, size);
         Page<UserEntity> getFollowers = userRepository.findFollowingsByUserAndRelation(user, requestPage);
 
-        return getFollowers.map(userMapper::entityToDomain);
+        return getFollowers.map(userMapper::populated);
     }
-
     @Override
     @Transactional
     public void blockUser(String slug) {
@@ -131,22 +106,82 @@ public class UserServiceImpl implements UserService{
         user.block(CurrentUser.getCurrentUserProfile());
         userRepository.save(user);
     }
-
     @Override
     public void unblockUser(String slug) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
         user.unblock(CurrentUser.getCurrentUserProfile());
         userRepository.save(user);
     }
-
     @Override
-    public UserView getUserMe() {
-        return userMapper.entityToDomain(CurrentUser.getCurrentUserProfile());
+    public void removeMyProfileImage() {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        if(user.getAvatarFileName() != null){
+            imageService.deleteFile(user.getAvatarFileName());
+            user.removeProfilePhoto();
+            userRepository.save(user);
+        }
     }
-
+    @Override
+    public DetailedUserView getUserMe() {
+        return userMapper.populateDetailed(CurrentUser.getCurrentUserProfile());
+    }
     @Override
     public UserView getUser(String slug) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
-        return userMapper.entityToDomain(user);
+        return userMapper.populated(user);
+    }
+    @Override
+    @Transactional
+    public UserView updateBio(String bio) {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        user.updateBio(bio);
+        userRepository.save(user);
+        return userMapper.populated(user);
+    }
+    @Override
+    @Transactional
+    public UserView updateName(String name) {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        user.updateName(name);
+        userRepository.save(user);
+        return userMapper.populated(user);
+    }
+    @Override
+    @Transactional
+    public UserView updateSlug(String slug) {
+        boolean isSlugExists = userRepository.findBySlug(slug).isPresent();
+        if(isSlugExists){
+            throw new SlugAlreadyExistException();
+        }
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        user.updateSlug(slug);
+        userRepository.save(user);
+        return userMapper.populated(user);
+    }
+    @Override
+    @Transactional
+    public UserView makeAccountPrivate() {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        user.makeAccountPrivate();
+        userRepository.save(user);
+        return userMapper.populated(user);
+    }
+
+    @Override
+    @Transactional
+    public UserView makeAccountPublic() {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        user.makeAccountPublic();
+        userRepository.save(user);
+        return userMapper.populated(user);
+    }
+
+    @Override
+    public boolean checkSlugExists(String slug) {
+        Optional<UserEntity> user = userRepository.findBySlug(slug);
+        user.ifPresent(e-> {
+            throw new SlugAlreadyExistException();
+        });
+        return false;
     }
 }
