@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface PostService {
     // GET POSTS FOR SLUG
     Page<PostView> getPosts(int page, int size, String slug, PostType type);
@@ -40,4 +42,5 @@ public interface PostService {
     CommentView replyComment(Long postId, Long commentId, CommentPayload payload);
     // DELETE REPLY COMMENT
     CommentView deleteReplyComment(Long postId, Long commentId, Long replyCommentId);
+    List<PostView> getTodaysPosts();
 }

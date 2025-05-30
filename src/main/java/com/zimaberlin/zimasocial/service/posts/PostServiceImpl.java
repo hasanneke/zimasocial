@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.service.posts;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
+import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.events.*;
 import com.zimaberlin.zimasocial.factory.CommentViewFactory;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -39,6 +41,7 @@ public class PostServiceImpl implements PostService {
     private final NotificationService notificationService;
     private final CommentViewFactory commentViewFactory;
     private final PostViewFactory postFactory;
+    private final TodaysPostRepository todaysPostRepository;
     @Override
     public Page<PostView> getPosts(int page, int size, String slug, PostType type) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
@@ -253,6 +256,9 @@ public class PostServiceImpl implements PostService {
         return commentViewFactory.plain(reply);
     }
 
-
-
+    @Override
+    public List<PostView> getTodaysPosts() {
+        final List<TodaysPost> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
+        return postFactory.populated(todaysPosts.stream().map(TodaysPost::getPost).toList());
+    }
 }

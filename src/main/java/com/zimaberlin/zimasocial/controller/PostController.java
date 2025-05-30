@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -208,5 +209,10 @@ public class PostController {
             @PathVariable(name = "replyId") Long replyId) {
         CommentView commentView = postService.deleteReplyComment(postId, commentId, replyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(commentView);
+    }
+
+    @GetMapping(path = "/todays-posts")
+    public ResponseEntity<List<PostView>> getTodaysPosts() {
+        return ResponseEntity.ok(postService.getTodaysPosts());
     }
 }

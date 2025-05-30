@@ -94,6 +94,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
         logger.severe(Arrays.toString(ex.getStackTrace()));
+        System.out.println(Arrays.toString(ex.getStackTrace()));
         return new ResponseEntity<>(ResponseError.
                 builder().
                 timeStamp(System.currentTimeMillis()).

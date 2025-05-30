@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,6 +53,10 @@ public class PostEntity extends BaseEntity{
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<LikeEntity> likes =  new HashSet<>();
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnore
+    private Set<TodaysPost> todaysPosts =  new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

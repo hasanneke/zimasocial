@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.report.ReportEntity;
+import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.exceptions.*;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
@@ -116,6 +117,11 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserRelationEntity> receivedRelations = new HashSet<>();
+
+    @OneToMany(mappedBy = "author")
+    @JsonIgnore
+    private Set<TodaysPost> todaysPost =  new HashSet<>();
+
     public Set<UserEntity> getFollowers() {
         return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getActor).collect(Collectors.toSet());
     }
