@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.entity.userRelation;
 
-import com.zimaberlin.zimasocial.entity.BaseEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +16,7 @@ import java.util.Objects;
 @SuperBuilder(toBuilder = true)
 @Table(name = "user_relation")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class UserRelationEntity extends BaseEntity {
+public class UserRelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,6 +36,14 @@ public class UserRelationEntity extends BaseEntity {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "IS_DELETED", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.entity.report;
 
-import com.zimaberlin.zimasocial.entity.BaseEntity;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
@@ -20,7 +19,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 @Getter
-public class ReportEntity extends BaseEntity {
+public class ReportEntity  {
     @EmbeddedId
     private ReportId id;
 
@@ -39,6 +38,13 @@ public class ReportEntity extends BaseEntity {
     @Column(name = "description", length = 512)
     private String description;
 
+    @Column(name = "IS_DELETED", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
     public static ReportEntity buildPostReport(ReportRequest request, PostEntity post) {
         return ReportEntity.builder()
                 .id(new ReportId(post.getId(), CurrentUser.getCurrentUserProfile().getId(), ResourceType.post))

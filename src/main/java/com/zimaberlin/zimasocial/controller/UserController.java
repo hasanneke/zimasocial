@@ -4,7 +4,6 @@ import com.zimaberlin.zimasocial.service.users.UserService;
 import com.zimaberlin.zimasocial.views.user.DetailedUserView;
 import com.zimaberlin.zimasocial.views.user.UserView;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
@@ -179,5 +178,34 @@ public class UserController {
     public ResponseEntity<Void> unblockUser(@PathVariable(name = "slug") String slug) {
         userService.unblockUser(slug);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public HttpEntity<PagedModel<UserView>> search(@Valid @NotBlank @RequestParam(name = "query") String query,
+                                                       @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                       @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Page<UserView> userPage = userService.searchUsers(query, page, size);
+        PagedModel<UserView> pagedModel = PagedModel.of(
+                userPage.getContent(),
+                new PagedModel.PageMetadata(userPage.getSize(),
+                        userPage.getNumber(),
+                        userPage.getTotalElements(),
+                        userPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("search",
+                String.class,
+                Integer.class,
+                Integer.class);
+
+        if(page < userPage.getTotalPages()){
+            Link link = linkTo(method, query, page + 1, size).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, query, page - 1, size).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return new  HttpEntity<>(pagedModel);
     }
 }

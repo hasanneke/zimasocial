@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "api/v1/post-reports")
+@RequestMapping(path = "api/v1/reports")
 public class ReportController {
     private ReportService reportService;
     @Autowired

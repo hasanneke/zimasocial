@@ -1,11 +1,7 @@
 package com.zimaberlin.zimasocial.entity.file;
 
-import com.zimaberlin.zimasocial.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class FileEntity extends BaseEntity {
+public class FileEntity  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
@@ -53,4 +49,11 @@ public class FileEntity extends BaseEntity {
     @Column(name = "CODE")
     @Enumerated(EnumType.STRING)
     private FileCode code;
+
+    @Column(name = "IS_DELETED", nullable = false)
+    private Boolean isDeleted = false;
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+    }
 }

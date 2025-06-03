@@ -19,6 +19,7 @@ public class UserView extends RepresentationModel<UserView> {
     private int followingCount;
     private boolean isFollowed;
     private Boolean isPrivate;
+    private Boolean isBlocked;
 
     public UserView addLinks() {
         // Add self link to user details

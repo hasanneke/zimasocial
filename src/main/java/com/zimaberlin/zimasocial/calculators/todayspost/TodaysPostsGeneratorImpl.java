@@ -16,12 +16,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class TodaysPostsGeneratorImpl  implements TodaysPostGenerator {
+public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
     private static Logger logger = LoggerFactory.getLogger(TodaysPostsGeneratorImpl.class);
     private final PostRepository postRepository;
     private final PostScoreCalculator postScoreCalculator;

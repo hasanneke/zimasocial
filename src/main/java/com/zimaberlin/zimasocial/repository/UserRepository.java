@@ -32,4 +32,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             WHERE ir.actor = :user AND ir.relation = Relation.followed
             """)
     Page<UserEntity> findFollowingsByUserAndRelation(UserEntity user, Pageable pageable);
+
+    @Query(value = "SELECT * FROM USERS u WHERE u.name ILIKE %:query% OR u.slug ILIKE %:query%", nativeQuery = true)
+    Page<UserEntity> searchUser(String query, Pageable pageable);
 }

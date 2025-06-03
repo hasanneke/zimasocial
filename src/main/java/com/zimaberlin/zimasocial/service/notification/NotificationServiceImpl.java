@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.service.notification;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.UserViewFactory;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.slf4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfile;
 
@@ -38,20 +41,27 @@ public class NotificationServiceImpl implements NotificationService{
                 .targetCollection(e.getTargetCollection())
                 .postId(e.getPostId())
                 .createdAt(e.getCreatedAt())
-                .actor(userMapper.populated(e.getSenderUser()))
+                .actor(userMapper.populated(e.getActor()))
                 .build());
     }
 
     @Override
     public void sendPostLikedNotification(LikeEntity like) {
+        UserEntity actor = getCurrentUserProfile();
+        UserEntity receiver = like.getPost().getUser();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(receiver, actor, like.getPost().getId(), NotificationType.POST_LIKED, TargetCollection.post);
+        if(notificationEntity.isPresent()){
+            return;
+        }
+
         logger.info(String.format("Post %d liked", like.getPost().getId()));
-        UserEntity liker = getCurrentUserProfile();
-        String message = liker.getName() + " paylaşımını beğendi";
+        String message = actor.getName() + " paylaşımını beğendi";
 
         NotificationEntity notification = NotificationEntity.builder()
                 .type(NotificationType.POST_LIKED)
-                .senderUser(liker)
-                .receiverUser(like.getPost().getUser())
+                .actor(actor)
+                .receiverUser(receiver)
                 .targetCollection(TargetCollection.post)
                 .targetId(like.getPost().getId())
                 .postId(like.getPost().getId())
@@ -64,38 +74,42 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public void sendPostCommentedNotification(CommentEntity comment) {
         logger.info(String.format("Post %d commented", comment.getPost().getId()));
-        UserEntity commenter = getCurrentUserProfile();
-        UserEntity postOwner = comment.getPost().getUser();
-        String message = commenter.getName() + " paylaşımına yorum yaptı";
-
-        NotificationEntity notificationEntity = NotificationEntity.builder()
+        UserEntity actor = getCurrentUserProfile();
+        UserEntity receiver = comment.getPost().getUser();
+        String message = actor.getName() + " paylaşımına yorum yaptı";
+        NotificationEntity notification = NotificationEntity.builder()
                 .type(NotificationType.POST_COMMENTED)
-                .senderUser(commenter)
-                .receiverUser(postOwner)
+                .actor(actor)
+                .receiverUser(receiver)
                 .targetCollection(TargetCollection.comment)
                 .targetId(comment.getId())
                 .postId(comment.getPost().getId())
                 .content(message)
                 .build();
-        notificationRepository.save(notificationEntity);
+        notificationRepository.save(notification);
     }
 
     @Override
     public void sendCommentLikedNotification(CommentEntity comment) {
         logger.info(String.format("Comment %d liked", comment.getId()));
-        UserEntity postOwner = comment.getUser();
-        UserEntity liker = getCurrentUserProfile();
-        String message = liker.getName() + " yorumunu beğendi";
-        NotificationEntity notificationEntity = NotificationEntity.builder()
+        UserEntity receiver = comment.getUser();
+        UserEntity actor = getCurrentUserProfile();
+        String message = actor.getName() + " yorumunu beğendi";
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(receiver, actor, comment.getId(), NotificationType.COMMENT_LIKED, TargetCollection.comment);
+        if(notificationEntity.isPresent()){
+            return;
+        }
+        NotificationEntity notification = NotificationEntity.builder()
                 .type(NotificationType.COMMENT_LIKED)
-                .senderUser(liker)
-                .receiverUser(postOwner)
+                .actor(actor)
+                .receiverUser(receiver)
                 .targetCollection(TargetCollection.comment)
                 .targetId(comment.getId())
                 .postId(comment.getPost().getId())
                 .content(message)
                 .build();
-        notificationRepository.save(notificationEntity);
+        notificationRepository.save(notification);
     }
 
     @Override
@@ -108,7 +122,7 @@ public class NotificationServiceImpl implements NotificationService{
 
         NotificationEntity notificationEntity = NotificationEntity.builder()
                 .type(NotificationType.COMMENT_REPLIED)
-                .senderUser(commenter)
+                .actor(commenter)
                 .receiverUser(commentOwner)
                 .targetCollection(TargetCollection.comment)
                 .targetId(reply.getId())
@@ -117,5 +131,60 @@ public class NotificationServiceImpl implements NotificationService{
                 .build();
 
         notificationRepository.save(notificationEntity);
+    }
+
+    @Override
+    public void removePostLikedNotification(PostEntity post) {
+        UserEntity actor = CurrentUser.getCurrentUserProfile();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(post.getUser(), actor, post.getId(), NotificationType.POST_LIKED, TargetCollection.post);
+        if(notificationEntity.isPresent()){
+            notificationEntity.get().markAsDeleted();
+            notificationRepository.save(notificationEntity.get());
+        }
+    }
+
+    @Override
+    public void removePostCommentedNotification(CommentEntity comment) {
+        UserEntity actor = CurrentUser.getCurrentUserProfile();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(comment.getUser(), actor, comment.getId(), NotificationType.POST_COMMENTED, TargetCollection.comment);
+        if(notificationEntity.isPresent()){
+            notificationEntity.get().markAsDeleted();
+            notificationRepository.save(notificationEntity.get());
+        }
+    }
+
+    @Override
+    public void removeCommentLikedNotification(CommentEntity comment) {
+        UserEntity actor = CurrentUser.getCurrentUserProfile();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(comment.getUser(), actor, comment.getId(), NotificationType.COMMENT_LIKED, TargetCollection.comment);
+        if(notificationEntity.isPresent()){
+            notificationEntity.get().markAsDeleted();
+            notificationRepository.save(notificationEntity.get());
+        }
+    }
+
+    @Override
+    public void removeCommentRepliedNotification(CommentEntity reply) {
+        UserEntity actor = CurrentUser.getCurrentUserProfile();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(reply.getUser(), actor, reply.getId(), NotificationType.COMMENT_LIKED, TargetCollection.comment);
+        if(notificationEntity.isPresent()){
+            notificationEntity.get().markAsDeleted();
+            notificationRepository.save(notificationEntity.get());
+        }
+    }
+
+    @Override
+    public void removeCommentReplyLikedNotification(CommentEntity reply) {
+        UserEntity actor = CurrentUser.getCurrentUserProfile();
+        Optional<NotificationEntity> notificationEntity =
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(reply.getUser(), actor, reply.getId(), NotificationType.COMMENT_REPLIED, TargetCollection.comment);
+        if(notificationEntity.isPresent()){
+            notificationEntity.get().markAsDeleted();
+            notificationRepository.save(notificationEntity.get());
+        }
     }
 }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 @Table(name = "users")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class UserEntity extends BaseEntity {
+public class UserEntity {
     protected UserEntity() {}
     protected UserEntity(String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug){
         this.email = email;
@@ -122,6 +122,11 @@ public class UserEntity extends BaseEntity {
     @JsonIgnore
     private Set<TodaysPost> todaysPost =  new HashSet<>();
 
+    @Column(name = "IS_DELETED", nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+
     public Set<UserEntity> getFollowers() {
         return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getActor).collect(Collectors.toSet());
     }
@@ -145,6 +150,8 @@ public class UserEntity extends BaseEntity {
     public Set<UserRelationEntity> beingBlockedRelations() {
         return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.blocked)).collect(Collectors.toSet());
     }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -207,7 +214,7 @@ public class UserEntity extends BaseEntity {
         }
         Optional<UserRelationEntity> relation = followRelationWith(follower);
         if(relation.isPresent()){
-            relation.get().setIsDeleted(true);
+            relation.get().markAsDeleted();
             decrementFollowerCount();
             follower.decrementFollowingCount();
         }else{
@@ -251,7 +258,7 @@ public class UserEntity extends BaseEntity {
     public void unblock(UserEntity blocker){
         Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
         if(blockRelation.isPresent()){
-            blockRelation.get().setIsDeleted(true);
+            blockRelation.get().markAsDeleted();
         }else{
             throw new UserIsNotBlockedException();
         }

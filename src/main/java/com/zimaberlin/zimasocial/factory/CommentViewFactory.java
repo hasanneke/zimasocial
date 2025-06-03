@@ -2,8 +2,12 @@ package com.zimaberlin.zimasocial.factory;
 
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
+import com.zimaberlin.zimasocial.entity.report.ReportEntity;
+import com.zimaberlin.zimasocial.entity.report.ReportId;
+import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.LikeRepository;
+import com.zimaberlin.zimasocial.repository.ReportRepository;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.UserViewFactory;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
@@ -19,6 +23,7 @@ import java.util.Optional;
 public class CommentViewFactory {
     private final UserViewFactory userMapper;
     private final LikeRepository likeRepository;
+    private final ReportRepository reportRepository;
     public CommentView populated(CommentEntity entity) {
         // Create domain instance
         CommentView commentView = new CommentView();
@@ -35,6 +40,9 @@ public class CommentViewFactory {
 
         Optional<LikeEntity> like = likeRepository.findByUserAndComment(CurrentUser.getCurrentUserProfile(), entity);
         commentView.setIsLiked(like.isPresent());
+
+        Optional<ReportEntity> report = reportRepository.findById(new ReportId(entity.getId(), CurrentUser.getCurrentUserProfile().getId(), ResourceType.comment));
+        commentView.setIsReported(report.isPresent());
         return commentView;
     }
     public List<CommentView> populated(List<CommentEntity> comments) {

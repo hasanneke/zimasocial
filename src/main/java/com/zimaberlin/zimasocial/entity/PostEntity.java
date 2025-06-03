@@ -21,7 +21,7 @@ import java.util.Set;
 @Setter
 @Table(name = "post")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class PostEntity extends BaseEntity{
+public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -65,7 +65,10 @@ public class PostEntity extends BaseEntity{
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
+    @Column(name = "IS_DELETED", nullable = false)
+    private Boolean isDeleted = false;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,6 +93,9 @@ public class PostEntity extends BaseEntity{
     }
     public void decrementCommentCount(){
         commentCount = commentCount - 1;
+    }
+    public void markAsDeleted() {
+        this.isDeleted = true;
     }
 }
 

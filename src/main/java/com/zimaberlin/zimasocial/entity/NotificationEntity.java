@@ -48,7 +48,7 @@ public class NotificationEntity {
 
     @ManyToOne
     @JoinColumn(name = "sender_user_id")
-    private UserEntity senderUser;
+    private UserEntity actor;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "target_collection")
@@ -59,4 +59,11 @@ public class NotificationEntity {
 
     @Column(name = "post_id")
     private Long postId;
+
+    @Column(name = "is_deleted", nullable = false)
+    @Builder.Default()
+    private Boolean isDeleted = false;
+    public void markAsDeleted(){
+        this.isDeleted = true;
+    }
 }

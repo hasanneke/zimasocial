@@ -1,12 +1,12 @@
 package com.zimaberlin.zimasocial.controller;
 
+import com.zimaberlin.zimasocial.service.posts.PostService;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.service.posts.PostServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
@@ -29,10 +29,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RequestMapping("/api/v1/posts")
 @Tag(name = "Posts Management", description = "APIs for managing posts")
 public class PostController {
-    private final PostServiceImpl postService;
+    private final PostService postService;
 
     @Autowired
-    public PostController(PostServiceImpl postService) {
+    public PostController(PostService postService) {
         this.postService = postService;
     }
 
