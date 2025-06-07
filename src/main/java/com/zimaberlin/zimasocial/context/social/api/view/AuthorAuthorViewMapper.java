@@ -1,0 +1,55 @@
+package com.zimaberlin.zimasocial.context.social.api.view;
+
+import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.userRelation.AuthorRelationRepository;
+import com.zimaberlin.zimasocial.context.social.userRelation.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.userRelation.FollowRelation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+public class AuthorAuthorViewMapper {
+    private final AuthorRelationRepository authorRelationRepository;
+    private final AuthorRepository authorRepository;
+
+    @Autowired
+    public AuthorAuthorViewMapper(AuthorRelationRepository authorRelationRepository, AuthorRepository authorRepository) {
+        this.authorRelationRepository = authorRelationRepository;
+        this.authorRepository = authorRepository;
+    }
+
+    public AuthorView authorViewFromAuthor(Author author) {
+        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        Optional<FollowRelation> followRelation =
+                authorRelationRepository
+                        .findFollowRelationBetween(authenticatedUser.getAuthorId(), author.getAuthorId());
+        Optional<BlockRelation> blockRelation =
+                authorRelationRepository.findBlockRelationBetween(authenticatedUser.getAuthorId(), author.getAuthorId());
+
+        AuthorView authorView = new AuthorView();
+        authorView.setId(author.getAuthorId());
+        authorView.setSlug(author.getSlug());
+        authorView.setName(author.getName());
+        authorView.setFamilyName(author.getFamilyName());
+        authorView.setAvatarUrl(author.getAvatarFileName());
+        authorView.setBio(author.getBio());
+        authorView.setFollowerCount(author.getFollowersCount());
+        authorView.setFollowingCount(author.getFollowingCount());
+        authorView.setFollowed(followRelation.isPresent());
+        authorView.setIsPrivate(author.getIsPrivate());
+        authorView.setIsBlocked(blockRelation.isPresent());
+        authorView.addLinks();
+        return authorView;
+    }
+
+    public DetailedAuthorView detailedAuthorViewFromAuthor(Author author) {
+        AuthorView authorView = authorViewFromAuthor(author);
+        DetailedAuthorView detailedAuthorView = new DetailedAuthorView();
+        detailedAuthorView.mergeAuthorView(authorView);
+        detailedAuthorView.setEmail(author.getEmail());
+        return detailedAuthorView;
+    }
+}

@@ -6,7 +6,7 @@ import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.user.UserFactory;
-import com.zimaberlin.zimasocial.repository.PostRepository;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ public class TodaysPostsGeneratorTest {
     @Mock
     private PostScoreCalculator postScoreCalculator;
     @Mock
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
     @Mock
     private TodaysPostRepository todaysPostRepository;
     @InjectMocks
@@ -86,7 +86,7 @@ public class TodaysPostsGeneratorTest {
     }
     @Test
     void testSelectedTodaysPosts() {
-        when(postRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
+        when(postJpaRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
         List<TodaysPost> todaysPosts = todaysPostGenerator.selectTodaysPosts();
 
         assertEquals(3, todaysPosts.size());
@@ -101,7 +101,7 @@ public class TodaysPostsGeneratorTest {
     @Test
     void testCreateTodayPosts() {
         List<TodaysPost> existingTodaysPosts = List.of(TodaysPost.builder().id(0L).isDeleted(false).build(), TodaysPost.builder().id(1L).isDeleted(false).build());
-        when(postRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
+        when(postJpaRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
         when(todaysPostRepository.findTodaysPostByDate(LocalDate.now())).thenReturn(existingTodaysPosts);
         todaysPostGenerator.createTodaysPost();
         existingTodaysPosts.forEach(e->{

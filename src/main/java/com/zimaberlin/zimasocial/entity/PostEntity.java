@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.context.social.post.Post;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -50,10 +51,6 @@ public class PostEntity {
     @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<LikeEntity> likes =  new HashSet<>();
-
     @OneToMany(mappedBy = "post")
     @JsonIgnore
     private Set<TodaysPost> todaysPosts =  new HashSet<>();
@@ -94,8 +91,29 @@ public class PostEntity {
     public void decrementCommentCount(){
         commentCount = commentCount - 1;
     }
+
+    public void liked() {
+        likeCount = likeCount + 1;
+    }
+    public void commented() {
+        commentCount = commentCount + 1;
+    }
+    public void commentRemoved() {
+        commentCount = commentCount - 1;
+    }
+    public void unliked() {
+        likeCount = likeCount - 1;
+    }
     public void markAsDeleted() {
         this.isDeleted = true;
+    }
+
+    public void merge(Post post) {
+        this.content = post.getContent();
+        this.url = post.getUrl();
+        this.type = post.getType();
+        this.likeCount = post.getLikeCount();
+        this.commentCount = post.getCommentCount();
     }
 }
 

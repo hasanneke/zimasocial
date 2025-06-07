@@ -3,6 +3,10 @@ package com.zimaberlin.zimasocial.service.notification;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
+import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
+import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.UserViewFactory;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
@@ -20,13 +24,17 @@ import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfil
 @Service
 public class NotificationServiceImpl implements NotificationService{
     Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
-    private NotificationRepository notificationRepository;
-    private UserViewFactory userMapper;
+    private final NotificationRepository notificationRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final UserRepository userRepository;
+    private final UserViewFactory userMapper;
 
     @Autowired
-    public NotificationServiceImpl(NotificationRepository notificationRepository, UserViewFactory userMapper) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository, UserViewFactory userMapper, PostJpaRepository postJpaRepository, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
         this.userMapper = userMapper;
+        this.postJpaRepository = postJpaRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -48,14 +56,15 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public void sendPostLikedNotification(LikeEntity like) {
         UserEntity actor = getCurrentUserProfile();
-        UserEntity receiver = like.getPost().getUser();
+        PostEntity post = postJpaRepository.findById(like.getPostId()).orElseThrow(PostNotFoundException::new);
+        UserEntity receiver = userRepository.findById(post.getUser().getId()).orElseThrow(UserNotFoundException::new);
         Optional<NotificationEntity> notificationEntity =
-                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(receiver, actor, like.getPost().getId(), NotificationType.POST_LIKED, TargetCollection.post);
+                notificationRepository.findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(receiver, actor, like.getPostId(), NotificationType.POST_LIKED, TargetCollection.post);
         if(notificationEntity.isPresent()){
             return;
         }
 
-        logger.info(String.format("Post %d liked", like.getPost().getId()));
+        logger.info(String.format("Post %d liked", like.getPostId()));
         String message = actor.getName() + " paylaşımını beğendi";
 
         NotificationEntity notification = NotificationEntity.builder()
@@ -63,8 +72,8 @@ public class NotificationServiceImpl implements NotificationService{
                 .actor(actor)
                 .receiverUser(receiver)
                 .targetCollection(TargetCollection.post)
-                .targetId(like.getPost().getId())
-                .postId(like.getPost().getId())
+                .targetId(like.getPostId())
+                .postId(like.getPostId())
                 .content(message)
                 .build();
 

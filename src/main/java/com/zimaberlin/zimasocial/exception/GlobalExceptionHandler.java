@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 public class GlobalExceptionHandler {
     Logger logger = Logger.getLogger(getClass().getName());
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ResponseError> resourceNotFoundException(ResourceNotFoundException ex) {
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<ResponseError> resourceNotFoundException(DataNotFoundException ex) {
         logger.severe(Arrays.toString(ex.getStackTrace()));
         return new ResponseEntity<>(ResponseError.builder()
                 .errorCode(ex.getCode())
@@ -93,7 +93,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
-        logger.severe(Arrays.toString(ex.getStackTrace()));
         System.out.println(Arrays.toString(ex.getStackTrace()));
         return new ResponseEntity<>(ResponseError.
                 builder().

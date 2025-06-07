@@ -5,7 +5,7 @@ import com.zimaberlin.zimasocial.calculators.PostScoreCalculator;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
-import com.zimaberlin.zimasocial.repository.PostRepository;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
     private static Logger logger = LoggerFactory.getLogger(TodaysPostsGeneratorImpl.class);
-    private final PostRepository postRepository;
+    private final PostJpaRepository postJpaRepository;
     private final PostScoreCalculator postScoreCalculator;
     private final TodaysPostRepository todaysPostRepository;
     @Override
@@ -40,7 +40,7 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
 
     @Override
     public List<TodaysPost> selectTodaysPosts() {
-        List<PostEntity> yesterdaySharedPosts = postRepository.findAllByCreatedAtBetween(LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDateTime.now().minusDays(1), LocalDateTime.now());
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.movie))

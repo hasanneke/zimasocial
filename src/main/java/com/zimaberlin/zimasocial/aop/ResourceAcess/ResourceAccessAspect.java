@@ -4,10 +4,10 @@ import com.zimaberlin.zimasocial.config.CustomUserDetails;
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
+import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.exception.UnauthorizedException;
-import com.zimaberlin.zimasocial.repository.CommentRepository;
-import com.zimaberlin.zimasocial.repository.PostRepository;
+import com.zimaberlin.zimasocial.repository.CommentJpaRepository;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
@@ -27,10 +27,10 @@ public class ResourceAccessAspect {
     private final Logger logger = LoggerFactory.getLogger(ResourceAccessAspect.class);
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentJpaRepository commentJpaRepository;
 
     @Before("@annotation(hasPostAccess)")
     public void checkPostAccess(JoinPoint joinPoint, HasPostAccess hasPostAccess) throws Throwable {
@@ -66,14 +66,14 @@ public class ResourceAccessAspect {
 
     private void validatePostAccess(Long postId){
         UserEntity currentUser = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
-        PostEntity postEntity = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+        PostEntity postEntity = postJpaRepository.findById(postId).orElseThrow(()-> new DataNotFoundException("Post not found"));
         if(!postEntity.getUser().equals(currentUser)){
             throw new UnauthorizedException("You have no access to this resource");
         }
     }
     private void validateCommentAccess(Long commentId){
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
+        CommentEntity comment = commentJpaRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         if(!comment.getUser().equals(currentUser)){
             throw new UnauthorizedException("You have no access to this resource");
         }

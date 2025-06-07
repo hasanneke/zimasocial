@@ -15,7 +15,6 @@ public class PostPayload {
     private PostType type = PostType.any;
 
     @Schema(description = "Post Content")
-    @NotBlank(message = "Content is required")
     private String content;
 
     @Schema(description = "Post Url")

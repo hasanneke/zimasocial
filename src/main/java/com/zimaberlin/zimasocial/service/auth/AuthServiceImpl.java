@@ -2,17 +2,18 @@ package com.zimaberlin.zimasocial.service.auth;
 
 import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
+import com.zimaberlin.zimasocial.context.account.entity.Account;
+import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
+import com.zimaberlin.zimasocial.context.account.service.AccountService;
+import com.zimaberlin.zimasocial.context.account.value.CreateAccount;
 import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
-import com.zimaberlin.zimasocial.entity.user.UserFactory;
 import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
 import com.zimaberlin.zimasocial.utility.TokenResponse;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.UserRole;
-import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
+import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +24,12 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private UserRepository userRepository;
-    private JWTService jwtService;
+    private final AccountService accountService;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final JWTService jwtService;
     private final Random random = new Random();
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    public AuthServiceImpl(UserRepository userRepository, JWTService jwtService, RefreshTokenRepository refreshTokenRepository) {
-        this.userRepository = userRepository;
-        this.jwtService = jwtService;
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public TokenResponse googleLogin(String token) throws TokenVerifier.VerificationException {
@@ -42,14 +38,17 @@ public class AuthServiceImpl implements AuthService {
         String email = (String) jsonWebSignature.getPayload().get("email");
         String name = (String) jsonWebSignature.getPayload().get("name");
         String familyName = (String) jsonWebSignature.getPayload().get("family_name");
-        Optional<UserEntity> profile = checkUser(email, "google");
-        if(profile.isPresent()){
-            return createToken(profile.get());
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "google");
+        if(account.isPresent()){
+            if(account.get().getIsDisabled()){
+                accountService.activateAccount();
+            }
+            return createToken(account.get());
         }
         String slug = generateUniqueSlug(name);
-        UserEntity newUser = UserFactory.createUser(email, name, familyName, "google", Set.of(UserRole.regular), slug);
-        UserEntity createdProfile = saveUser(newUser);
-        return createToken(createdProfile);
+        Account newAccount = accountService
+                .createAccount(new CreateAccount(email, name, familyName, "google", Set.of(UserRole.regular), slug));
+        return createToken(newAccount);
     }
 
     @Override
@@ -59,14 +58,13 @@ public class AuthServiceImpl implements AuthService {
         if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
 
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByTokenAndRevoked(refreshToken, false)
-                .orElseThrow(()->new ResourceNotFoundException("Refresh token not found"));
+                .orElseThrow(()->new DataNotFoundException("Refresh token not found"));
         refreshTokenEntity.setRevoked(true);
         refreshTokenRepository.save(refreshTokenEntity);
 
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        return createToken(user);
+        Account account = accountRepository.findByUserId(userId);
+        return createToken(account);
     }
 
     private String generateUniqueSlug(String name) {
@@ -90,15 +88,7 @@ public class AuthServiceImpl implements AuthService {
         return name.replaceAll("\\s+", "").toLowerCase();
     }
 
-    private Optional<UserEntity> checkUser(String email, String provider) {
-        return userRepository.findByEmailAndAuthProvider(email, provider);
-    }
-
-    private UserEntity saveUser(UserEntity profile){
-        return userRepository.save(profile);
-    }
-
-    private TokenResponse createToken(UserEntity profile){
-        return jwtService.generateToken(profile.getId(), profile.getEmail(), profile.getAuthProvider(), profile);
+    private TokenResponse createToken(Account account){
+        return jwtService.generateToken(account.getUserId(), account.getEmail(), account.getAuthProvider(), account);
     }
 }

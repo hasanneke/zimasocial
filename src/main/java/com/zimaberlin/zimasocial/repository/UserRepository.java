@@ -19,19 +19,19 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query(value = "SELECT * FROM users WHERE slug = :slug", nativeQuery = true)
     Optional<UserEntity> findBySlugWithDeletedUsers(String slug);
     Optional<UserEntity> findBySlug(String slug);
-    @Query("""
-            SELECT u FROM UserEntity u
-            INNER JOIN u.initiatedRelations ir
-            WHERE ir.receiver = :user AND ir.relation = Relation.followed
-            """)
-    Page<UserEntity> findFollowersByUserAndRelation(UserEntity user, Pageable pageable);
-
-    @Query("""
-            SELECT u FROM UserEntity u
-            INNER JOIN u.receivedRelations ir
-            WHERE ir.actor = :user AND ir.relation = Relation.followed
-            """)
-    Page<UserEntity> findFollowingsByUserAndRelation(UserEntity user, Pageable pageable);
+//    @Query("""
+//            SELECT u FROM UserEntity u
+//            INNER JOIN u.initiatedRelations ir
+//            WHERE ir.receiver = :user AND ir.relation = Relation.followed
+//            """)
+//    Page<UserEntity> findFollowersByUserAndRelation(UserEntity user, Pageable pageable);
+//
+//    @Query("""
+//            SELECT u FROM UserEntity u
+//            INNER JOIN u.receivedRelations ir
+//            WHERE ir.actor = :user AND ir.relation = Relation.followed
+//            """)
+//    Page<UserEntity> findFollowingsByUserAndRelation(UserEntity user, Pageable pageable);
 
     @Query(value = "SELECT * FROM USERS u WHERE u.name ILIKE %:query% OR u.slug ILIKE %:query%", nativeQuery = true)
     Page<UserEntity> searchUser(String query, Pageable pageable);

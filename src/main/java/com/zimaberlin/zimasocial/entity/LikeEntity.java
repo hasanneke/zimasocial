@@ -1,7 +1,5 @@
 package com.zimaberlin.zimasocial.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +13,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Builder
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 public class LikeEntity {
@@ -24,24 +21,21 @@ public class LikeEntity {
     private Long id;
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    private UserEntity user;
+    private Long userId;
 
     @JoinColumn(name = "post_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    private PostEntity post;
+    private Long postId;
 
     @JoinColumn(name = "comment_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    private CommentEntity comment;
+    private Long commentId;
 
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "IS_DELETED")
+    @Builder.Default
+    private Boolean isDeleted = false;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,5 +47,9 @@ public class LikeEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public void markAsDeleted(){
+        this.isDeleted = true;
     }
 }

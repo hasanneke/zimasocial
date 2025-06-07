@@ -6,7 +6,7 @@ import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportId;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.repository.LikeRepository;
+import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
 import com.zimaberlin.zimasocial.repository.ReportRepository;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import org.hibernate.Hibernate;
@@ -19,20 +19,20 @@ import java.util.Optional;
 @Service
 public class PostViewFactory {
     private final UserViewFactory userMapper;
-    private final LikeRepository likeRepository;
+    private final LikeJpaRepository likeJpaRepository;
     private final ReportRepository reportRepository;
 
     @Autowired
-    public PostViewFactory(UserViewFactory userMapper, LikeRepository likeRepository, ReportRepository reportRepository) {
+    public PostViewFactory(UserViewFactory userMapper, LikeJpaRepository likeJpaRepository, ReportRepository reportRepository) {
         this.userMapper = userMapper;
-        this.likeRepository = likeRepository;
+        this.likeJpaRepository = likeJpaRepository;
         this.reportRepository = reportRepository;
     }
 
     public PostView populated(PostEntity postEntity) {
         UserEntity profile = CurrentUser.getCurrentUserProfile();
         Optional<ReportEntity> report = reportRepository.findById(new ReportId(postEntity.getId(), profile.getId(), ResourceType.post));
-        Optional<LikeEntity> like = likeRepository.findByUserAndPost(profile, postEntity);
+        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostId(profile.getId(), postEntity.getId());
 
         PostView postView = new PostView();
         if(like.isPresent()){

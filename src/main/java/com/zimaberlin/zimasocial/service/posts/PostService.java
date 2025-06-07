@@ -3,8 +3,6 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.entity.userRelation.Relation;
-import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.factory.CommentViewFactory;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.notification.NotificationService;
@@ -16,14 +14,13 @@ import com.zimaberlin.zimasocial.config.CustomUserDetails;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.entity.*;
-import com.zimaberlin.zimasocial.exception.ResourceNotFoundException;
+import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,30 +28,27 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostService  {
-    private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final LikeJpaRepository likeJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
     private final UserRepository userRepository;
-    private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
     private final CommentViewFactory commentViewFactory;
     private final PostViewFactory postFactory;
     private final TodaysPostRepository todaysPostRepository;
-    private final UserRelationRepository userRelationRepository;
     public Page<PostView> getPosts(int page, int size, String slug, PostType type) {
-        UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(()->new DataNotFoundException("User not found"));
         Pageable pageable = PageRequest.of(page, size);
         Page<PostEntity> postsPage;
 
         if(type != null){
-            postsPage = postRepository.findByUserAndTypeOrderByCreatedAt(pageable, user, type);
+            postsPage = postJpaRepository.findByUserAndTypeOrderByCreatedAt(pageable, user, type);
         }else{
-            postsPage = postRepository.findByUserOrderByCreatedAt(pageable, user);
+            postsPage = postJpaRepository.findByUserOrderByCreatedAt(pageable, user);
         }
         List<PostView> postViews = postFactory.populated(postsPage.getContent());
         postViews = filterPostsForBlocked(postViews);
@@ -66,9 +60,9 @@ public class PostService  {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<PostEntity> postsPage;
         if(type == PostType.any){
-          postsPage = postRepository.findAll(pageable);
+          postsPage = postJpaRepository.findAll(pageable);
         }else{
-            postsPage = postRepository.findByType(pageable, type);
+            postsPage = postJpaRepository.findByType(pageable, type);
         }
         List<PostView> postViews = postFactory.populated(postsPage.getContent());
         postViews = filterPostsForBlocked(postViews);
@@ -78,7 +72,7 @@ public class PostService  {
       
     public Page<CommentView> getComments(int page, int size, Long postId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<CommentEntity> commentsPage = commentRepository.findByPostIdAndParentId(pageable, postId, null);
+        Page<CommentEntity> commentsPage = commentJpaRepository.findByPostIdAndParentId(pageable, postId, null);
         List<CommentView> commentViews = commentViewFactory.populated(commentsPage.getContent());
         return new PageImpl<>(commentViews, pageable, commentsPage.getTotalElements());
     }
@@ -86,14 +80,14 @@ public class PostService  {
       
     public Page<CommentView> getCommentReplies(int page, int size, Long postId, Long commentId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<CommentEntity> repliesPage = commentRepository.findByParentIdOrderByCreatedAtDesc(commentId, pageable);
+        Page<CommentEntity> repliesPage = commentJpaRepository.findByParentIdOrderByCreatedAtDesc(commentId, pageable);
         List<CommentView> commentViews = commentViewFactory.populated(repliesPage.getContent());
         return new PageImpl<>(commentViews, pageable, repliesPage.getTotalElements());
     }
 
       
     public PostView getPost(Long postId) {
-        PostEntity post = postRepository.findById(postId).orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+        PostEntity post = postJpaRepository.findById(postId).orElseThrow(()-> new DataNotFoundException("Post not found"));
         return  postFactory.populated(post);
     }
 
@@ -101,7 +95,7 @@ public class PostService  {
     @Transactional
     public PostView createPost(@Valid PostPayload payload) {
         UserEntity userObject = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getProfile();
-        UserEntity user = userRepository.findById(userObject.getId()).orElseThrow(()->new ResourceNotFoundException("User not found"));
+        UserEntity user = userRepository.findById(userObject.getId()).orElseThrow(()->new DataNotFoundException("User not found"));
         if ( payload == null ) {
             return null;
         }
@@ -111,30 +105,31 @@ public class PostService  {
         post.setType( payload.getType() == null ? PostType.any : payload.getType() );
         post.setUser(user);
 
-        PostEntity createdPost = postRepository.save(post);
+        PostEntity createdPost = postJpaRepository.save(post);
         return postFactory.populated(createdPost);
     }
 
       
     @HasPostAccess(idParameterName = "id")
     public void deletePost(Long id){
-        PostEntity post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        PostEntity post = postJpaRepository.findById(id).orElseThrow(PostNotFoundException::new);
         post.markAsDeleted();
-        postRepository.save(post);
+        postJpaRepository.save(post);
     }
 
       
     @Transactional
     public void likePost(Long postId)  {
-        PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        boolean isAlreadyLiked = likeRepository.existsByUserAndPost(CurrentUser.getCurrentUserProfile(), post);
+        PostEntity post = postJpaRepository.findById(postId).orElseThrow(()->new DataNotFoundException("Post not found"));
+        boolean isAlreadyLiked = likeJpaRepository.existsByUserIdAndPostId(CurrentUser.getCurrentUserProfile().getId(), post.getId());
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         if(!isAlreadyLiked){
-            LikeEntity like = new LikeEntity();
-            like.setPost(post);
-            like.setUser(currentUser);
+            LikeEntity like = LikeEntity.builder()
+                            .postId(post.getId())
+                            .userId(currentUser.getId())
+                                    .build();
             post.incrementLikeCount();
-            likeRepository.save(like);
+            likeJpaRepository.save(like);
             boolean selfLiked = post.getUser().equals(currentUser);
             if(!selfLiked){
                 notificationService.sendPostLikedNotification(like);
@@ -147,18 +142,19 @@ public class PostService  {
       
     @Transactional
     public void unlikePost(Long postId) {
-        LikeEntity likeEntity = likeRepository.findByUserIdAndPostId(CurrentUser.getCurrentUserProfile().getId(), postId)
-                .orElseThrow(()-> new ResourceNotFoundException("Post is not liked"));
-        likeEntity.getPost().decrementLikeCount();
-        notificationService.removePostLikedNotification(likeEntity.getPost());
-        likeRepository.delete(likeEntity);
+        LikeEntity likeEntity = likeJpaRepository.findByUserIdAndPostId(CurrentUser.getCurrentUserProfile().getId(), postId)
+                .orElseThrow(()-> new DataNotFoundException("Post is not liked"));
+        PostEntity post = postJpaRepository.findById(likeEntity.getPostId()).orElseThrow(PostNotFoundException::new);
+        post.decrementLikeCount();
+        notificationService.removePostLikedNotification(post);
+        likeJpaRepository.delete(likeEntity);
     }
 
       
     @Transactional
     public CommentView commentPost(Long postId, CommentPayload payload) {
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
-        PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
+        PostEntity post = postJpaRepository.findById(postId).orElseThrow(()->new DataNotFoundException("Post not found"));
         CommentEntity comment = new CommentEntity();
         comment.setPost(post);
         comment.setUser(currentUser);
@@ -167,7 +163,7 @@ public class PostService  {
         post.getComments().add(comment);
         post.incrementCommentCount();
 
-        CommentEntity commentEntity = commentRepository.save(comment);
+        CommentEntity commentEntity = commentJpaRepository.save(comment);
         boolean selfCommented = currentUser.equals(post.getUser());
 
         if (!selfCommented){
@@ -181,29 +177,30 @@ public class PostService  {
     @HasCommentAccess(idParameterName = "commentId")
     @Transactional
     public void deleteComment(Long postId, Long commentId) {
-        PostEntity post = postRepository.findById(postId).orElseThrow(()->new ResourceNotFoundException("Post not found"));
-        CommentEntity commentEntity = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
+        PostEntity post = postJpaRepository.findById(postId).orElseThrow(()->new DataNotFoundException("Post not found"));
+        CommentEntity commentEntity = commentJpaRepository.findById(commentId).orElseThrow(()->new DataNotFoundException("Comment not found"));
         post.decrementCommentCount();
         notificationService.removePostCommentedNotification(commentEntity);
         commentEntity.markAsDeleted();
-        commentRepository.save(commentEntity);
+        commentJpaRepository.save(commentEntity);
     }
 
       
     @Transactional
     public void likeComment(Long postId, Long commentId) {
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
-        boolean isAlreadyLiked = likeRepository.existsByUserAndComment(CurrentUser.getCurrentUserProfile(), comment);
+        CommentEntity comment = commentJpaRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
+        boolean isAlreadyLiked = likeJpaRepository.existsByUserIdAndCommentId(CurrentUser.getCurrentUserProfile().getId(), comment.getId());
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
 
         if(!isAlreadyLiked){
-            LikeEntity like = new LikeEntity();
-            like.setComment(comment);
-            like.setUser(currentUser);
-
+            LikeEntity like = LikeEntity
+                    .builder()
+                    .postId(postId)
+                    .commentId(commentId)
+                    .build();
             comment.incrementLikeCount();
 
-            likeRepository.save(like);
+            likeJpaRepository.save(like);
             boolean selfLiked = currentUser.equals(comment.getUser());
             if(!selfLiked){
                 notificationService.sendCommentLikedNotification(comment);
@@ -216,20 +213,20 @@ public class PostService  {
       
     @Transactional
     public void unlikeComment(Long postId, Long commentId) {
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
-        LikeEntity like = likeRepository
+        CommentEntity comment = commentJpaRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
+        LikeEntity like = likeJpaRepository
                 .findByUserIdAndCommentId(CurrentUser.getCurrentUserProfile().getId(), commentId)
-                .orElseThrow(()-> new ResourceNotFoundException("Comment not liked"));
-
-        like.getComment().decrementLikeCount();
+                .orElseThrow(()-> new DataNotFoundException("Comment not liked"));
+        comment.decrementLikeCount();
+        commentJpaRepository.save(comment);
+        likeJpaRepository.delete(like);
         notificationService.removeCommentLikedNotification(comment);
-        likeRepository.delete(like);
     }
 
       
     @Transactional
     public CommentView replyComment(Long postId, Long commentId, CommentPayload payload) {
-        CommentEntity parent = commentRepository.findById(commentId).orElseThrow(()-> new ResourceNotFoundException("Comment not found"));
+        CommentEntity parent = commentJpaRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         PostEntity post = parent.getPost();
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
 
@@ -241,7 +238,7 @@ public class PostService  {
         reply.setPost(post);
 
         parent.incrementReplyCount();
-        CommentEntity comment = commentRepository.save(reply);
+        CommentEntity comment = commentJpaRepository.save(reply);
         boolean selfReplied = currentUser.equals(parent.getUser());
         if(!selfReplied){
             notificationService.sendCommentRepliedNotification(reply);
@@ -252,10 +249,10 @@ public class PostService  {
       
     @HasCommentAccess(idParameterName = "replyCommentId")
     public CommentView deleteReplyComment(Long postId, Long commentId, Long replyCommentId) {
-        CommentEntity reply = commentRepository.findById(replyCommentId).orElseThrow(()->new ResourceNotFoundException("Comment not found"));
+        CommentEntity reply = commentJpaRepository.findById(replyCommentId).orElseThrow(()->new DataNotFoundException("Comment not found"));
         reply.getParent().decrementReplyCount();
         reply.markAsDeleted();
-        commentRepository.save(reply);
+        commentJpaRepository.save(reply);
         notificationService.removeCommentRepliedNotification(reply);
         return commentViewFactory.plain(reply);
     }

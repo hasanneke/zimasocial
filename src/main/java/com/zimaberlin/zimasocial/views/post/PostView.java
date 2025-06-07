@@ -1,10 +1,8 @@
 package com.zimaberlin.zimasocial.views.post;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import com.zimaberlin.zimasocial.controller.PostController;
-import com.zimaberlin.zimasocial.controller.UserController;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.views.user.UserView;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -23,7 +21,7 @@ public class PostView extends RepresentationModel<PostView> {
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;
-    private UserView user;
+    private AuthorView user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isReported;

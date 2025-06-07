@@ -16,7 +16,7 @@ public class UserFactory {
     public static UserEntity createUser(Long id, Set<UserRelationEntity> receivedRelations){
         UserEntity user = new UserEntity();
         user.setId(id);
-        user.setReceivedRelations(receivedRelations);
+//        user.setReceivedRelations(receivedRelations);
         return user;
     }
     public static UserEntity createUser(String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug) {

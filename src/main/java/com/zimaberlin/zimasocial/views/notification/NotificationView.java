@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.views.notification;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
-import com.zimaberlin.zimasocial.views.user.UserView;
+import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,5 +21,5 @@ public class NotificationView {
     private TargetCollection targetCollection;
     private Long targetId;
     private Long postId;
-    private UserView actor;
+    private AuthorView actor;
 }

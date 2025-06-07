@@ -1,0 +1,13 @@
+package com.zimaberlin.zimasocial.entity.user.values;
+
+public enum DeleteReason {
+    WANT_TO_REMOVE_SOMETHING,
+    CANT_FIND_PEOPLE_TO_FOLLOW,
+    TOO_MANY_ADS,
+    PRIVACY_CONCERNS,
+    CREATED_SECOND_ACCOUNT,
+    TROUBLE_GETTING_STARTED,
+    TOO_BUSY_TOO_DISTRACTING,
+    CONCERNED_ABOUT_MY_DATE,
+    SOMETHING_ELSE;
+}

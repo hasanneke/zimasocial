@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.entity.userRelation;
 
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,13 +20,11 @@ public class UserRelationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "initiated_id")
-    private UserEntity actor;
+    @Column(name = "initiated_id")
+    private Long actorId;
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private UserEntity receiver;
+    @Column(name = "receiver_id")
+    private Long receiverId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "relation")
@@ -50,14 +47,14 @@ public class UserRelationEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserRelationEntity that = (UserRelationEntity) o;
-        return Objects.equals(actor, that.getActor())
-                && Objects.equals(receiver, that.getReceiver())
+        return Objects.equals(actorId, that.actorId)
+                && Objects.equals(receiverId, that.receiverId)
                 && Objects.equals(relation, that.getRelation())
                 && Objects.equals(getIsDeleted(), that.getIsDeleted());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(actor, receiver, relation, getIsDeleted());
+        return Objects.hash(actorId, receiverId, relation, getIsDeleted());
     }
 }

@@ -5,16 +5,15 @@ import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportId;
-import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
-import com.zimaberlin.zimasocial.repository.CommentRepository;
-import com.zimaberlin.zimasocial.repository.PostRepository;
+import com.zimaberlin.zimasocial.repository.CommentJpaRepository;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.ReportRepository;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.service.report.ReportService;
 import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
 import com.zimaberlin.zimasocial.service.report.exception.ReportAlreadyMadeException;
-import com.zimaberlin.zimasocial.service.report.exception.ReportResourceTypeNotFound;
+import com.zimaberlin.zimasocial.service.report.exception.ReportDataTypeNotFound;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
@@ -26,14 +25,14 @@ import java.util.Optional;
 
 @Service
 public class ReportServiceImpl implements ReportService {
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
+    private final PostJpaRepository postJpaRepository;
+    private final CommentJpaRepository commentJpaRepository;
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     @Autowired
-    public ReportServiceImpl(PostRepository postRepository, CommentRepository commentRepository, ReportRepository reportRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
+    public ReportServiceImpl(PostJpaRepository postJpaRepository, CommentJpaRepository commentJpaRepository, ReportRepository reportRepository, UserRepository userRepository) {
+        this.postJpaRepository = postJpaRepository;
+        this.commentJpaRepository = commentJpaRepository;
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
     }
@@ -48,17 +47,17 @@ public class ReportServiceImpl implements ReportService {
         ReportEntity report;
         switch (request.getResourceType()){
             case ResourceType.post -> {
-                PostEntity post = postRepository.findById(resourceId).orElseThrow(PostNotFoundException::new);
+                PostEntity post = postJpaRepository.findById(resourceId).orElseThrow(PostNotFoundException::new);
                 report = ReportEntity.buildPostReport(request, post);
             }
             case ResourceType.comment -> {
-                CommentEntity comment = commentRepository.findById(resourceId).orElseThrow(CommentNotFoundException::new);
+                CommentEntity comment = commentJpaRepository.findById(resourceId).orElseThrow(CommentNotFoundException::new);
                 report = ReportEntity.buildCommentReport(request, comment);
             }case ResourceType.profile -> {
                 UserEntity user = userRepository.findById(resourceId).orElseThrow(UserNotFoundException::new);
                 report = ReportEntity.buildProfileReport(request, user);
             } case null -> {
-                throw new ReportResourceTypeNotFound();
+                throw new ReportDataTypeNotFound();
             }
         }
         reportRepository.save(report);

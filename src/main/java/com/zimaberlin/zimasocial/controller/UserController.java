@@ -1,8 +1,8 @@
 package com.zimaberlin.zimasocial.controller;
-import com.zimaberlin.zimasocial.service.users.Payload.UserUpdatePayload;
+import com.zimaberlin.zimasocial.service.users.payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.UserService;
-import com.zimaberlin.zimasocial.views.user.DetailedUserView;
-import com.zimaberlin.zimasocial.views.user.UserView;
+import com.zimaberlin.zimasocial.context.social.api.view.DetailedAuthorView;
+import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,26 +35,20 @@ public class UserController {
     }
 
     @GetMapping(path = "/me")
-    ResponseEntity<DetailedUserView> getMe(){
-        DetailedUserView userView = userService.getUserMe();
+    ResponseEntity<DetailedAuthorView> getMe(){
+        DetailedAuthorView userView = userService.getUserMe();
         return ResponseEntity.ok(userView);
     }
 
     @GetMapping(path = "/{slug}")
-    public ResponseEntity<UserView> getUser(@PathVariable(name = "slug") String slug){
-        UserView userView = userService.getUser(slug);
-        return ResponseEntity.ok(userView);
-    }
-
-    @PatchMapping(path = "/me")
-    public ResponseEntity<UserView> updateUser(@RequestBody UserUpdatePayload payload){
-        UserView userView = userService.updateUser(payload);
-        return ResponseEntity.ok(userView);
+    public ResponseEntity<AuthorView> getUser(@PathVariable(name = "slug") String slug){
+        AuthorView authorView = userService.getUser(slug);
+        return ResponseEntity.ok(authorView);
     }
 
     @PatchMapping(path = "/me/upload-image")
-    public ResponseEntity<UserView> uploadProfileImage(MultipartFile image) throws IOException {
-        UserView user = userService.updateProfileImage(image);
+    public ResponseEntity<AuthorView> uploadProfileImage(MultipartFile image) throws IOException {
+        AuthorView user = userService.updateProfileImage(image);
         return ResponseEntity.ok(user);
     }
 
@@ -65,30 +59,20 @@ public class UserController {
     }
 
     @PatchMapping("/me/update-slug")
-    public ResponseEntity<UserView> updateSlug(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "slug") String slug){
-        UserView userView = userService.updateSlug(slug);
-        return ResponseEntity.ok(userView);
+    public ResponseEntity<AuthorView> updateSlug(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "slug") String slug){
+        AuthorView authorView = userService.updateSlug(slug);
+        return ResponseEntity.ok(authorView);
     }
     @PatchMapping("/me/update-bio")
-    public ResponseEntity<UserView> updateBio(@Valid @NotBlank @Size(max= 128) @RequestParam(name = "bio") String bio){
-        UserView userView = userService.updateBio(bio);
-        return ResponseEntity.ok(userView);
+    public ResponseEntity<AuthorView> updateBio(@Valid @NotBlank @Size(max= 128) @RequestParam(name = "bio") String bio){
+        AuthorView authorView = userService.updateBio(bio);
+        return ResponseEntity.ok(authorView);
     }
 
     @PatchMapping("/me/update-name")
-    public ResponseEntity<UserView> updateName(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "name") String name){
-        UserView userView = userService.updateName(name);
-        return ResponseEntity.ok(userView);
-    }
-    @PatchMapping("/me/make-account-public")
-    public ResponseEntity<UserView> makeAccountPublic(){
-        UserView userView = userService.makeAccountPublic();
-        return ResponseEntity.ok(userView);
-    }
-    @PatchMapping("/me/make-account-private")
-    public ResponseEntity<UserView> makeAccountPrivate(){
-        UserView userView = userService.makeAccountPrivate();
-        return ResponseEntity.ok(userView);
+    public ResponseEntity<AuthorView> updateName(@Valid @NotBlank @Size(max= 128)  @RequestParam(name = "name") String name){
+        AuthorView authorView = userService.updateName(name);
+        return ResponseEntity.ok(authorView);
     }
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
@@ -109,13 +93,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/{slug}/followers")
-    public HttpEntity<PagedModel<UserView>> getFollowers(
+    public HttpEntity<PagedModel<AuthorView>> getFollowers(
             @PathVariable(name = "slug") String slug,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Page<UserView> followersPage = userService.getFollowers(slug, page, size);
+        Page<AuthorView> followersPage = userService.getFollowers(slug, page, size);
 
-        PagedModel<UserView> pagedModel = PagedModel.of(
+        PagedModel<AuthorView> pagedModel = PagedModel.of(
                 followersPage.getContent(),
                 new PagedModel.PageMetadata(followersPage.getSize(),
                         followersPage.getNumber(),
@@ -140,13 +124,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/{slug}/followings")
-    public HttpEntity<PagedModel<UserView>> getFollowing(
+    public HttpEntity<PagedModel<AuthorView>> getFollowing(
             @PathVariable(name = "slug") String slug,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Page<UserView> followingsPage = userService.getFollowing(slug, page, size);
+        Page<AuthorView> followingsPage = userService.getFollowing(slug, page, size);
 
-        PagedModel<UserView> pagedModel = PagedModel.of(
+        PagedModel<AuthorView> pagedModel = PagedModel.of(
                 followingsPage.getContent(),
                 new PagedModel.PageMetadata(followingsPage.getSize(),
                         followingsPage.getNumber(),
@@ -181,11 +165,11 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public HttpEntity<PagedModel<UserView>> search(@Valid @NotBlank @RequestParam(name = "query") String query,
-                                                       @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                       @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Page<UserView> userPage = userService.searchUsers(query, page, size);
-        PagedModel<UserView> pagedModel = PagedModel.of(
+    public HttpEntity<PagedModel<AuthorView>> search(@Valid @NotBlank @RequestParam(name = "query") String query,
+                                                     @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                     @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Page<AuthorView> userPage = userService.searchUsers(query, page, size);
+        PagedModel<AuthorView> pagedModel = PagedModel.of(
                 userPage.getContent(),
                 new PagedModel.PageMetadata(userPage.getSize(),
                         userPage.getNumber(),

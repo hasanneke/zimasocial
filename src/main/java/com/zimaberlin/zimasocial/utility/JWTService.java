@@ -1,9 +1,12 @@
 package com.zimaberlin.zimasocial.utility;
 
 
+import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
+import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -21,14 +24,16 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    public JWTService(RefreshTokenRepository refreshTokenRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
-
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     @Value("${jwt.secret}")
     private String secret;
+
+    @Autowired
+    public JWTService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
+    }
 
     public String extractId(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
@@ -58,11 +63,11 @@ public class JWTService {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
-    public TokenResponse generateToken(Long id, String email, String provider,  UserEntity user) {
-        return createToken(id, email, provider, user);
+    public TokenResponse generateToken(Long id, String email, String provider,  Account account) {
+        return createToken(id, email, provider, account);
     }
 
-    public TokenResponse createToken(Long id, String email, String provider, UserEntity user) {
+    public TokenResponse createToken(Long id, String email, String provider, Account account) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("id", id);
@@ -89,6 +94,7 @@ public class JWTService {
         RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
         tokenEntity.setToken(hashedRefreshToken);
         tokenEntity.setExpiresAt(refreshTokenExpirationDate);
+        UserEntity user = userRepository.findById(account.getUserId()).orElseThrow(UserNotFoundException::new);
         tokenEntity.setUser(user);
 
         TokenResponse refreshToken = TokenResponse.builder()

@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.views.comment;
-import com.zimaberlin.zimasocial.views.user.UserView;
+import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import lombok.*;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentView {
     private Long id;
     private String content;
-    private UserView userView;
+    private AuthorView authorView;
     private Integer replyCount = 0;
     private Integer likeCount = 0;
     private LocalDateTime createdAt;

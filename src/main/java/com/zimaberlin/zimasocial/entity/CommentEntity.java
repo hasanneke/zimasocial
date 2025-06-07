@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
+import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,8 +9,6 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "comment")
@@ -30,9 +29,6 @@ public class CommentEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private Set<LikeEntity> likes = new HashSet<>();
 
     @Column(name = "like_count")
     private int likeCount = 0;
@@ -73,5 +69,11 @@ public class CommentEntity {
 
     public void markAsDeleted() {
         this.isDeleted = true;
+    }
+
+    public void mergeDomain(Comment comment){
+        this.likeCount = comment.getLikeCount();
+        this.replyCount = comment.getReplyCount();
+        this.content = comment.getContent();
     }
 }
