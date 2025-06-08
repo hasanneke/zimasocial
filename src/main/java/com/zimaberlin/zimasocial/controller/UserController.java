@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-@RestController
-@RequestMapping(path = "api/v1/users")
+//@RestController
+//@RequestMapping(path = "api/v2/users")
 @RequiredArgsConstructor
 public class UserController {
     private UserService userService;

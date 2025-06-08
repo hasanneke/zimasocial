@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -23,6 +24,9 @@ import org.hibernate.annotations.SQLRestriction;
 public class ReportEntity  {
     @EmbeddedId
     private ReportId id;
+
+    @Column(name = "reported_post_owner_id")
+    private Long reportedUserId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "report_reason", nullable = false)
@@ -61,6 +65,7 @@ public class ReportEntity  {
                 .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.post))
                 .reportReason(report.getReason())
                 .description(report.getDescription())
+                .reportedUserId(report.getReportedAuthorId())
                 .build();
     }
     private static ReportEntity buildCommentReport(Report report) {
@@ -68,6 +73,7 @@ public class ReportEntity  {
                 .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.comment))
                 .reportReason(report.getReason())
                 .description(report.getDescription())
+                .reportedUserId(report.getReportedAuthorId())
                 .build();
     }
     private static ReportEntity buildProfileReport(Report report) {
@@ -75,6 +81,7 @@ public class ReportEntity  {
                 .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.profile))
                 .reportReason(report.getReason())
                 .description(report.getDescription())
+                .reportedUserId(report.getReportedAuthorId())
                 .build();
     }
 }

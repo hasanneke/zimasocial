@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.context.social.api.author;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.author.AuthorService;
+import com.zimaberlin.zimasocial.context.social.author.SlugAlreadyTakenException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-
-@RequestMapping(path = "/api/v1/authors")
+@RestController
+@RequestMapping(path = "api/v1/authors")
 public class AuthorController {
     private AuthorControllerBridge authorControllerBridge;
     private AuthorService authorService;
@@ -32,7 +33,7 @@ public class AuthorController {
     }
 
     @GetMapping(path = "/me")
-    ResponseEntity<DetailedAuthorView> getMe(){
+    public ResponseEntity<DetailedAuthorView> getMe(){
         DetailedAuthorView userView = authorControllerBridge.getMe();
         return ResponseEntity.ok(userView);
     }
@@ -75,7 +76,10 @@ public class AuthorController {
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
         Optional<Author> author = authorRepository.findBySlug(slug);
-        return ResponseEntity.ok(author.isPresent());
+        if(author.isPresent()){
+            throw new SlugAlreadyTakenException(slug);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/{slug}/follow")

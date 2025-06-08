@@ -44,8 +44,8 @@ public class AuthorDBRepository implements AuthorRepository {
 
     @Override
     public Optional<Author> findBySlug(String slug) {
-        UserEntity user = userRepository.findBySlug(slug).orElse(null);
-        return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(user));
+        Optional<UserEntity> user = userRepository.findBySlug(slug);
+        return user.map(authorUserEntityAdapter::convertUserEntityToAuthor);
     }
 
     @Override

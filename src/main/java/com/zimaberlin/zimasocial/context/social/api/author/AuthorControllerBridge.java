@@ -19,14 +19,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 public class AuthorControllerBridge {
-    private AuthorService authorService;
     private AuthorRepository authorRepository;
     private AuthorRelationRepository authorRelationRepository;
     private AuthorAuthorViewAdapter authorAuthorViewMapper;
 
     @Autowired
-    public AuthorControllerBridge(AuthorService authorService, AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper) {
-        this.authorService = authorService;
+    public AuthorControllerBridge(AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper) {
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;
         this.authorAuthorViewMapper = authorAuthorViewMapper;

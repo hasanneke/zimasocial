@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/auth")
+@RequestMapping(path = "/api/v1/authentication")
 public class AuthController {
     private AuthService authService;
 
