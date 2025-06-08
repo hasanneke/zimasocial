@@ -2,21 +2,21 @@ package com.zimaberlin.zimasocial.context.social.api.view;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.userRelation.AuthorRelationRepository;
-import com.zimaberlin.zimasocial.context.social.userRelation.BlockRelation;
-import com.zimaberlin.zimasocial.context.social.userRelation.FollowRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationRepository;
+import com.zimaberlin.zimasocial.context.social.authorrelation.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class AuthorAuthorViewMapper {
+public class AuthorAuthorViewAdapter {
     private final AuthorRelationRepository authorRelationRepository;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public AuthorAuthorViewMapper(AuthorRelationRepository authorRelationRepository, AuthorRepository authorRepository) {
+    public AuthorAuthorViewAdapter(AuthorRelationRepository authorRelationRepository, AuthorRepository authorRepository) {
         this.authorRelationRepository = authorRelationRepository;
         this.authorRepository = authorRepository;
     }

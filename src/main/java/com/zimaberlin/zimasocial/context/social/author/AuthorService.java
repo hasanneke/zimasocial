@@ -1,11 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
-import com.zimaberlin.zimasocial.context.social.ImageService;
-import com.zimaberlin.zimasocial.context.social.userRelation.BlockRelation;
-import com.zimaberlin.zimasocial.context.social.userRelation.FollowRelation;
-import com.zimaberlin.zimasocial.context.social.userRelation.AuthorRelationRepository;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.utility.CurrentUser;
+import com.zimaberlin.zimasocial.context.social.image.ImageService;
+import com.zimaberlin.zimasocial.context.social.authorrelation.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

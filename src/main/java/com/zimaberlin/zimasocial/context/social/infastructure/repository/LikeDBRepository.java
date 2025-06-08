@@ -3,9 +3,9 @@ package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.LikeAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostLike;
-import com.zimaberlin.zimasocial.context.social.values.Like;
+import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
-import com.zimaberlin.zimasocial.context.social.repository.LikeRepository;
+import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
@@ -30,6 +30,11 @@ public class LikeDBRepository implements LikeRepository {
     public Optional<Like> findByPostIdAndAuthorId(Long postId, Long authorId) {
         Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostId(authorId, postId);
         return Optional.ofNullable(likeAdapter.convertLikeEntityToLikeForPost(like.get()));
+    }
+
+    @Override
+    public Optional<Like> findByCommentIdAndAuthorId(Long commentId, Long authorId) {
+        return likeJpaRepository.findByUserIdAndCommentId(authorId, commentId).map(likeAdapter::convertLikeEntityToLikeForPost);
     }
 
     @Override

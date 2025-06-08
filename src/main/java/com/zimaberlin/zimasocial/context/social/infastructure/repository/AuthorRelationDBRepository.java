@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
-import com.zimaberlin.zimasocial.context.social.userRelation.*;
+import com.zimaberlin.zimasocial.context.social.authorrelation.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;

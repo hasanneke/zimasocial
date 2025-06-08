@@ -45,13 +45,20 @@ public class Comment {
         this.replyCount = 0;
     }
 
-    public void replied(Comment reply){
+    public void reply(Comment reply){
         replyCount += 1;
         StaticEventPublisher.publishEvent(new CommentRepliedEvent(this, reply));
+    }
+    public void removeReply(Comment reply) {
+        replyCount -= 1;
     }
 
     public void like(Author liker){
         likeCount += 1;
         StaticEventPublisher.publishEvent(new CommentLikedEvent(this, liker));
+    }
+
+    public void unlike(){
+        likeCount -= 1;
     }
 }

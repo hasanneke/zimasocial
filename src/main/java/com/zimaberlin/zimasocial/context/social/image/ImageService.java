@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social;
+package com.zimaberlin.zimasocial.context.social.image;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.service.users;
 
-import com.zimaberlin.zimasocial.context.social.ImageService;
+import com.zimaberlin.zimasocial.context.social.image.ImageService;
 import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.user.exceptions.SlugAlreadyExistException;

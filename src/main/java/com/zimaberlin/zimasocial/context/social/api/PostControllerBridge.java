@@ -1,19 +1,48 @@
 package com.zimaberlin.zimasocial.context.social.api;
 
+import com.zimaberlin.zimasocial.context.social.comment.Comment;
+import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
+import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zimaberlin.zimasocial.context.social.post.CreatePost;
 import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostService;
+import com.zimaberlin.zimasocial.context.social.post.PostRepository;
+import com.zimaberlin.zimasocial.context.social.post.PostServiceBeta;
+import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
+import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
+import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
-//@Component
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
+@Component
 public class PostControllerBridge {
-    private final PostService postService;
+    private final PostServiceBeta postService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final PostViewAdapter postViewAdapter;
+    private final CommentViewAdapter commentViewAdapter;
+
     @Autowired
-    public PostControllerBridge(PostService postService) {
+    public PostControllerBridge(PostServiceBeta postService, PostRepository postRepository, CommentRepository commentRepository,  PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter) {
         this.postService = postService;
+        this.postRepository = postRepository;
+        this.postViewAdapter = postViewAdapter;
+        this.commentRepository = commentRepository;
+        this.commentViewAdapter = commentViewAdapter;
     }
 
     public PostView createPost(PostPayload payload) {
@@ -23,6 +52,93 @@ public class PostControllerBridge {
                         .content(payload.getContent())
                         .build()
         );
-        return new PostView();
+        return postViewAdapter.populated(post);
+    }
+
+    public PagedModel<PostView> getPosts(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size,
+            @RequestParam(name = "type", required = false) PostType type,
+            @RequestParam(name = "slug", required = false) String slug
+    ) throws NoSuchMethodException {
+        Page<Post> postPage = postRepository.findAll(PageRequest.of(page, size), slug, type, Sort.by("createdAt").descending());
+
+        PagedModel<PostView> pagedModel = PagedModel.of(
+                postViewAdapter.populated(postPage.getContent()),
+                new PagedModel.PageMetadata(postPage.getSize(),
+                        postPage.getNumber(),
+                        postPage.getTotalElements(),
+                        postPage.getTotalPages()));
+
+        Method method = PostControllerBeta.class.getMethod("getPosts",
+                Integer.class,
+                Integer.class,
+                PostType.class,
+                String.class);
+
+        if(page + 1 < postPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, type, slug).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, type, slug).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+
+        return pagedModel;
+    }
+
+    public PostView getPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        return postViewAdapter.populated(post);
+    }
+
+    public PagedModel<CommentView> getComments(int page, int size, Long postId) throws NoSuchMethodException {
+        Page<Comment> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
+
+        PagedModel<CommentView> pagedModel = PagedModel.of(
+                commentViewAdapter.populated(commentPage.getContent()),
+                new PagedModel.PageMetadata(commentPage.getSize(),
+                        commentPage.getNumber(),
+                        commentPage.getTotalElements(),
+                        commentPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("getComments", Integer.class, Integer.class, Long.class);
+        if(page + 1 < commentPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, postId).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, postId).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return pagedModel;
+    }
+
+    public PagedModel<CommentView> getCommentReplies(int page, int size, Long commentId) throws NoSuchMethodException {
+        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAtDesc(commentId, PageRequest.of(page, size));
+
+        PagedModel<CommentView> pagedModel = PagedModel.of(
+                commentViewAdapter.populated(commentPage.getContent()),
+                new PagedModel.PageMetadata(commentPage.getSize(),
+                        commentPage.getNumber(),
+                        commentPage.getTotalElements(),
+                        commentPage.getTotalPages()));
+
+        Method method = this.getClass().getMethod("getCommentReplies", Integer.class, Integer.class, Long.class);
+        if(page + 1 < commentPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, commentId).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, commentId).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return pagedModel;
+    }
+
+    public List<PostView> getTodaysPosts() {
+        return postRepository.findTodaysPosts().stream().map(postViewAdapter::populated).toList();
     }
 }

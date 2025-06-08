@@ -2,15 +2,16 @@ package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.PostEntity;
+import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PostPostEntityAdapter {
+public class PostDBAdapter {
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
 
     @Autowired
-    public PostPostEntityAdapter(AuthorUserEntityAdapter authorUserEntityAdapter) {
+    public PostDBAdapter(AuthorUserEntityAdapter authorUserEntityAdapter) {
         this.authorUserEntityAdapter = authorUserEntityAdapter;
     }
 

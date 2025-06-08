@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.service.report.exception;
+package com.zimaberlin.zimasocial.context.contentmoderation.report;
 
 import com.zimaberlin.zimasocial.exception.ConflictException;
 

@@ -248,7 +248,7 @@ public class PostService  {
 
       
     @HasCommentAccess(idParameterName = "replyCommentId")
-    public CommentView deleteReplyComment(Long postId, Long commentId, Long replyCommentId) {
+    public CommentView deleteReplyComment(Long replyCommentId) {
         CommentEntity reply = commentJpaRepository.findById(replyCommentId).orElseThrow(()->new DataNotFoundException("Comment not found"));
         reply.getParent().decrementReplyCount();
         reply.markAsDeleted();
@@ -257,7 +257,6 @@ public class PostService  {
         return commentViewFactory.plain(reply);
     }
 
-      
     public List<PostView> getTodaysPosts() {
         final List<TodaysPost> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
         return postFactory.populated(todaysPosts.stream().map(TodaysPost::getPost).filter(Objects::nonNull).toList());

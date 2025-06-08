@@ -6,6 +6,7 @@ import com.zimaberlin.zimasocial.entity.user.exceptions.CircularUnfollowExceptio
 import com.zimaberlin.zimasocial.entity.user.exceptions.NameLengthExceededException;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -24,7 +25,11 @@ public class Author {
     private int followingCount;
     private final LocalDateTime createdAt;
 
-    public Author(Long authorId, String slug, String name, String bio, String familyName, String avatarFileName,Boolean isPrivate, String email , int followersCount, int followingCount, LocalDateTime createdAt) {
+    public Author(Long authorId, String slug, String name, String bio, String familyName, String avatarFileName,Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt) {
+        Assert.notNull(authorId, "Author Id cannot be null");
+        Assert.notNull(slug, "Slug cannot be null");
+        Assert.notNull(name, "Name cannot be null");
+        Assert.notNull(createdAt, "Created At cannot be null");
         this.authorId = authorId;
         this.slug = slug;
         this.name = name;
@@ -36,6 +41,17 @@ public class Author {
         this.followingCount = followingCount;
         this.createdAt = createdAt;
         this.isPrivate = isPrivate;
+    }
+
+    public Author(Long authorId, String slug, String name, LocalDateTime createdAt){
+        Assert.notNull(authorId, "Author Id cannot be null");
+        Assert.notNull(slug, "Slug cannot be null");
+        Assert.notNull(name, "Name cannot be null");
+        Assert.notNull(createdAt, "Created At cannot be null");
+        this.authorId = authorId;
+        this.slug = slug;
+        this.name = name;
+        this.createdAt = createdAt;
     }
 
     public void updateBio(String bio){

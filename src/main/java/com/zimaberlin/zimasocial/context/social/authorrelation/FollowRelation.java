@@ -1,6 +1,5 @@
-package com.zimaberlin.zimasocial.context.social.userRelation;
+package com.zimaberlin.zimasocial.context.social.authorrelation;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
 import lombok.Getter;
 
 @Getter

@@ -1,22 +1,20 @@
 package com.zimaberlin.zimasocial.context.social.api;
 
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorAuthorViewMapper;
+import com.zimaberlin.zimasocial.context.social.api.view.AuthorAuthorViewAdapter;
 import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
 import com.zimaberlin.zimasocial.context.social.api.view.DetailedAuthorView;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.author.AuthorService;
-import com.zimaberlin.zimasocial.context.social.userRelation.AuthorRelationRepository;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -27,10 +25,10 @@ public class AuthorControllerBridge {
     private AuthorService authorService;
     private AuthorRepository authorRepository;
     private AuthorRelationRepository authorRelationRepository;
-    private AuthorAuthorViewMapper authorAuthorViewMapper;
+    private AuthorAuthorViewAdapter authorAuthorViewMapper;
 
     @Autowired
-    public AuthorControllerBridge(AuthorService authorService, AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, AuthorAuthorViewMapper authorAuthorViewMapper) {
+    public AuthorControllerBridge(AuthorService authorService, AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper) {
         this.authorService = authorService;
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;

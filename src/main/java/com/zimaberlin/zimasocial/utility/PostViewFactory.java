@@ -7,7 +7,7 @@ import com.zimaberlin.zimasocial.entity.report.ReportId;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
-import com.zimaberlin.zimasocial.repository.ReportRepository;
+import com.zimaberlin.zimasocial.repository.ReportJpaRepository;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ import java.util.Optional;
 public class PostViewFactory {
     private final UserViewFactory userMapper;
     private final LikeJpaRepository likeJpaRepository;
-    private final ReportRepository reportRepository;
+    private final ReportJpaRepository reportRepository;
 
     @Autowired
-    public PostViewFactory(UserViewFactory userMapper, LikeJpaRepository likeJpaRepository, ReportRepository reportRepository) {
+    public PostViewFactory(UserViewFactory userMapper, LikeJpaRepository likeJpaRepository, ReportJpaRepository reportRepository) {
         this.userMapper = userMapper;
         this.likeJpaRepository = likeJpaRepository;
         this.reportRepository = reportRepository;

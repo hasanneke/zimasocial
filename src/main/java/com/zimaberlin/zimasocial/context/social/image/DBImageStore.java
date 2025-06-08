@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social;
+package com.zimaberlin.zimasocial.context.social.image;
 
 import com.zimaberlin.zimasocial.entity.file.FileCode;
 import com.zimaberlin.zimasocial.entity.file.FileEntity;

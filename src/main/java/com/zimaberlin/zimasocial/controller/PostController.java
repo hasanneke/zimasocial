@@ -207,7 +207,7 @@ public class PostController {
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId,
             @PathVariable(name = "replyId") Long replyId) {
-        CommentView commentView = postService.deleteReplyComment(postId, commentId, replyId);
+        CommentView commentView = postService.deleteReplyComment(replyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(commentView);
     }
 

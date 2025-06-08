@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
 import com.zimaberlin.zimasocial.context.social.post.PostLike;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
-import com.zimaberlin.zimasocial.context.social.values.Like;
+import com.zimaberlin.zimasocial.context.social.like.Like;
 import org.springframework.stereotype.Component;
 
 @Component

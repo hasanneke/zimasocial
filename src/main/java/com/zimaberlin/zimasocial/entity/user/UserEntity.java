@@ -86,14 +86,6 @@ public class UserEntity {
     @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "reporter", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @JsonIgnore
-    private Set<ReportEntity> reports = new HashSet<>();
-
-    @OneToMany(mappedBy = "reportedUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @JsonIgnore
-    private Set<ReportEntity> filedReports = new HashSet<>();
-
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

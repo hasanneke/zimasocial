@@ -7,7 +7,7 @@ import com.zimaberlin.zimasocial.entity.report.ReportId;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
-import com.zimaberlin.zimasocial.repository.ReportRepository;
+import com.zimaberlin.zimasocial.repository.ReportJpaRepository;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.UserViewFactory;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class CommentViewFactory {
     private final UserViewFactory userMapper;
     private final LikeJpaRepository likeJpaRepository;
-    private final ReportRepository reportRepository;
+    private final ReportJpaRepository reportRepository;
     public CommentView populated(CommentEntity entity) {
         // Create domain instance
         CommentView commentView = new CommentView();

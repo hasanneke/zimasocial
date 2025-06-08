@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.controller;
 
-import com.zimaberlin.zimasocial.context.social.ImageService;
+import com.zimaberlin.zimasocial.context.social.image.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.post;
 
-import com.zimaberlin.zimasocial.context.social.values.Like;
+import com.zimaberlin.zimasocial.context.social.like.Like;
 
 public class PostLike extends Like {
     public PostLike(Long postId, Long authorId) {

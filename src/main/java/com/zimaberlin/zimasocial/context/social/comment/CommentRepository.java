@@ -9,5 +9,6 @@ public interface CommentRepository {
     Optional<Comment> findById(Long id);
     Comment save(Comment comment);
     Page<Comment> findByParentIdOrderByCreatedAtDesc(Long parentId, Pageable pageable);
-    Page<Comment> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId);
+    Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable);
+    void delete(Comment comment);
 }

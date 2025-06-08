@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.controller;
 
-import com.zimaberlin.zimasocial.service.report.ReportService;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportService;
 import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
