@@ -127,7 +127,8 @@ public class PostService  {
             LikeEntity like = LikeEntity.builder()
                             .postId(post.getId())
                             .userId(currentUser.getId())
-                                    .build();
+                            .type(LikeType.post)
+                            .build();
             post.incrementLikeCount();
             likeJpaRepository.save(like);
             boolean selfLiked = post.getUser().equals(currentUser);
@@ -142,7 +143,7 @@ public class PostService  {
       
     @Transactional
     public void unlikePost(Long postId) {
-        LikeEntity likeEntity = likeJpaRepository.findByUserIdAndPostId(CurrentUser.getCurrentUserProfile().getId(), postId)
+        LikeEntity likeEntity = likeJpaRepository.findByUserIdAndPostIdAndType(CurrentUser.getCurrentUserProfile().getId(), postId, LikeType.post)
                 .orElseThrow(()-> new DataNotFoundException("Post is not liked"));
         PostEntity post = postJpaRepository.findById(likeEntity.getPostId()).orElseThrow(PostNotFoundException::new);
         post.decrementLikeCount();
@@ -196,7 +197,9 @@ public class PostService  {
             LikeEntity like = LikeEntity
                     .builder()
                     .postId(postId)
+                    .userId(currentUser.getId())
                     .commentId(commentId)
+                    .type(LikeType.comment)
                     .build();
             comment.incrementLikeCount();
 

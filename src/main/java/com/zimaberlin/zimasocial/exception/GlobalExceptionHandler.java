@@ -90,17 +90,6 @@ public class GlobalExceptionHandler {
                 message("Maximum upload size exceeded").build(),
                 HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
-        System.out.println(Arrays.toString(ex.getStackTrace()));
-        return new ResponseEntity<>(ResponseError.
-                builder().
-                timeStamp(System.currentTimeMillis()).
-                errorCode("internal_server_error").
-                message("Internal Error").build(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -161,5 +150,19 @@ public class GlobalExceptionHandler {
         logger.severe(Arrays.toString(ex.getStackTrace()));
         Map<String, String> errors = new HashMap<>();
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
+        for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
+            logger.severe(stackTraceElement.toString());
+        }
+        return new ResponseEntity<>(ResponseError.
+                builder().
+                timeStamp(System.currentTimeMillis()).
+                errorCode("internal_server_error").
+                message("Internal Error").build(),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

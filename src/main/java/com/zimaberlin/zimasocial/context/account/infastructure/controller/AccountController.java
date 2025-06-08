@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.account.infastructure.controller;
 
 import com.zimaberlin.zimasocial.context.account.service.AccountService;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
-import com.zimaberlin.zimasocial.entity.user.values.DeleteReason;
-import com.zimaberlin.zimasocial.entity.user.values.DisableReason;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
+import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
+import com.zimaberlin.zimasocial.context.account.value.DisableReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

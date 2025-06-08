@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.repository;
 
 import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
+import com.zimaberlin.zimasocial.entity.LikeType;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,5 @@ public interface LikeJpaRepository extends JpaRepository<LikeEntity, Long> {
     boolean existsByUserIdAndPostId(Long userId,  Long postId);
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
     Optional<LikeEntity> findByUserIdAndCommentId(Long userId, Long commentId);
-    Optional<LikeEntity> findByUserIdAndPostId(Long userId, Long postId);
+    Optional<LikeEntity> findByUserIdAndPostIdAndType(Long userId, Long postId, LikeType type);
 }

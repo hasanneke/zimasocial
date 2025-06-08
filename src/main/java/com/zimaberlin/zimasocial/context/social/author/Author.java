@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
-import com.zimaberlin.zimasocial.entity.user.exceptions.BioLengthExceededException;
-import com.zimaberlin.zimasocial.entity.user.exceptions.CircularFollowException;
-import com.zimaberlin.zimasocial.entity.user.exceptions.CircularUnfollowException;
-import com.zimaberlin.zimasocial.entity.user.exceptions.NameLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.exception.CircularFollowException;
+import com.zimaberlin.zimasocial.context.account.exception.CircularUnfollowException;
+import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;

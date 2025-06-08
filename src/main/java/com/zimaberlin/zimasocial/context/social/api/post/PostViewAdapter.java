@@ -1,17 +1,13 @@
-package com.zimaberlin.zimasocial.context.social.api;
+package com.zimaberlin.zimasocial.context.social.api.post;
 
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorAuthorViewAdapter;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
 import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.entity.LikeEntity;
-import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

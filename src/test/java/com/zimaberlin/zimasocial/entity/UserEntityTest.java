@@ -1,10 +1,10 @@
 //package com.zimaberlin.zimasocial.entity;
 //import com.zimaberlin.zimasocial.entity.user.UserEntity;
 //import com.zimaberlin.zimasocial.entity.user.UserFactory;
-//import com.zimaberlin.zimasocial.entity.user.exceptions.CircularFollowException;
-//import com.zimaberlin.zimasocial.entity.user.exceptions.CircularUnfollowException;
-//import com.zimaberlin.zimasocial.entity.user.exceptions.UserAlreadyFollowed;
-//import com.zimaberlin.zimasocial.entity.user.exceptions.UserNotFollowed;
+//import com.zimaberlin.zimasocial.context.account.exception.CircularFollowException;
+//import com.zimaberlin.zimasocial.context.account.exception.CircularUnfollowException;
+//import com.zimaberlin.zimasocial.context.account.exception.UserAlreadyFollowed;
+//import com.zimaberlin.zimasocial.context.account.exception.UserNotFollowed;
 //import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 //import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 //import org.junit.jupiter.api.Assertions;

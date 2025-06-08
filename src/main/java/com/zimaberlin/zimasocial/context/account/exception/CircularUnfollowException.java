@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.entity.user.exceptions;
+package com.zimaberlin.zimasocial.context.account.exception;
 
 import com.zimaberlin.zimasocial.exception.BadRequestException;
 

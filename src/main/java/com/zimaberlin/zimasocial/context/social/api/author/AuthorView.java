@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.api.view;
+package com.zimaberlin.zimasocial.context.social.api.author;
 import com.zimaberlin.zimasocial.controller.UserController;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;

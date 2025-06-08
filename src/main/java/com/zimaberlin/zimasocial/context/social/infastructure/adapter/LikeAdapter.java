@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LikeAdapter {
     public Like convertLikeEntityToLikeForPost(LikeEntity like) {
+        if(like == null) return null;
         return new PostLike(like.getPostId(), like.getPostId());
     }
 }

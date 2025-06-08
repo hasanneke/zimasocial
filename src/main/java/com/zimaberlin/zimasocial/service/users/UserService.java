@@ -1,16 +1,16 @@
 package com.zimaberlin.zimasocial.service.users;
 
 import com.zimaberlin.zimasocial.context.social.image.ImageService;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.entity.user.exceptions.SlugAlreadyExistException;
+import com.zimaberlin.zimasocial.context.account.exception.SlugAlreadyExistException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserRepository;
 import com.zimaberlin.zimasocial.service.users.payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.utility.UserViewFactory;
-import com.zimaberlin.zimasocial.context.social.api.view.DetailedAuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.DetailedAuthorView;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

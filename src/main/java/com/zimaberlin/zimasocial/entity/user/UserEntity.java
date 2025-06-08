@@ -1,13 +1,13 @@
 package com.zimaberlin.zimasocial.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
+import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.entity.*;
-import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
-import com.zimaberlin.zimasocial.entity.user.exceptions.*;
-import com.zimaberlin.zimasocial.entity.user.values.DeleteReason;
-import com.zimaberlin.zimasocial.entity.user.values.DisableReason;
+import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
+import com.zimaberlin.zimasocial.context.account.value.DisableReason;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

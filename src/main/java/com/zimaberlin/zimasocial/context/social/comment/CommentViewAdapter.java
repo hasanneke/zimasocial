@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.comment;
 
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorAuthorViewAdapter;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.Like;

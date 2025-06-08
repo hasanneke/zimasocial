@@ -63,12 +63,6 @@ public class CommentDBRepository implements CommentRepository {
     public Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable) {
         return commentJpaRepository.findByParentIdOrderByCreatedAtDesc(postId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
-
-    @Override
-    public Page<Comment> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId) {
-        return null;
-    }
-
     @Override
     public void delete(Comment comment) {
         CommentEntity commentEntity = commentJpaRepository.findById(comment.getCommentId()).orElseThrow(CommentNotFoundException::new);

@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.api;
+package com.zimaberlin.zimasocial.context.social.api.post;
 
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -61,7 +60,7 @@ public class PostControllerBridge {
             @RequestParam(name = "type", required = false) PostType type,
             @RequestParam(name = "slug", required = false) String slug
     ) throws NoSuchMethodException {
-        Page<Post> postPage = postRepository.findAll(PageRequest.of(page, size), slug, type, Sort.by("createdAt").descending());
+        Page<Post> postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()), slug, type);
 
         PagedModel<PostView> pagedModel = PagedModel.of(
                 postViewAdapter.populated(postPage.getContent()),

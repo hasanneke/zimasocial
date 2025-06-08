@@ -53,7 +53,7 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
-    public Page<Post> findAll(Pageable page, String slug, PostType type, Sort sort) {
+    public Page<Post> findAll(Pageable page, String slug, PostType type) {
         Specification<PostEntity> specification = Specification.where(null);
         if(slug != null){
             UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
@@ -61,6 +61,8 @@ public class PostDBRepository implements PostRepository {
         }
         if(type == PostType.any || type == null){
             specification = specification.and(PostSpecification.type(PostType.any));
+        }else{
+            specification = specification.and(PostSpecification.type(type));
         }
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
         return postEntityPage.map(postDBAdapter::convertPostEntityToPost);

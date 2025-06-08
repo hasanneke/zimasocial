@@ -1,8 +1,7 @@
 package com.zimaberlin.zimasocial.controller;
-import com.zimaberlin.zimasocial.service.users.payload.UserUpdatePayload;
 import com.zimaberlin.zimasocial.service.users.UserService;
-import com.zimaberlin.zimasocial.context.social.api.view.DetailedAuthorView;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.DetailedAuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

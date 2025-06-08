@@ -1,6 +1,8 @@
 package com.zimaberlin.zimasocial.context.social.like;
 
 import com.zimaberlin.zimasocial.context.social.like.Like;
+import com.zimaberlin.zimasocial.entity.LikeType;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 

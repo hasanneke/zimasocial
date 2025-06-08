@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.views.notification;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -1,21 +1,17 @@
-package com.zimaberlin.zimasocial.context.social.api;
+package com.zimaberlin.zimasocial.context.social.api.post;
 
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
 import com.zimaberlin.zimasocial.context.social.post.PostServiceBeta;
-import com.zimaberlin.zimasocial.entity.CommentEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
-import com.zimaberlin.zimasocial.service.posts.PostService;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
 import com.zimaberlin.zimasocial.views.post.PostView;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;

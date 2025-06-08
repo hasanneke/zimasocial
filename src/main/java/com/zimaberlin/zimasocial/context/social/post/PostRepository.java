@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface PostRepository {
     Optional<Post> findById(Long postId);
     List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    Page<Post> findAll(Pageable page, String slug, PostType type, Sort sort);
+    Page<Post> findAll(Pageable page, String slug, PostType type);
     List<Post> findTodaysPosts();
     Post save(Post post);
     void delete(Post post);

@@ -1,5 +1,6 @@
-package com.zimaberlin.zimasocial.context.social.api.view;
+package com.zimaberlin.zimasocial.context.social.api.author;
 
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

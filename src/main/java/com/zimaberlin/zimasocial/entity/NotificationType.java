@@ -1,8 +1,5 @@
 package com.zimaberlin.zimasocial.entity;
 
-import org.hibernate.annotations.SQLRestriction;
-
-@SQLRestriction(value = "IS_DELETED IS FALSE")
 public enum NotificationType {
     POST_LIKED,
     COMMENT_LIKED,

@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -23,11 +24,15 @@ public class LikeEntity {
     @JoinColumn(name = "user_id")
     private Long userId;
 
-    @JoinColumn(name = "post_id")
+    @Column(name = "post_id")
     private Long postId;
 
-    @JoinColumn(name = "comment_id")
+    @Column(name = "comment_id")
     private Long commentId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "like_type")
+    private LikeType type;
 
     @CreationTimestamp
     @Column(name = "created_at")

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.views.post;
 
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.controller.PostController;
 import com.zimaberlin.zimasocial.entity.PostType;
 import lombok.*;

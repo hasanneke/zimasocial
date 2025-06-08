@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.entity.LikeEntity;
+import com.zimaberlin.zimasocial.entity.LikeType;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportId;
@@ -32,7 +33,7 @@ public class PostViewFactory {
     public PostView populated(PostEntity postEntity) {
         UserEntity profile = CurrentUser.getCurrentUserProfile();
         Optional<ReportEntity> report = reportRepository.findById(new ReportId(postEntity.getId(), profile.getId(), ResourceType.post));
-        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostId(profile.getId(), postEntity.getId());
+        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(profile.getId(), postEntity.getId(), LikeType.post);
 
         PostView postView = new PostView();
         if(like.isPresent()){

@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.api.view;
+package com.zimaberlin.zimasocial.context.social.api.author;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;

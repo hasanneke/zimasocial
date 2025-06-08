@@ -6,6 +6,7 @@ import com.zimaberlin.zimasocial.context.social.post.PostLike;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
+import com.zimaberlin.zimasocial.entity.LikeType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
@@ -28,8 +29,8 @@ public class LikeDBRepository implements LikeRepository {
     }
     @Override
     public Optional<Like> findByPostIdAndAuthorId(Long postId, Long authorId) {
-        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostId(authorId, postId);
-        return Optional.ofNullable(likeAdapter.convertLikeEntityToLikeForPost(like.get()));
+        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(authorId, postId, LikeType.post);
+        return like.map(likeAdapter::convertLikeEntityToLikeForPost);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class LikeDBRepository implements LikeRepository {
         LikeEntity likeEntity;
         if(like instanceof PostLike){
             likeEntity =
-                    likeJpaRepository.findByUserIdAndPostId(like.getAuthorId(), like.getPostId()).orElseThrow(()-> new ConflictException("Post not liked"));
+                    likeJpaRepository.findByUserIdAndPostIdAndType(like.getAuthorId(), like.getPostId(), LikeType.post).orElseThrow(()-> new ConflictException("Post not liked"));
         }else if(like instanceof CommentLike){
             likeEntity =
                     likeJpaRepository.findByUserIdAndCommentId(like.getAuthorId(), like.getCommentId()).orElseThrow(()-> new ConflictException("Comment not liked"));

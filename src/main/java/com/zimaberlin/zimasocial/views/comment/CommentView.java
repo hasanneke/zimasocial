@@ -1,5 +1,5 @@
 package com.zimaberlin.zimasocial.views.comment;
-import com.zimaberlin.zimasocial.context.social.api.view.AuthorView;
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import lombok.*;
 
 import java.time.LocalDateTime;
