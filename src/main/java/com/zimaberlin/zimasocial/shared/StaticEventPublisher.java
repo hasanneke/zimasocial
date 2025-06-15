@@ -12,7 +12,6 @@ public class StaticEventPublisher {
     public StaticEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         StaticEventPublisher.applicationEventPublisher = applicationEventPublisher;
     }
-
     public static void publishEvent(Object event) {
         applicationEventPublisher.publishEvent(event);
     }

@@ -1,5 +1,5 @@
 package com.zimaberlin.zimasocial.context.social.post;
-import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -42,15 +42,17 @@ public class Post {
         this.createdAt = LocalDateTime.now();
         this.authorId = authorId;
     }
-    public void like(Author liker) {
-        likeCount = likeCount + 1;
-        StaticEventPublisher.publishEvent(new PostLikedEvent(postId, liker.getAuthorId()));
+    public PostLike like(Long likerAuthorId) {
+        likeCount += 1;
+        StaticEventPublisher.publishEvent(new PostLikedEvent(postId, likerAuthorId));
+        return new PostLike(postId, likerAuthorId);
     }
-    public void commented(Author commenter) {
-        commentCount = commentCount + 1;
-        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, commenter.getAuthorId()));
+    public Comment comment(Long commenterAuthorId, String comment) {
+        commentCount += 1;
+        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, commenterAuthorId));
+        return new Comment(postId, null, commenterAuthorId, comment);
     }
-    public void commentRemoved() {
+    public void removeComment(Long commentId) {
         commentCount = commentCount - 1;
     }
     public void unliked() {

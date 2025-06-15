@@ -121,6 +121,13 @@ public class AuthorController {
         return new  HttpEntity<>(authorControllerBridge.getFollowings(slug, page, size));
     }
 
+    @GetMapping(path = "/blocks")
+    public HttpEntity<PagedModel<AuthorView>> getBlocks(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        return new  HttpEntity<>(authorControllerBridge.getBlocks(page, size));
+    }
+
     @GetMapping("/search")
     public HttpEntity<PagedModel<AuthorView>> search(@Valid @NotBlank @RequestParam(name = "query") String query,
                                                      @RequestParam(name = "page", defaultValue = "0") Integer page,

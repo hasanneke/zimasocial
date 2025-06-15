@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentView {
     private Long id;
     private String content;
-    private AuthorView authorView;
+    private AuthorView author;
     private Integer replyCount = 0;
     private Integer likeCount = 0;
     private LocalDateTime createdAt;

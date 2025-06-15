@@ -6,7 +6,7 @@ import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zimaberlin.zimasocial.context.social.post.CreatePost;
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.context.social.post.PostRepository;
-import com.zimaberlin.zimasocial.context.social.post.PostServiceBeta;
+import com.zimaberlin.zimasocial.context.social.post.PostService;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
@@ -29,14 +29,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 public class PostControllerBridge {
-    private final PostServiceBeta postService;
+    private final PostService postService;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final PostViewAdapter postViewAdapter;
     private final CommentViewAdapter commentViewAdapter;
 
     @Autowired
-    public PostControllerBridge(PostServiceBeta postService, PostRepository postRepository, CommentRepository commentRepository,  PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter) {
+    public PostControllerBridge(PostService postService, PostRepository postRepository, CommentRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter) {
         this.postService = postService;
         this.postRepository = postRepository;
         this.postViewAdapter = postViewAdapter;
@@ -45,6 +45,9 @@ public class PostControllerBridge {
     }
 
     public PostView createPost(PostPayload payload) {
+        if(payload.getType() == null){
+            payload.setType(PostType.any);
+        }
         Post post = postService.createPost(
                 CreatePost.builder()
                         .type(payload.getType())
@@ -69,7 +72,7 @@ public class PostControllerBridge {
                         postPage.getTotalElements(),
                         postPage.getTotalPages()));
 
-        Method method = PostControllerBeta.class.getMethod("getPosts",
+        Method method = PostController.class.getMethod("getPosts",
                 Integer.class,
                 Integer.class,
                 PostType.class,
@@ -94,7 +97,7 @@ public class PostControllerBridge {
     }
 
     public PagedModel<CommentView> getComments(int page, int size, Long postId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size));
+        Page<Comment> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
                 commentViewAdapter.populated(commentPage.getContent()),
@@ -103,7 +106,7 @@ public class PostControllerBridge {
                         commentPage.getTotalElements(),
                         commentPage.getTotalPages()));
 
-        Method method = this.getClass().getMethod("getComments", Integer.class, Integer.class, Long.class);
+        Method method = this.getClass().getMethod("getComments", int.class, int.class, Long.class);
         if(page + 1 < commentPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, postId).withRel(LinkRelation.of("next"));
             pagedModel.add(link);
@@ -125,7 +128,7 @@ public class PostControllerBridge {
                         commentPage.getTotalElements(),
                         commentPage.getTotalPages()));
 
-        Method method = this.getClass().getMethod("getCommentReplies", Integer.class, Integer.class, Long.class);
+        Method method = this.getClass().getMethod("getCommentReplies", int.class, int.class, Long.class);
         if(page + 1 < commentPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, commentId).withRel(LinkRelation.of("next"));
             pagedModel.add(link);

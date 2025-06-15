@@ -1,12 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.post;
 
-import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
-import com.zimaberlin.zimasocial.entity.CommentEntity;
-import com.zimaberlin.zimasocial.entity.LikeEntity;
-import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -14,26 +9,22 @@ import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
-import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
-import com.zimaberlin.zimasocial.utility.CurrentUser;
-import com.zimaberlin.zimasocial.views.comment.CommentView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-public class PostServiceBeta {
+public class PostService {
     private final PostRepository postRepository;
     private final AuthorRepository authorRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     @Autowired
-    public PostServiceBeta(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.authorRepository = authorRepository;
         this.likeRepository = likeRepository;
@@ -54,9 +45,9 @@ public class PostServiceBeta {
             throw new ConflictException("Post is already liked");
         }
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        post.like(author);
-        Like newLike = new PostLike(postId, author.getAuthorId());
-        likeRepository.save(newLike);
+        PostLike postLike = post.like(author.getAuthorId());
+        postRepository.save(post);
+        likeRepository.save(postLike);
     }
 
     @Transactional
@@ -82,32 +73,29 @@ public class PostServiceBeta {
     public Comment comment(Long postId, String content) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment comment = new Comment(postId, null, author.getAuthorId(), content);
-        Comment createdComment = commentRepository.save(comment);
-        post.commented(author);
-        return createdComment;
+        Comment comment = post.comment(author.getAuthorId(), content);
+        postRepository.save(post);
+        return commentRepository.save(comment);
     }
 
     @Transactional
     public void removeComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         Post post = postRepository.findById(comment.getPostId()).orElseThrow(PostNotFoundException::new);
-        post.commentRemoved();
+        post.removeComment(commentId);
         postRepository.save(post);
+        commentRepository.delete(comment);
     }
 
-
-
     @Transactional
-    public void likeComment(Long postId, Long commentId) {
+    public void likeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<Like> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
-
+        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
         if(checkLike.isEmpty()){
-            Like like = new CommentLike(postId, commentId, authenticatedAuthor.getAuthorId() );
-            comment.like(authenticatedAuthor);
-            likeRepository.save(like);
+            CommentLike commentLike = comment.like(authenticatedAuthor);
+            commentRepository.save(comment);
+            likeRepository.save(commentLike);
         }else{
             throw new ConflictException("Comment is already liked");
         }
@@ -117,9 +105,10 @@ public class PostServiceBeta {
     public void unlikeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<Like> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
+        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
         if(checkLike.isPresent()){
             comment.unlike();
+            commentRepository.save(comment);
             likeRepository.delete(checkLike.get());
         }else{
             throw new DataNotFoundException("Comment not liked");
@@ -127,21 +116,20 @@ public class PostServiceBeta {
     }
 
     @Transactional
-    public Comment replyComment(Long postId, Long parentId, String content) {
-        Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
+    public Comment replyComment(Long parentId, String content) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment reply = new Comment(postId, parentId, author.getAuthorId(), content);
-        Comment savedReply  = commentRepository.save(reply);
-        parent.reply(savedReply);
-        return savedReply;
+        Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
+        Comment reply = parent.reply(author.getAuthorId(), content);
+        commentRepository.save(parent);
+        return commentRepository.save(reply);
     }
 
     @Transactional
     public void deleteReply(Long replyId) {
         Comment reply = commentRepository.findById(replyId).orElseThrow(CommentNotFoundException::new);
         Comment parent = commentRepository.findById(reply.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
-        commentRepository.delete(reply);
         parent.removeReply(reply);
+        commentRepository.delete(reply);
         commentRepository.save(parent);
     }
 }

@@ -32,7 +32,7 @@ public class CommentViewFactory {
         // Set domain values
         commentView.setContent(entity.getContent());
         commentView.setId(entity.getId());
-        commentView.setAuthorView(userMapper.populated(user));
+        commentView.setAuthor(userMapper.populated(user));
         commentView.setUpdatedAt(entity.getUpdatedAt());
         commentView.setCreatedAt(entity.getCreatedAt());
         commentView.setLikeCount(entity.getLikeCount());
@@ -56,7 +56,7 @@ public class CommentViewFactory {
         // Set domain values
         commentView.setContent(entity.getContent());
         commentView.setId(entity.getId());
-        commentView.setAuthorView(userMapper.populated(user));
+        commentView.setAuthor(userMapper.populated(user));
         commentView.setUpdatedAt(entity.getUpdatedAt());
         commentView.setCreatedAt(entity.getCreatedAt());
         commentView.setLikeCount(entity.getLikeCount());

@@ -5,7 +5,7 @@ import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,12 +25,12 @@ import java.util.function.Function;
 @Service
 public class JWTService {
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     @Value("${jwt.secret}")
     private String secret;
 
     @Autowired
-    public JWTService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public JWTService(RefreshTokenRepository refreshTokenRepository, UserJpaRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }

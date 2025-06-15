@@ -4,7 +4,7 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zimaberlin.zimasocial.context.social.post.PostServiceBeta;
+import com.zimaberlin.zimasocial.context.social.post.PostService;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
@@ -26,14 +26,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RestController
 @RequestMapping(path = "/api/v2/posts")
 @Tag(name = "Posts Controller Beta", description = "APIs for managing posts")
-public class PostControllerBeta {
-    private final PostServiceBeta postServiceBeta;
+public class PostController {
+    private final PostService postService;
     private final PostControllerBridge postControllerBridge;
     private final CommentViewAdapter commentViewAdapter;
     @Autowired
-    public PostControllerBeta(PostControllerBridge postControllerBridge, PostServiceBeta postServiceBeta, CommentViewAdapter commentViewAdapter) {
+    public PostController(PostControllerBridge postControllerBridge, PostService postService, CommentViewAdapter commentViewAdapter) {
         this.postControllerBridge = postControllerBridge;
-        this.postServiceBeta = postServiceBeta;
+        this.postService = postService;
         this.commentViewAdapter = commentViewAdapter;
     }
 
@@ -59,19 +59,19 @@ public class PostControllerBeta {
     @DeleteMapping(path = "/{postId}")
     @HasPostAccess(idParameterName = "postId")
     public ResponseEntity<PostView> deletePost(@PathVariable Long postId) {
-        postServiceBeta.delete(postId);
+        postService.delete(postId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping(path = "/{postId}/like")
     public ResponseEntity<Void> likePost(@PathVariable Long postId) {
-        postServiceBeta.like(postId);
+        postService.like(postId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping(path = "/{postId}/unlike")
     public ResponseEntity<Void> unlikePost(@PathVariable Long postId) {
-        postServiceBeta.unlikePost(postId);
+        postService.unlikePost(postId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -86,7 +86,7 @@ public class PostControllerBeta {
     public ResponseEntity<CommentView> makeComment(
             @PathVariable Long postId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postServiceBeta.comment(postId, payload.getContent());
+        Comment comment = postService.comment(postId, payload.getContent());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
     @DeleteMapping(path = "/{postId}/comments/{commentId}")
@@ -94,7 +94,7 @@ public class PostControllerBeta {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId) {
-        postServiceBeta.removeComment(commentId);
+        postService.removeComment(commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -102,7 +102,7 @@ public class PostControllerBeta {
     public HttpEntity<Void> likeComment(
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId) {
-        postServiceBeta.likeComment(postId, commentId);
+        postService.likeComment(commentId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -110,7 +110,7 @@ public class PostControllerBeta {
     public HttpEntity<Void> unlikeComment(
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId) {
-        postServiceBeta.unlikeComment(commentId);
+        postService.unlikeComment(commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @PostMapping(path = "/{postId}/comments/{commentId}/replies")
@@ -118,7 +118,7 @@ public class PostControllerBeta {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postServiceBeta.replyComment(postId, commentId, payload.getContent());
+        Comment comment = postService.replyComment(commentId, payload.getContent());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
 
@@ -127,7 +127,7 @@ public class PostControllerBeta {
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") Long commentId,
             @PathVariable(name = "replyId") Long replyId) {
-        postServiceBeta.deleteReply(replyId);
+        postService.deleteReply(replyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

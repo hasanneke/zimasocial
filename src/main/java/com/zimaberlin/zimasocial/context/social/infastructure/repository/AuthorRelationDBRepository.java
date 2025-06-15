@@ -7,8 +7,9 @@ import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
+import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,11 +22,11 @@ import java.util.Optional;
 @Repository
 public class AuthorRelationDBRepository implements AuthorRelationRepository {
     private final UserRelationJpaRepository userRelationJpaRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
 
     @Autowired
-    public AuthorRelationDBRepository(UserRelationJpaRepository userRelationJpaRepository, UserRepository userRepository, AuthorUserEntityAdapter authorUserEntityAdapter) {
+    public AuthorRelationDBRepository(UserRelationJpaRepository userRelationJpaRepository, UserJpaRepository userRepository, AuthorUserEntityAdapter authorUserEntityAdapter) {
         this.userRelationJpaRepository = userRelationJpaRepository;
         this.userRepository = userRepository;
         this.authorUserEntityAdapter = authorUserEntityAdapter;
@@ -39,7 +40,7 @@ public class AuthorRelationDBRepository implements AuthorRelationRepository {
 
     @Override
     public Optional<BlockRelation> findBlockRelationBetween(Long blockerId, Long blockedId) {
-        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockedId, blockerId, Relation.blocked);
+        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId, blockedId, Relation.blocked);
         return blockRelation.map(userRelationEntity -> new BlockRelation(userRelationEntity.getActorId(), userRelationEntity.getReceiverId()));
 
     }
@@ -64,16 +65,16 @@ public class AuthorRelationDBRepository implements AuthorRelationRepository {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
         Page<UserRelationEntity> followingRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
         List<UserEntity> followings = followingRelations.map(e->
-                userRepository.findById(e.getActorId()).orElseThrow(UserNotFoundException::new)).stream().toList();
+                userRepository.findById(e.getReceiverId()).orElseThrow(UserNotFoundException::new)).stream().toList();
         return new PageImpl<>(followings.stream().map(authorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
     }
 
     @Override
-    public Page<Author> findBlocks(String slug, int page, int size) {
-        UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
-        Page<UserRelationEntity> blockedRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
+    public Page<Author> findBlocks(int page, int size) {
+        UserEntity user = CurrentUser.getCurrentUserProfile();
+        Page<UserRelationEntity> blockedRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.blocked, PageRequest.of(page, size));
         List<UserEntity> blockedAuthors = blockedRelations.map(e->
-                userRepository.findById(e.getActorId()).orElseThrow(UserNotFoundException::new)).stream().toList();
+                userRepository.findById(e.getReceiverId()).orElseThrow(UserNotFoundException::new)).stream().toList();
         return new PageImpl<>(blockedAuthors.stream().map(authorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), blockedRelations.getTotalElements());
 
     }

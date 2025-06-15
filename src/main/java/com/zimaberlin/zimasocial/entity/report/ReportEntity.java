@@ -1,17 +1,12 @@
 package com.zimaberlin.zimasocial.entity.report;
 
-import com.zimaberlin.zimasocial.context.contentmoderation.report.Report;
-import com.zimaberlin.zimasocial.entity.CommentEntity;
-import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
-import com.zimaberlin.zimasocial.utility.CurrentUser;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -42,46 +37,20 @@ public class ReportEntity  {
     public void markAsDeleted() {
         this.isDeleted = true;
     }
-
-    public static ReportEntity buildReport(Report report){
-        switch (report.getResourceType()){
-            case ResourceType.post -> {
-                return buildPostReport(report);
-            }
-            case ResourceType.comment -> {
-                return buildCommentReport(report);
-            }
-            case ResourceType.profile -> {
-                return buildProfileReport(report);
-            }
-            default ->{
-                return null;
-            }
-        }
-    }
-
-    private static ReportEntity buildPostReport(Report report) {
+    public static ReportEntity buildPostReport(PostReport report) {
         return ReportEntity.builder()
-                .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.post))
-                .reportReason(report.getReason())
-                .description(report.getDescription())
-                .reportedUserId(report.getReportedAuthorId())
+                .id(new ReportId(report.postId(), report.reporterAuthorId(), ResourceType.post))
+                .reportReason(report.reason())
+                .description(report.description())
+                .reportedUserId(report.reportedAuthorId())
                 .build();
     }
-    private static ReportEntity buildCommentReport(Report report) {
+    public static ReportEntity buildCommentReport(CommentReport report) {
         return ReportEntity.builder()
-                .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.comment))
-                .reportReason(report.getReason())
-                .description(report.getDescription())
-                .reportedUserId(report.getReportedAuthorId())
-                .build();
-    }
-    private static ReportEntity buildProfileReport(Report report) {
-        return ReportEntity.builder()
-                .id(new ReportId(report.getResourceId(), report.getReporterAuthorId(), ResourceType.profile))
-                .reportReason(report.getReason())
-                .description(report.getDescription())
-                .reportedUserId(report.getReportedAuthorId())
+                .id(new ReportId(report.commentId(), report.reporterAuthorId(), ResourceType.comment))
+                .reportReason(report.reason())
+                .description(report.description())
+                .reportedUserId(report.reportedAuthorId())
                 .build();
     }
 }

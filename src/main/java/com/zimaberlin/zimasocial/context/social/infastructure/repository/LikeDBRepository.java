@@ -7,6 +7,7 @@ import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.entity.LikeType;
+import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.repository.LikeJpaRepository;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
@@ -34,8 +35,8 @@ public class LikeDBRepository implements LikeRepository {
     }
 
     @Override
-    public Optional<Like> findByCommentIdAndAuthorId(Long commentId, Long authorId) {
-        return likeJpaRepository.findByUserIdAndCommentId(authorId, commentId).map(likeAdapter::convertLikeEntityToLikeForPost);
+    public Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, Long authorId) {
+        return likeJpaRepository.findByUserIdAndCommentId(authorId, commentId).map(likeAdapter::convertLikeEntityToLikeForComment);
     }
 
     @Override
@@ -44,6 +45,7 @@ public class LikeDBRepository implements LikeRepository {
                 .commentId(like.getCommentId())
                 .postId(like.getPostId())
                 .userId(like.getAuthorId())
+                .type(like instanceof PostLike ? LikeType.post : LikeType.comment)
                 .build();
         likeJpaRepository.save(likeEntity);
     }

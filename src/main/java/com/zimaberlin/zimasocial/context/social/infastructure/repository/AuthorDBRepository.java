@@ -4,13 +4,12 @@ import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -18,9 +17,9 @@ import java.util.Optional;
 @Repository
 public class AuthorDBRepository implements AuthorRepository {
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     @Autowired
-    public AuthorDBRepository(AuthorUserEntityAdapter authorUserEntityAdapter, UserRepository userRepository) {
+    public AuthorDBRepository(AuthorUserEntityAdapter authorUserEntityAdapter, UserJpaRepository userRepository) {
         this.authorUserEntityAdapter = authorUserEntityAdapter;
         this.userRepository = userRepository;
     }

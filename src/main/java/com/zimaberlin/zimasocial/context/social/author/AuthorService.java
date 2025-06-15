@@ -14,9 +14,9 @@ import java.util.Optional;
 
 @Service
 public class AuthorService {
-    private AuthorRepository authorRepository;
-    private AuthorRelationRepository authorRelationRepository;
-    private ImageService imageService;
+    private final AuthorRepository authorRepository;
+    private final AuthorRelationRepository authorRelationRepository;
+    private final ImageService imageService;
     @Autowired
     public AuthorService(AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, ImageService imageService) {
         this.authorRepository = authorRepository;
@@ -66,7 +66,7 @@ public class AuthorService {
         if(blockRelation.isEmpty()){
             throw new AuthorNotBlockedException(blocked.getAuthorId());
         }
-        authorRelationRepository.save(blockRelation.get());
+        authorRelationRepository.delete(blockRelation.get());
     }
 
     @Transactional
@@ -101,7 +101,7 @@ public class AuthorService {
         author.attachFileName(avatarFileName);
         authorRepository.save(author);
     }
-
+    @Transactional
     public void removeMyProfileImage() {
         Author author = authorRepository.getAuthenticatedAuthor();
         if (author.getAvatarFileName() != null) {

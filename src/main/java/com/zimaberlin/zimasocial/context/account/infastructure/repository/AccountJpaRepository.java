@@ -5,7 +5,7 @@ import com.zimaberlin.zimasocial.context.account.value.CreateAccount;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class AccountJpaRepository implements AccountRepository {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final AccountUserAdapter accountUserAdapter;
     @Override
     public Account getAuthenticatedAccount() {

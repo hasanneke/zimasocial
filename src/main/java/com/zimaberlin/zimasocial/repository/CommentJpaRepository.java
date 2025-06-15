@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CommentJpaRepository extends JpaRepository<CommentEntity, Long> {
-    Page<CommentEntity> findByPostId(Long postId, Pageable pageable);
+    Page<CommentEntity> findByPostIdAndParentIdIsNull(Long postId, Pageable pageable);
     Page<CommentEntity> findByParentId(Long parentId, Pageable pageable);
     Page<CommentEntity> findByParentIdOrderByCreatedAtDesc(Long postId, Pageable pageable);
     Page<CommentEntity> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId);

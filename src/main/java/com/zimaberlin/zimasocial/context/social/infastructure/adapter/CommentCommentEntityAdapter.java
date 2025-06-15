@@ -10,7 +10,7 @@ public class CommentCommentEntityAdapter {
        if(comment == null) return null;
        return new Comment(
                 comment.getId(),
-                comment.getParent().getId(),
+                comment.getParent() != null ? comment.getParent().getId() : null,
                 comment.getPost().getId(),
                 comment.getUser().getId(),
                 comment.getContent(),

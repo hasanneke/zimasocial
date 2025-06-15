@@ -1,8 +1,8 @@
 package com.zimaberlin.zimasocial.context.contentmoderation.report.instracture;
 
-import com.zimaberlin.zimasocial.context.contentmoderation.report.Report;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
-import com.zimaberlin.zimasocial.context.contentmoderation.report.UnknownResourceTypeException;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportId;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
@@ -20,13 +20,15 @@ public class ReportDBRepository implements ReportRepository {
     }
 
     @Override
-    public void save(Report report) {
-        ReportEntity reportEntity =  ReportEntity.buildReport(report);
-        if(reportEntity == null){
-            throw new UnknownResourceTypeException();
-        }else{
-            reportJpaRepository.save(reportEntity);
-        }
+    public void save(PostReport report) {
+        ReportEntity reportEntity =  ReportEntity.buildPostReport(report);
+        reportJpaRepository.save(reportEntity);
+    }
+
+    @Override
+    public void save(CommentReport report) {
+        ReportEntity reportEntity =  ReportEntity.buildCommentReport(report);
+        reportJpaRepository.save(reportEntity);
     }
 
     @Override

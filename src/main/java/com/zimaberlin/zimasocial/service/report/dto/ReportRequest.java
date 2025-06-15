@@ -20,7 +20,5 @@ public class ReportRequest {
     private Long resourceId;
     @NotBlank
     private ReportReason reason;
-    @NotBlank
-    private ResourceType resourceType;
     private String description;
 }

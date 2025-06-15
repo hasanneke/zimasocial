@@ -11,7 +11,7 @@ import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
 import com.zimaberlin.zimasocial.utility.TokenResponse;
 import com.zimaberlin.zimasocial.entity.UserRole;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.utility.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ import java.util.Set;
 public class AuthServiceImpl implements AuthService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final JWTService jwtService;
     private final Random random = new Random();
     private final RefreshTokenRepository refreshTokenRepository;

@@ -9,6 +9,11 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.devtools.remote.server.Dispatcher;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.DispatcherServlet;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -46,6 +51,9 @@ public class PostEntity {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;
+
+    @Column(name = "user_id",insertable = false, updatable = false)
+    private Long userId;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore

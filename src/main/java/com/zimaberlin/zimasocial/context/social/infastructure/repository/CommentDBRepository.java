@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -46,6 +47,10 @@ public class CommentDBRepository implements CommentRepository {
             commentEntity.setPost(post);
             commentEntity.setUser(user);
             commentEntity.setContent(comment.getContent());
+            if(comment.getParentCommentId() != null){
+                CommentEntity parent = commentJpaRepository.findById(comment.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
+                commentEntity.setParent(parent);
+            }
         }else{
             commentEntity = commentJpaRepository.findById(comment.getCommentId()).orElseThrow(CommentNotFoundException::new);
             commentEntity.mergeDomain(comment);
@@ -55,13 +60,20 @@ public class CommentDBRepository implements CommentRepository {
     }
 
     @Override
+    public void saveAll(List<Comment> comments) {
+        for (Comment comment : comments) {
+            save(comment);
+        }
+    }
+
+    @Override
     public Page<Comment> findByParentIdOrderByCreatedAtDesc(Long parentId, Pageable pageable) {
-        return null;
+        return commentJpaRepository.findByParentIdOrderByCreatedAtDesc(parentId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
 
     @Override
     public Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable) {
-        return commentJpaRepository.findByParentIdOrderByCreatedAtDesc(postId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
+        return commentJpaRepository.findByPostIdAndParentIdIsNull(postId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
     @Override
     public void delete(Comment comment) {

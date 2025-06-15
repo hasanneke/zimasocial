@@ -1,15 +1,15 @@
 package com.zimaberlin.zimasocial.contentmoderation;
 
-import com.zimaberlin.zimasocial.context.contentmoderation.report.Report;
-import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportAlreadyMadeException;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.ContentRepository;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.content.CommentContent;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.content.PostContent;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.exception.ReportAlreadyMadeException;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportService;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
-import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
-import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
@@ -31,34 +31,53 @@ public class ReportServiceTest {
     @Mock
     private AuthorRepository authorRepository;
     @Mock
-    private PostRepository postRepository;
-    @Mock
-    private CommentRepository commentRepository;
+    private ContentRepository contentRepository;
     @Mock
     private ReportRepository reportRepository;
     @InjectMocks
     private ReportService reportService;
 
     private Author testAuthor = new Author(0L, "", "", LocalDateTime.now());
-    private Report testReport = new Report(0L, 0L, ResourceType.post, ReportReason.spam);
-    private ReportRequest testRequest = new ReportRequest(0L, ReportReason.spam, ResourceType.post, "");
-    private Post dummyPost = new Post(0L,"", PostType.any, 0, 0,  LocalDateTime.now(), LocalDateTime.now(), 0L);
+    private ReportRequest testRequest = new ReportRequest(0L, ReportReason.spam, "");
+    private PostContent dummyPostContent = new PostContent(0L,0L);
+    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, 0L);
     @Test
-    void testThrowReportAlreadyMadeException_WhenReportExists() {
+    void testReportPost_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
         when(reportRepository.checkReportExists(0L, 0L, ResourceType.post)).thenReturn(true);
 
-        Assertions.assertThrows(ReportAlreadyMadeException.class, ()-> reportService.report(testRequest));
+        Assertions.assertThrows(ReportAlreadyMadeException.class,
+                ()-> reportService.reportPost(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));
     }
 
     @Test
-    void testWhenSuccess() {
-        ReportRequest request = new ReportRequest(0L, ReportReason.spam, ResourceType.post, "");
+    void testReportPost_WhenSuccess() {
+        ReportRequest request = new ReportRequest(0L, ReportReason.spam, "");
 
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
         when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);
-        when(postRepository.findById(any())).thenReturn(Optional.of(dummyPost));
-        reportService.report(request);
-        verify(reportRepository, times(1)).save(new Report(0L, 0L, ResourceType.post, ReportReason.spam));
+        when(contentRepository.getPost(any())).thenReturn(Optional.of(dummyPostContent));
+        reportService.reportPost(request.getResourceId(), request.getReason(), request.getDescription());
+        verify(reportRepository, times(1)).save(new PostReport(request.getResourceId(), request.getReason(), testAuthor.getAuthorId(), dummyPostContent.authorId(), request.getDescription()));
+    }
+
+    @Test
+    void testReportComment_ThrowReportAlreadyMadeException_WhenReportExists() {
+        when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
+        when(reportRepository.checkReportExists(0L, 0L, ResourceType.comment)).thenReturn(true);
+
+        Assertions.assertThrows(ReportAlreadyMadeException.class,
+                ()-> reportService.reportComment(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));
+    }
+
+    @Test
+    void testReportComment_WhenSuccess() {
+        ReportRequest request = new ReportRequest(0L, ReportReason.spam, "");
+
+        when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
+        when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);
+        when(contentRepository.getComment(any())).thenReturn(Optional.of(dummyCommentContent));
+        reportService.reportComment(request.getResourceId(), request.getReason(), request.getDescription());
+        verify(reportRepository, times(1)).save(new CommentReport(request.getResourceId(), request.getReason(), testAuthor.getAuthorId(), dummyPostContent.authorId(), request.getDescription()));
     }
 }

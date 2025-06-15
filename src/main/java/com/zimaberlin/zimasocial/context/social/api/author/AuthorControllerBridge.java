@@ -94,6 +94,30 @@ public class AuthorControllerBridge {
         return pagedModel;
     }
 
+    PagedModel<AuthorView> getBlocks(int page, int size) throws NoSuchMethodException {
+        Page<Author> followersPage = authorRelationRepository.findBlocks(page, size);
+        List<AuthorView> authorViewList = followersPage.get().map(e-> authorAuthorViewMapper.authorViewFromAuthor(e)).toList();
+        PagedModel<AuthorView> pagedModel = PagedModel.of(
+                authorViewList,
+                new PagedModel.PageMetadata(followersPage.getSize(),
+                        followersPage.getNumber(),
+                        followersPage.getTotalElements(),
+                        followersPage.getTotalPages()));
+
+        Method method = AuthorController.class.getMethod("getBlocks", Integer.class, Integer.class);
+
+        if(page < followersPage.getTotalPages()){
+            Link link = linkTo(method,page + 1, size).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return pagedModel;
+    }
+
     PagedModel<AuthorView> searchAuthors(String query, int page, int size) throws NoSuchMethodException {
         Page<Author> userPage = authorRepository.search(query, page, size);
         List<AuthorView> authorViewList = userPage.get().map(e-> authorAuthorViewMapper.authorViewFromAuthor(e)).toList();

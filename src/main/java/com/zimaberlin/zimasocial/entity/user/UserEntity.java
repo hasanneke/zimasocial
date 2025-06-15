@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
 import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
+import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
@@ -64,6 +65,9 @@ public class UserEntity {
     @Column(name = "following_count")
     private int followingCount = 0;
 
+    @Column(name = "trust_score")
+    private Double trustScore = 100.0;
+
     @Column(name = "avatar_file_name")
     private String avatarFileName;
 
@@ -100,14 +104,6 @@ public class UserEntity {
     @JsonIgnore
     private Set<NotificationEntity> notifications = new HashSet<>();
 
-//    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private Set<UserRelationEntity> initiatedRelations = new HashSet<>();
-//
-//    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private Set<UserRelationEntity> receivedRelations = new HashSet<>();
-
     @OneToMany(mappedBy = "author")
     @JsonIgnore
     private Set<TodaysPost> todaysPost =  new HashSet<>();
@@ -133,31 +129,6 @@ public class UserEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
-//    public Set<UserEntity> getFollowers() {
-//        return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getActor).collect(Collectors.toSet());
-//    }
-
-//    public Set<UserEntity> getFollowings() {
-//        return initiatedRelations.stream().filter(e->e.getRelation().equals(Relation.followed)).map(UserRelationEntity::getReceiver).collect(Collectors.toSet());
-//    }
-//    boolean isBlocked(UserEntity blocker){
-//        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
-//        return blockRelation.isPresent();
-//    }
-//    private Optional<UserRelationEntity> followRelationWith(UserEntity user) {
-//        return receivedRelations.stream().filter(e-> user.equals(e.getActor()) && e.getRelation().equals(Relation.followed)).findFirst();
-//    }
-//    private Optional<UserRelationEntity> followedByRelationWith(UserEntity user) {
-//        return receivedRelations.stream().filter(e-> user.equals(e.getActor()) && e.getRelation().equals(Relation.followed)).findFirst();
-//    }
-//    private Set<UserRelationEntity> blockedRelations() {
-//        return initiatedRelations.stream().filter(e->e.getRelation().equals(Relation.blocked)).collect(Collectors.toSet());
-//    }
-//    public Set<UserRelationEntity> beingBlockedRelations() {
-//        return receivedRelations.stream().filter(e->e.getRelation().equals(Relation.blocked)).collect(Collectors.toSet());
-//    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -171,22 +142,6 @@ public class UserEntity {
         return Objects.hash(id);
     }
 
-    protected void incrementFollowingCount(){
-        followingCount = getFollowingCount() + 1;
-    }
-    protected void decrementFollowingCount(){
-        followingCount = getFollowingCount() - 1;
-    }
-    protected void incrementFollowerCount(){
-        followersCount = getFollowersCount() + 1;
-    }
-    protected void decrementFollowerCount(){
-        followersCount = getFollowersCount() - 1;
-    }
-
-//    protected void setReceivedRelations(Set<UserRelationEntity> relations) {
-//        this.receivedRelations = relations;
-//    }
     protected void setId(Long id){
         this.id = id;
     }
@@ -215,59 +170,6 @@ public class UserEntity {
         avatarFileName = null;
     }
     public void unfollowUser(UserEntity follower) {
-//        if(follower.equals(this)){
-//            throw new CircularUnfollowException();
-//        }
-//        Optional<UserRelationEntity> relation = followRelationWith(follower);
-//        if(relation.isPresent()){
-//            relation.get().markAsDeleted();
-//            decrementFollowerCount();
-//            follower.decrementFollowingCount();
-//        }else{
-//            throw new UserNotFollowed("You are not following the user");
-//        }
-    }
-    public void follow(UserEntity follower)  {
-//        if(follower.equals(this)){
-//            throw new CircularFollowException();
-//        }
-//        Optional<UserRelationEntity> relation = followedByRelationWith(follower);
-//        if(relation.isEmpty()){
-//            UserRelationEntity relationEntity = UserRelationEntity.builder()
-//                    .actor(follower)
-//                    .receiver(this)
-//                    .relation(Relation.followed)
-//                    .isDeleted(false)
-//                    .build();
-//            receivedRelations.add(relationEntity);
-//            follower.incrementFollowingCount();
-//            incrementFollowerCount();
-//        }else{
-//            throw new UserAlreadyFollowed("You are already following the user");
-//        }
-    }
-
-    public void block(UserEntity blocker) {
-//        Optional<UserRelationEntity> checkRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
-//        if(checkRelation.isEmpty()){
-//            UserRelationEntity blockRelation = UserRelationEntity.builder()
-//                    .relation(Relation.blocked)
-//                    .actor(blocker)
-//                    .receiver(this)
-//                    .build();
-//            receivedRelations.add(blockRelation);
-//        }else{
-//            throw new UserIsAlreadyBlockedException();
-//        }
-    }
-
-    public void unblock(UserEntity blocker){
-//        Optional<UserRelationEntity> blockRelation = beingBlockedRelations().stream().filter(e->e.getActor().equals(blocker)).toList().stream().findFirst();
-//        if(blockRelation.isPresent()){
-//            blockRelation.get().markAsDeleted();
-//        }else{
-//            throw new UserIsNotBlockedException();
-//        }
     }
     public void mergeAccount(Account account) {
         this.isDeleted = account.getIsDeleted();
@@ -284,5 +186,10 @@ public class UserEntity {
         this.familyName = author.getFamilyName();
         this.slug = author.getSlug();
         this.bio = author.getBio();
+    }
+
+    public void mergeUser(User user){
+        this.trustScore = user.getTrustScore();
+        this.isDisabled = user.getIsBanned();
     }
 }

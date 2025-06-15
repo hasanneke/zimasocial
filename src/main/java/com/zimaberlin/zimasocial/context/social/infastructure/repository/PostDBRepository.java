@@ -7,15 +7,19 @@ import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.PostDBAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostRepository;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
+import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
-import com.zimaberlin.zimasocial.repository.UserRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
+import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
+import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
@@ -28,14 +32,16 @@ import java.util.Optional;
 public class PostDBRepository implements PostRepository {
     private final PostJpaRepository postJpaRepository;
     private final PostDBAdapter postDBAdapter;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final TodaysPostRepository todaysPostRepository;
+    private final UserRelationJpaRepository userRelationJpaRepository;
     @Autowired
-    public PostDBRepository(PostJpaRepository postJpaRepository, PostDBAdapter postDBAdapter, UserRepository userRepository, TodaysPostRepository todaysPostRepository) {
+    public PostDBRepository(PostJpaRepository postJpaRepository, PostDBAdapter postDBAdapter, UserJpaRepository userRepository, TodaysPostRepository todaysPostRepository, UserRelationJpaRepository userRelationJpaRepository) {
         this.postJpaRepository = postJpaRepository;
         this.postDBAdapter = postDBAdapter;
         this.userRepository = userRepository;
         this.todaysPostRepository = todaysPostRepository;
+        this.userRelationJpaRepository = userRelationJpaRepository;
     }
     @Override
     public Optional<Post> findById(Long postId) {
@@ -54,6 +60,7 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public Page<Post> findAll(Pageable page, String slug, PostType type) {
+        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         Specification<PostEntity> specification = Specification.where(null);
         if(slug != null){
             UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
@@ -65,7 +72,11 @@ public class PostDBRepository implements PostRepository {
             specification = specification.and(PostSpecification.type(type));
         }
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
-        return postEntityPage.map(postDBAdapter::convertPostEntityToPost);
+        List<PostEntity> filterPostForBlockedAuthors = postEntityPage.get().filter(e->{
+            Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(currentUser.getId(), e.getUserId(), Relation.blocked);
+            return blockRelation.isEmpty();
+        }).toList();
+        return new PageImpl<>(filterPostForBlockedAuthors, page, postEntityPage.getTotalElements()).map(postDBAdapter::convertPostEntityToPost);
     }
 
     @Override

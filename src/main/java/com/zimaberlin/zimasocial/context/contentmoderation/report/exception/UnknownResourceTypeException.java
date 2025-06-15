@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.contentmoderation.report;
+package com.zimaberlin.zimasocial.context.contentmoderation.report.exception;
 
 import com.zimaberlin.zimasocial.exception.BadRequestException;
 

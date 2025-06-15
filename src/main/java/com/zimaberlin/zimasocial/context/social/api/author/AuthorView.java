@@ -1,5 +1,4 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
-import com.zimaberlin.zimasocial.controller.UserController;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -24,17 +23,17 @@ public class AuthorView extends RepresentationModel<AuthorView> {
     public AuthorView addLinks() {
         // Add self link to user details
         this.add(WebMvcLinkBuilder.linkTo(
-                        WebMvcLinkBuilder.methodOn(UserController.class)
+                        WebMvcLinkBuilder.methodOn(AuthorController.class)
                                 .getUser(this.slug))
                 .withSelfRel());
         // Add link to followers
         try {
             this.add(WebMvcLinkBuilder.linkTo(
-                            WebMvcLinkBuilder.methodOn(UserController.class)
+                            WebMvcLinkBuilder.methodOn(AuthorController.class)
                                     .getFollowers(this.slug, 0, 20))
                     .withRel("followers"));
             this.add(WebMvcLinkBuilder.linkTo(
-                            WebMvcLinkBuilder.methodOn(UserController.class)
+                            WebMvcLinkBuilder.methodOn(AuthorController.class)
                                     .getFollowing(this.slug, 0, 20))
                     .withRel("following"));
         } catch (NoSuchMethodException e) {

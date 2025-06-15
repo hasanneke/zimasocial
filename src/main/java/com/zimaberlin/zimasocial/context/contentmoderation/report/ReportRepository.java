@@ -1,10 +1,13 @@
 package com.zimaberlin.zimasocial.context.contentmoderation.report;
 
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
+import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 
 import java.util.Optional;
 
 public interface ReportRepository {
-    void save(Report report);
+    void save(PostReport report);
+    void save(CommentReport report);
     boolean checkReportExists(Long resourceId, Long reporterId, ResourceType resourceType);
 }

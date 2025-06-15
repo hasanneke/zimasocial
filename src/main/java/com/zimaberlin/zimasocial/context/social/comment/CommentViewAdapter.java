@@ -36,13 +36,13 @@ public class CommentViewAdapter {
         // Set domain values
         commentView.setContent(comment.getContent());
         commentView.setId(comment.getCommentId());
-        commentView.setAuthorView(authorViewAdapter.authorViewFromAuthor(author));
+        commentView.setAuthor(authorViewAdapter.authorViewFromAuthor(author));
         commentView.setUpdatedAt(comment.getUpdatedAt());
         commentView.setCreatedAt(comment.getCreatedAt());
         commentView.setLikeCount(comment.getLikeCount());
         commentView.setReplyCount(comment.getReplyCount());
 
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(comment.getPostId(), authenticatedAuthor.getAuthorId());
+        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getAuthorId());
         commentView.setIsLiked(like.isPresent());
 
         boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), authenticatedAuthor.getAuthorId(), ResourceType.comment);
