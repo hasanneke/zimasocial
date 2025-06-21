@@ -1,6 +1,4 @@
 package com.zimaberlin.zimasocial.context.social.comment;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-
-public record CommentLikedEvent(Comment comment, Author author) {
+public record CommentLikedEvent(Long commentId, Long commentOwnerId, Long likerAuthorId) {
 }

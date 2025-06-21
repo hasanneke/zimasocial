@@ -1,5 +1,6 @@
-package com.zimaberlin.zimasocial.controller;
-import com.zimaberlin.zimasocial.service.notification.NotificationService;
+package com.zimaberlin.zimasocial.context.communication.controller;
+
+import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +21,22 @@ import java.lang.reflect.Method;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController()
-@RequestMapping(path = "/api/v1/notifications")
-public class NotificationController {
-    private final NotificationService notificationService;
+@RequestMapping(path = "/api/v2/notifications")
+public class NotificationControllerBeta {
+    private final NotificationReadRepository notificationReadRepository;
+    private final AuthorRepository authorRepository;
 
     @Autowired
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
+    public NotificationControllerBeta(NotificationReadRepository notificationReadRepository, AuthorRepository authorRepository) {
+        this.notificationReadRepository = notificationReadRepository;
+        this.authorRepository = authorRepository;
     }
 
     @GetMapping
-    public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                         @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Long userId = CurrentUser.getCurrentUserProfile().getId();
+    public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Long authorId = authorRepository.getAuthenticatedAuthor().getAuthorId();
         Pageable pageable = PageRequest.of(page, size);
-        Page<NotificationView> notificationsPage = notificationService.getNotifications(userId, pageable);
+        Page<NotificationView> notificationsPage = notificationReadRepository.findByRecipientId(authorId, pageable);
 
         PagedModel<NotificationView> pagedModel = PagedModel.of(
                 notificationsPage.getContent(),

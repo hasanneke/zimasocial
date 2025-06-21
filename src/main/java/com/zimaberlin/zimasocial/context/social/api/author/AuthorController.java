@@ -24,12 +24,14 @@ public class AuthorController {
     private AuthorControllerBridge authorControllerBridge;
     private AuthorService authorService;
     private AuthorRepository authorRepository;
+    private AuthorAuthorViewAdapter authorAuthorViewMapper;
 
     @Autowired
-    public AuthorController(AuthorControllerBridge authorControllerBridge, AuthorService authorService, AuthorRepository authorRepository) {
+    public AuthorController(AuthorControllerBridge authorControllerBridge, AuthorService authorService, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
         this.authorControllerBridge = authorControllerBridge;
         this.authorService = authorService;
         this.authorRepository = authorRepository;
+        this.authorAuthorViewMapper = authorViewAdapter;
     }
 
     @GetMapping(path = "/me")
@@ -46,8 +48,8 @@ public class AuthorController {
 
     @PatchMapping(path = "/me/upload-image")
     public ResponseEntity<AuthorView> uploadProfileImage(MultipartFile image) throws IOException {
-        authorService.updateProfileImage(image);
-        return ResponseEntity.ok().build();
+        Author author = authorService.updateProfileImage(image);
+        return ResponseEntity.ok(authorAuthorViewMapper.authorViewFromAuthor(author));
     }
 
     @DeleteMapping(path = "/me/remove-profile")

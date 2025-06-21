@@ -22,7 +22,7 @@ public class FileEntity  {
     @Column(name = "USER_ID")
     private Long userId;
 
-    @Column(name = "NAME", nullable = false, unique = true)
+    @Column(name = "NAME", nullable = false, unique = true, length = 2048)
     private String name;
 
     @Column(name = "MEDIA_TYPE", nullable = false)

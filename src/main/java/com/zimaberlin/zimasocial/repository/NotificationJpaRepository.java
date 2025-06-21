@@ -12,8 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
+public interface NotificationJpaRepository extends JpaRepository<NotificationEntity, Long> {
     Page<NotificationEntity> findByReceiverUserIdOrderByCreatedAtDesc(Long receiverId, Pageable page);
     Optional<NotificationEntity> findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
     Optional<NotificationEntity> findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
+    Optional<NotificationEntity> findByActorIdAndTargetIdAndTypeAndTargetCollection(Long actorId, Long targetId, NotificationType type, TargetCollection collection);
 }

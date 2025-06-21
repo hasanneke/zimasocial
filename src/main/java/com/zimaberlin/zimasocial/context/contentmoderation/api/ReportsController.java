@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "api/v2/reports")
+@RequestMapping(path = "/api/v2/reports")
 public class ReportsController {
     private final ReportService reportService;
     @Autowired

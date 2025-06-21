@@ -10,7 +10,7 @@ public interface CommentRepository {
     Optional<Comment> findById(Long id);
     Comment save(Comment comment);
     void saveAll(List<Comment> comments);
-    Page<Comment> findByParentIdOrderByCreatedAtDesc(Long parentId, Pageable pageable);
+    Page<Comment> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable);
     Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable);
     void delete(Comment comment);
 }

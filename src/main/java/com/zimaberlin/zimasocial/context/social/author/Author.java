@@ -92,7 +92,7 @@ public class Author {
         }
         decrementFollowerCount();
         follower.decrementFollowingCount();
-        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
+//        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
     }
 
     public void attachFileName(String fileName) {

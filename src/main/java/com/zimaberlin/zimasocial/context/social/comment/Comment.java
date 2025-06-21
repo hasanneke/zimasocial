@@ -46,9 +46,7 @@ public class Comment {
     }
     public Comment reply(Long replierAuthorId, String comment){
         replyCount += 1;
-        Comment reply = new Comment(postId, commentId, replierAuthorId, comment);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(this, reply));
-        return reply;
+        return new Comment(postId, commentId, replierAuthorId, comment);
     }
     public void removeReply(Comment reply) {
         replyCount -= 1;
@@ -56,7 +54,7 @@ public class Comment {
 
     public CommentLike like(Author liker){
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new CommentLikedEvent(this, liker));
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.getCommentId(), authorId, liker.getAuthorId()));
         return new CommentLike(postId, liker.getAuthorId(), commentId);
     }
 

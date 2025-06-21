@@ -92,7 +92,7 @@ public class AuthorService {
         authorRepository.save(author);
     }
     @Transactional
-    public void updateProfileImage(MultipartFile image) throws IOException {
+    public Author updateProfileImage(MultipartFile image) throws IOException {
         String avatarFileName = imageService.uploadProfileImage(image);
         Author author = authorRepository.getAuthenticatedAuthor();
         if (author.getAvatarFileName() != null) {
@@ -100,6 +100,7 @@ public class AuthorService {
         }
         author.attachFileName(avatarFileName);
         authorRepository.save(author);
+        return author;
     }
     @Transactional
     public void removeMyProfileImage() {

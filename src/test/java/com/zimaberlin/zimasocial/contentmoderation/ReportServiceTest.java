@@ -38,7 +38,7 @@ public class ReportServiceTest {
     private ReportService reportService;
 
     private Author testAuthor = new Author(0L, "", "", LocalDateTime.now());
-    private ReportRequest testRequest = new ReportRequest(0L, ReportReason.spam, "");
+    private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
     private PostContent dummyPostContent = new PostContent(0L,0L);
     private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, 0L);
     @Test
@@ -52,7 +52,7 @@ public class ReportServiceTest {
 
     @Test
     void testReportPost_WhenSuccess() {
-        ReportRequest request = new ReportRequest(0L, ReportReason.spam, "");
+        ReportRequest request = new ReportRequest(0L, ReportReason.SPAM, "");
 
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
         when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);
@@ -72,7 +72,7 @@ public class ReportServiceTest {
 
     @Test
     void testReportComment_WhenSuccess() {
-        ReportRequest request = new ReportRequest(0L, ReportReason.spam, "");
+        ReportRequest request = new ReportRequest(0L, ReportReason.SPAM, "");
 
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
         when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);

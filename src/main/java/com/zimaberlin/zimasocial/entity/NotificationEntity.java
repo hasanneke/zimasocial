@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
+import com.zimaberlin.zimasocial.context.communication.notifications.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -42,12 +43,18 @@ public class NotificationEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_user_id")
-    private UserEntity receiverUser;
+    @Column(name = "receiver_user_id")
+    private Long receiverUserId;
 
     @ManyToOne
-    @JoinColumn(name = "sender_user_id")
+    @JoinColumn(name = "receiver_user_id", insertable = false, updatable = false)
+    private UserEntity receiverUser;
+
+    @Column(name = "sender_user_id")
+    private Long actorId;
+
+    @ManyToOne
+    @JoinColumn(name = "sender_user_id", insertable = false, updatable = false)
     private UserEntity actor;
 
     @Enumerated(value = EnumType.STRING)
@@ -65,5 +72,61 @@ public class NotificationEntity {
     private Boolean isDeleted = false;
     public void markAsDeleted(){
         this.isDeleted = true;
+    }
+
+    public static NotificationEntity buildPostLikedNotification(PostLikedNotification postLikedNotification, UserEntity recipient, UserEntity actor) {
+        return NotificationEntity.builder()
+                .postId(postLikedNotification.getPostId())
+                .type(NotificationType.POST_LIKED)
+                .content(postLikedNotification.getMessage())
+                .targetId(postLikedNotification.getPostId())
+                .targetCollection(TargetCollection.post)
+                .receiverUserId(recipient.getId())
+                .actorId(actor.getId())
+                .build();
+    }
+    public static NotificationEntity buildPostCommentedNotification(PostCommentedNotification postCommentedNotification, UserEntity recipient, UserEntity actor) {
+        return NotificationEntity.builder()
+                .postId(postCommentedNotification.getPostId())
+                .type(NotificationType.POST_COMMENTED)
+                .content(postCommentedNotification.getMessage())
+                .targetId(postCommentedNotification.getPostId())
+                .targetCollection(TargetCollection.post)
+                .receiverUserId(recipient.getId())
+                .actorId(actor.getId())
+                .build();
+    }
+    public static NotificationEntity buildCommentLikedNotification(CommentLikedNotification commentLikedNotification, UserEntity recipient, UserEntity actor) {
+        return NotificationEntity.builder()
+                .postId(commentLikedNotification.getPostId())
+                .type(NotificationType.COMMENT_LIKED)
+                .content(commentLikedNotification.getMessage())
+                .targetId(commentLikedNotification.getCommentId())
+                .targetCollection(TargetCollection.comment)
+                .receiverUserId(recipient.getId())
+                .actorId(actor.getId())
+                .build();
+    }
+
+    public static NotificationEntity buildCommentRepliedNotification(CommentRepliedNotification commentRepliedNotification, UserEntity recipient, UserEntity actor) {
+        return NotificationEntity.builder()
+                .postId(commentRepliedNotification.getPostId())
+                .type(NotificationType.COMMENT_REPLIED)
+                .content(commentRepliedNotification.getMessage())
+                .targetId(commentRepliedNotification.getReplyId())
+                .targetCollection(TargetCollection.comment)
+                .receiverUserId(recipient.getId())
+                .actorId(actor.getId())
+                .build();
+    }
+    public static NotificationEntity buildAuthorFollowedNotification(AuthorFollowedNotification authorFollowedNotification) {
+        return NotificationEntity.builder()
+                .type(NotificationType.USER_FOLLOWED_YOU)
+                .content(authorFollowedNotification.getMessage())
+                .targetId(authorFollowedNotification.getRecipientId())
+                .targetCollection(TargetCollection.profile)
+                .receiverUserId(authorFollowedNotification.getRecipientId())
+                .actorId(authorFollowedNotification.getActorId())
+                .build();
     }
 }

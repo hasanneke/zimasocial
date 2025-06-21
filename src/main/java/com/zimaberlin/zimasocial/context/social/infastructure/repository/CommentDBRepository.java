@@ -67,8 +67,8 @@ public class CommentDBRepository implements CommentRepository {
     }
 
     @Override
-    public Page<Comment> findByParentIdOrderByCreatedAtDesc(Long parentId, Pageable pageable) {
-        return commentJpaRepository.findByParentIdOrderByCreatedAtDesc(parentId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
+    public Page<Comment> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable) {
+        return commentJpaRepository.findByParentIdOrderByCreatedAt(parentId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
 
     @Override

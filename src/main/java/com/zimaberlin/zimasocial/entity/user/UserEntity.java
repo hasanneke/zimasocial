@@ -186,6 +186,7 @@ public class UserEntity {
         this.familyName = author.getFamilyName();
         this.slug = author.getSlug();
         this.bio = author.getBio();
+        this.avatarFileName = author.getAvatarFileName();
     }
 
     public void mergeUser(User user){

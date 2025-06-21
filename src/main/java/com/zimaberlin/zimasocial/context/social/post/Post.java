@@ -44,12 +44,12 @@ public class Post {
     }
     public PostLike like(Long likerAuthorId) {
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new PostLikedEvent(postId, likerAuthorId));
+        StaticEventPublisher.publishEvent(new PostLikedEvent(postId, authorId, likerAuthorId));
         return new PostLike(postId, likerAuthorId);
     }
     public Comment comment(Long commenterAuthorId, String comment) {
         commentCount += 1;
-        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, commenterAuthorId));
+
         return new Comment(postId, null, commenterAuthorId, comment);
     }
     public void removeComment(Long commentId) {

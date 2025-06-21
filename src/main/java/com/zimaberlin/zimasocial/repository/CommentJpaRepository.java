@@ -11,7 +11,7 @@ import java.util.List;
 public interface CommentJpaRepository extends JpaRepository<CommentEntity, Long> {
     Page<CommentEntity> findByPostIdAndParentIdIsNull(Long postId, Pageable pageable);
     Page<CommentEntity> findByParentId(Long parentId, Pageable pageable);
-    Page<CommentEntity> findByParentIdOrderByCreatedAtDesc(Long postId, Pageable pageable);
+    Page<CommentEntity> findByParentIdOrderByCreatedAt(Long postId, Pageable pageable);
     Page<CommentEntity> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId);
     Page<CommentEntity> findByPostIdOrderByCreatedAtDesc(Pageable pageable, Long postId, Long parentId);
     void deleteAllByUser(UserEntity user);

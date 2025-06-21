@@ -2,6 +2,7 @@ package com.zimaberlin.zimasocial.context.social.post;
 
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
+import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -11,6 +12,7 @@ import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
+import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,8 +76,10 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment comment = post.comment(author.getAuthorId(), content);
+        Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
-        return commentRepository.save(comment);
+        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, savedComment.getCommentId(), author.getAuthorId(), post.getAuthorId()));
+        return savedComment;
     }
 
     @Transactional
@@ -120,7 +124,9 @@ public class PostService {
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
         Comment reply = parent.reply(author.getAuthorId(), content);
+        Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getAuthorId()));
         return commentRepository.save(reply);
     }
 

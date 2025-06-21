@@ -119,7 +119,7 @@ public class PostControllerBridge {
     }
 
     public PagedModel<CommentView> getCommentReplies(int page, int size, Long commentId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAtDesc(commentId, PageRequest.of(page, size));
+        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAt(commentId, PageRequest.of(page, size));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
                 commentViewAdapter.populated(commentPage.getContent()),
@@ -128,7 +128,7 @@ public class PostControllerBridge {
                         commentPage.getTotalElements(),
                         commentPage.getTotalPages()));
 
-        Method method = this.getClass().getMethod("getCommentReplies", int.class, int.class, Long.class);
+        Method method = PostController.class.getMethod("getCommentReplies", Integer.class, Integer.class, Long.class);
         if(page + 1 < commentPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, commentId).withRel(LinkRelation.of("next"));
             pagedModel.add(link);

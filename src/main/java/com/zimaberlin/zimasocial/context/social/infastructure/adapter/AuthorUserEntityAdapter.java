@@ -9,6 +9,6 @@ public class AuthorUserEntityAdapter {
    public Author convertUserEntityToAuthor(UserEntity user){
        if(user == null) return null;
 
-       return new Author(user.getId(), user.getSlug(), user.getName(), user.getFamilyName(), user.getBio(), user.getAvatarFileName(), user.isPrivate(), user.getEmail(), user.getFollowersCount(), user.getFollowingCount(), user.getCreatedAt());
+       return new Author(user.getId(), user.getSlug(), user.getName(),  user.getBio(), user.getFamilyName(), user.getAvatarFileName(), user.isPrivate(), user.getEmail(), user.getFollowersCount(), user.getFollowingCount(), user.getCreatedAt());
     }
 }

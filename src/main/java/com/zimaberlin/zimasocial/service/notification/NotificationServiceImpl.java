@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.service.notification;
 
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.repository.NotificationJpaRepository;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
@@ -24,13 +24,13 @@ import static com.zimaberlin.zimasocial.utility.CurrentUser.getCurrentUserProfil
 @Service
 public class NotificationServiceImpl implements NotificationService{
     Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
-    private final NotificationRepository notificationRepository;
+    private final NotificationJpaRepository notificationRepository;
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userRepository;
     private final UserViewFactory userMapper;
 
     @Autowired
-    public NotificationServiceImpl(NotificationRepository notificationRepository, UserViewFactory userMapper, PostJpaRepository postJpaRepository, UserJpaRepository userRepository) {
+    public NotificationServiceImpl(NotificationJpaRepository notificationRepository, UserViewFactory userMapper, PostJpaRepository postJpaRepository, UserJpaRepository userRepository) {
         this.notificationRepository = notificationRepository;
         this.userMapper = userMapper;
         this.postJpaRepository = postJpaRepository;
