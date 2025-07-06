@@ -1,8 +1,7 @@
 package com.zimaberlin.zimasocial.service.musicService.impl;
 
-import com.google.gson.internal.NonNullElementWrapperList;
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
-import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicService;
+import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -14,12 +13,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class SpotifyMusicService implements SearchMusicService {
+public class SpotifyMusicClient implements SearchMusicClient {
     private final RestTemplate restTemplate;
     String baseUrl;
 
     @Autowired
-    public SpotifyMusicService(RestTemplateBuilder restTemplateBuilder) {
+    public SpotifyMusicClient(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
         this.baseUrl = "https://api.spotify.com/v1/search";
     }

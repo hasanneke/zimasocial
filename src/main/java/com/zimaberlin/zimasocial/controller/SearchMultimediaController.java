@@ -6,8 +6,8 @@ import com.zimaberlin.zimasocial.service.movieService.Impl.TDMBMovieService;
 import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
 import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
-import com.zimaberlin.zimasocial.service.musicService.impl.SpotifyMusicService;
-import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicService;
+import com.zimaberlin.zimasocial.service.musicService.impl.SpotifyMusicClient;
+import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/api/v1/mediasearch")
 public class SearchMultimediaController {
-    private final SearchMusicService spotifyMusicService;
+    private final SearchMusicClient spotifyMusicService;
     private final SearchMovieService movieService;
     private final SearchBookService searchBookService;
 
     @Autowired
-    public SearchMultimediaController(SpotifyMusicService spotifyMusicService, TDMBMovieService movieService, SearchBookService searchBookService) {
+    public SearchMultimediaController(SpotifyMusicClient spotifyMusicService, TDMBMovieService movieService, SearchBookService searchBookService) {
         this.spotifyMusicService = spotifyMusicService;
         this.movieService = movieService;
         this.searchBookService = searchBookService;

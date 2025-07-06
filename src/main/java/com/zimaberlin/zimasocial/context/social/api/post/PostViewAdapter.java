@@ -51,6 +51,7 @@ public class PostViewAdapter {
         postView.setCommentCount( post.getCommentCount() );
         postView.setCreatedAt( post.getCreatedAt() );
         postView.setUpdatedAt( post.getUpdatedAt() );
+        postView.setMovie( post.getMovie() );
         postView.addLinks();
 
         return postView;

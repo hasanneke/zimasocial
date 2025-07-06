@@ -56,6 +56,7 @@ public class NotificationEventListener {
             return;
         }
         CommentLikedNotification commentLikedNotification = CommentLikedNotification.builder()
+                .postId(commentLikedEvent.postId())
                 .commentId(commentLikedEvent.commentId())
                 .actorId(commentLikedEvent.likerAuthorId())
                 .recipientId(commentLikedEvent.commentOwnerId())

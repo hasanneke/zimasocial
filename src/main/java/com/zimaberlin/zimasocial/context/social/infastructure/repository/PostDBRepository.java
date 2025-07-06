@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
+import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
@@ -59,16 +60,22 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
-    public Page<Post> findAll(Pageable page, String slug, PostType type) {
+    public Page<Post> findAll(Pageable page, String slug, PostCategory category) {
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         Specification<PostEntity> specification = Specification.where(null);
         if(slug != null){
             UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
             specification = specification.and(PostSpecification.authorId(user.getId()));
         }
-        if(type == PostType.any || type == null){
-            specification = specification.and(PostSpecification.type(PostType.any));
-        }else{
+
+        PostType type = switch (category) {
+                case any -> PostType.any;
+                case music -> PostType.music;
+                case movie -> PostType.movie;
+                case book -> PostType.book;
+                case followings -> null;
+        };
+        if(type != PostType.any){
             specification = specification.and(PostSpecification.type(type));
         }
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
@@ -77,6 +84,11 @@ public class PostDBRepository implements PostRepository {
             return blockRelation.isEmpty();
         }).toList();
         return new PageImpl<>(filterPostForBlockedAuthors, page, postEntityPage.getTotalElements()).map(postDBAdapter::convertPostEntityToPost);
+    }
+
+    @Override
+    public Page<Post> findFollowingsPosts(Pageable page, Long authorId) {
+        return postJpaRepository.findFollowingsPosts(page, authorId).map(postDBAdapter::convertPostEntityToPost);
     }
 
     @Override

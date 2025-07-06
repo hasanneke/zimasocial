@@ -4,4 +4,4 @@ import com.zimaberlin.zimasocial.entity.PostType;
 import lombok.Builder;
 
 @Builder
-public record CreatePost(PostType type, String content) { }
+public record CreatePost(PostType type, String content, Integer mediaId, String language) { }

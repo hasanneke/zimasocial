@@ -4,6 +4,6 @@ import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface NotificationReadRepository {
+public interface NotificationQuery {
     Page<NotificationView> findByRecipientId(Long recipientId, Pageable pageable);
 }

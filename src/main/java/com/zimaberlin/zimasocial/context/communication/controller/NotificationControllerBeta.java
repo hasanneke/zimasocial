@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.context.communication.controller;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.utility.CurrentUser;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,11 +22,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RestController()
 @RequestMapping(path = "/api/v2/notifications")
 public class NotificationControllerBeta {
-    private final NotificationReadRepository notificationReadRepository;
+    private final NotificationQuery notificationReadRepository;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public NotificationControllerBeta(NotificationReadRepository notificationReadRepository, AuthorRepository authorRepository) {
+    public NotificationControllerBeta(NotificationQuery notificationReadRepository, AuthorRepository authorRepository) {
         this.notificationReadRepository = notificationReadRepository;
         this.authorRepository = authorRepository;
     }

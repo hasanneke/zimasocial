@@ -1,9 +1,7 @@
 package com.zimaberlin.zimasocial.service.movieService.Impl;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class TDMBMovieResponse {
         private String overview;
         private double popularity;
         private String poster_path;
-        private Date release_date;
+        private LocalDate release_date;
         private String title;
         private boolean video;
         private double vote_average;

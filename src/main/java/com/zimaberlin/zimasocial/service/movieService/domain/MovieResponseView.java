@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.service.movieService.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -21,8 +22,15 @@ public class MovieResponseView {
         private int id;
         private String title;
         private String posterUrl;
-        private Date releaseDate;
+        private String backdropUrl;
+        private LocalDate releaseDate;
         private String overview;
+        private Integer voteCount;
+        private Double voteAverage;
         private String href;
+        private double popularity;
+        private String originalTitle;
+        private String originalLanguage;
+        private boolean adult;
     }
 }

@@ -3,6 +3,11 @@ package com.zimaberlin.zimasocial.context.social.post;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
+import com.zimaberlin.zimasocial.context.social.media.MediaRepository;
+import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
+import com.zimaberlin.zimasocial.context.social.media.SearchMovieMediaItem;
+import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -10,12 +15,15 @@ import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
+import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
+import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.Optional;
 
@@ -25,18 +33,47 @@ public class PostService {
     private final AuthorRepository authorRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+    private final MovieSearcher movieSearcher;
+    private final MediaRepository mediaRepository;
     @Autowired
-    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository, MovieSearcher movieSearcher, MediaRepository mediaRepository) {
         this.postRepository = postRepository;
         this.authorRepository = authorRepository;
         this.likeRepository = likeRepository;
         this.commentRepository=  commentRepository;
+        this.movieSearcher = movieSearcher;
+        this.mediaRepository = mediaRepository;
     }
     @Transactional
     public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Post post = new Post(createPost.content(), createPost.type(), author.getAuthorId());
         return postRepository.save(post);
+    }
+
+    @Transactional
+    public Post createMoviePost(String content, Integer movieId, String language) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        Post post = new Post(content, PostType.movie, author.getAuthorId());
+        SearchMovieMediaItem searchMovieMediaItem = movieSearcher.getMovie(movieId, language);
+        MovieMedia movieMedia = MovieMedia.builder()
+                .movieProvider(searchMovieMediaItem.getMovieProvider())
+                .movieGenres(searchMovieMediaItem.getMovieGenres())
+                .originalLanguage(searchMovieMediaItem.getOriginalLanguage())
+                .name(searchMovieMediaItem.getName())
+                .description(searchMovieMediaItem.getDescription())
+                .imdbScore(searchMovieMediaItem.getImdbScore())
+                .posterUrl(searchMovieMediaItem.getPosterUrl())
+                .backdropUrl(searchMovieMediaItem.getBackdropUrl())
+                .releaseDate(searchMovieMediaItem.getReleaseDate())
+                .summary(searchMovieMediaItem.getSummary())
+                .voteAverage(searchMovieMediaItem.getVoteAverage())
+                .voteCount(searchMovieMediaItem.getVoteCount())
+                .build();
+        MovieMedia savedMovie = mediaRepository.save(movieMedia);
+        post.setMovie(savedMovie);
+        postRepository.save(post);
+        return post;
     }
 
     @Transactional

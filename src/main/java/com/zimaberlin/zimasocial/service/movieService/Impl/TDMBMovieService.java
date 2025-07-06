@@ -1,13 +1,10 @@
 package com.zimaberlin.zimasocial.service.movieService.Impl;
 
-import com.zimaberlin.zimasocial.controller.SearchMultimediaController;
 import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
 import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,12 +13,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import java.util.Objects;
 
 @Service
 public class TDMBMovieService implements SearchMovieService {
@@ -76,8 +69,15 @@ public class TDMBMovieService implements SearchMovieService {
         MovieResponseView.Movie movie = new MovieResponseView.Movie();
         movie.setId(e.getId());
         movie.setTitle(e.getTitle());
+        movie.setBackdropUrl(String.format("https://image.tmdb.org/t/p/w500/%s", e.getBackdrop_path()));
         movie.setReleaseDate(e.getRelease_date());
         movie.setOverview(e.getOverview());
+        movie.setVoteCount(e.getVote_count());
+        movie.setVoteAverage(e.getVote_average());
+        movie.setAdult(e.isAdult());
+        movie.setPopularity(e.getPopularity());
+        movie.setOriginalLanguage(e.getOriginal_language());
+        movie.setOriginalTitle(e.getOriginal_title());
         String imageUrl = String.format("https://image.tmdb.org/t/p/w500/%s", e.getPoster_path());
         movie.setPosterUrl(imageUrl);
         return movie;
@@ -101,6 +101,6 @@ public class TDMBMovieService implements SearchMovieService {
                 TDMBMovieResponse.MovieResult.class
         );
 
-        return convertTDMBMovieToDomain(result.getBody());
+        return convertTDMBMovieToDomain(Objects.requireNonNull(result.getBody()));
     }
 }

@@ -1,5 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.post;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
+import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.SearchMovieMediaItem;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -18,8 +20,9 @@ public class Post {
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private final Long authorId;
+    private MovieMedia movie;
 
-    public Post(Long postId, String content, PostType type, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, Long authorId) {
+    public Post(Long postId, String content, PostType type, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, Long authorId, MovieMedia movie) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(type, "Post type cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
@@ -32,8 +35,8 @@ public class Post {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.authorId = authorId;
+        this.movie = movie;
     }
-
     protected Post(String content, PostType type, Long authorId) {
         this.content = content;
         this.type = type;
@@ -41,6 +44,16 @@ public class Post {
         this.commentCount = 0;
         this.createdAt = LocalDateTime.now();
         this.authorId = authorId;
+    }
+
+    protected Post(String content, PostType type, Long authorId, SearchMovieMediaItem movie) {
+        this.content = content;
+        this.type = type;
+        this.likeCount = 0;
+        this.commentCount = 0;
+        this.createdAt = LocalDateTime.now();
+        this.authorId = authorId;
+        this.type = PostType.movie;
     }
     public PostLike like(Long likerAuthorId) {
         likeCount += 1;
@@ -58,5 +71,8 @@ public class Post {
     public void unliked() {
         likeCount = likeCount - 1;
         updatedAt = LocalDateTime.now();
+    }
+    public void setMovie(MovieMedia movie) {
+        this.movie = movie;
     }
 }

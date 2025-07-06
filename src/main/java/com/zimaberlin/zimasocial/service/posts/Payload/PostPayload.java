@@ -19,4 +19,7 @@ public class PostPayload {
 
     @Schema(description = "Post Url")
     private String url;
+
+    @Schema(description = "Selected media id")
+    private int mediaId;
 }

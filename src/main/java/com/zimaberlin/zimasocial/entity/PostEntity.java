@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zimaberlin.zimasocial.entity.media.MediaJpa;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.post.Post;
@@ -9,16 +10,12 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.boot.devtools.remote.server.Dispatcher;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -74,6 +71,13 @@ public class PostEntity {
     @Column(name = "IS_DELETED", nullable = false)
     private Boolean isDeleted = false;
 
+    @OneToOne
+    @JoinColumn(name = "media_id", insertable = false, updatable = false)
+    private MediaJpa media;
+
+    @Column(name = "media_id")
+    private UUID mediaId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,32 +90,6 @@ public class PostEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    public void incrementLikeCount(){
-        likeCount = likeCount + 1;
-    }
-    public void decrementLikeCount(){
-        likeCount = likeCount - 1;
-    }
-    public void incrementCommentCount(){
-        commentCount = commentCount + 1;
-    }
-    public void decrementCommentCount(){
-        commentCount = commentCount - 1;
-    }
-
-    public void liked() {
-        likeCount = likeCount + 1;
-    }
-    public void commented() {
-        commentCount = commentCount + 1;
-    }
-    public void commentRemoved() {
-        commentCount = commentCount - 1;
-    }
-    public void unliked() {
-        likeCount = likeCount - 1;
-    }
     public void markAsDeleted() {
         this.isDeleted = true;
     }
@@ -122,6 +100,9 @@ public class PostEntity {
         this.type = post.getType();
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
+        if (Objects.requireNonNull(post.getType()) == PostType.movie) {
+            mediaId = post.getMovie().getId();
+        }
     }
 }
 

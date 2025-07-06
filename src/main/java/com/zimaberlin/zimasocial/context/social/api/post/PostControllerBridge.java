@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.api.post;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
@@ -34,37 +35,53 @@ public class PostControllerBridge {
     private final CommentRepository commentRepository;
     private final PostViewAdapter postViewAdapter;
     private final CommentViewAdapter commentViewAdapter;
+    private final AuthorRepository authorRepository;
 
     @Autowired
-    public PostControllerBridge(PostService postService, PostRepository postRepository, CommentRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter) {
+    public PostControllerBridge(PostService postService, PostRepository postRepository, CommentRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter, AuthorRepository authorRepository) {
         this.postService = postService;
         this.postRepository = postRepository;
         this.postViewAdapter = postViewAdapter;
         this.commentRepository = commentRepository;
         this.commentViewAdapter = commentViewAdapter;
+        this.authorRepository = authorRepository;
     }
 
-    public PostView createPost(PostPayload payload) {
-        if(payload.getType() == null){
-            payload.setType(PostType.any);
+    public PostView createPost(PostPayload payload, String language) {
+        switch (payload.getType()){
+            case PostType.movie -> {
+                Post post = postService.createMoviePost(
+                        payload.getContent(),
+                        payload.getMediaId(),
+                        language
+                );
+                return postViewAdapter.populated(post);
+            }
+            default -> {
+                payload.setType(PostType.any);
+                Post post = postService.createPost(
+                        CreatePost.builder()
+                                .type(payload.getType())
+                                .content(payload.getContent())
+                                .build()
+                );
+                return postViewAdapter.populated(post);
+            }
         }
-        Post post = postService.createPost(
-                CreatePost.builder()
-                        .type(payload.getType())
-                        .content(payload.getContent())
-                        .build()
-        );
-        return postViewAdapter.populated(post);
     }
-
     public PagedModel<PostView> getPosts(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @RequestParam(name = "type", required = false) PostType type,
+            @RequestParam(name = "type", required = false) PostCategory category,
             @RequestParam(name = "slug", required = false) String slug
     ) throws NoSuchMethodException {
-        Page<Post> postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()), slug, type);
-
+        Page<Post> postPage;
+        if(category == PostCategory.followings){
+            Long authorId = authorRepository.getAuthenticatedAuthor().getAuthorId();
+            postPage = postRepository.findFollowingsPosts(PageRequest.of(page, size), authorId);
+        }else{
+            postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()), slug, category);
+        }
         PagedModel<PostView> pagedModel = PagedModel.of(
                 postViewAdapter.populated(postPage.getContent()),
                 new PagedModel.PageMetadata(postPage.getSize(),
@@ -75,16 +92,17 @@ public class PostControllerBridge {
         Method method = PostController.class.getMethod("getPosts",
                 Integer.class,
                 Integer.class,
-                PostType.class,
+                PostCategory.class,
+                String.class,
                 String.class);
 
         if(page + 1 < postPage.getTotalPages()){
-            Link link = linkTo(method, page + 1, size, type, slug).withRel(LinkRelation.of("next"));
+            Link link = linkTo(method, page + 1, size, category, slug).withRel(LinkRelation.of("next"));
             pagedModel.add(link);
         }
 
         if(page > 0){
-            Link link = linkTo(method, page - 1, size, type, slug).withRel(LinkRelation.of("previous"));
+            Link link = linkTo(method, page - 1, size, category, slug).withRel(LinkRelation.of("previous"));
             pagedModel.add(link);
         }
 

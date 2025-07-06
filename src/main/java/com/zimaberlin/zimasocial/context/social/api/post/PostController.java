@@ -38,17 +38,18 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) {
-        return ResponseEntity.ok(postControllerBridge.createPost(payload));
+    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload, String language) {
+        return ResponseEntity.ok(postControllerBridge.createPost(payload, language));
     }
 
     @GetMapping
     public HttpEntity<PagedModel<PostView>> getPosts(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @RequestParam(name = "type", required = false) PostType type,
-            @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException {
-        return new HttpEntity<>(postControllerBridge.getPosts(page, size, type, slug));
+            @RequestParam(name = "type") PostCategory category,
+            @RequestParam(name = "slug", required = false) String slug,
+            @RequestParam(name = "language", required = false, defaultValue = "en") String language) throws NoSuchMethodException {
+        return new HttpEntity<>(postControllerBridge.getPosts(page, size, category, slug));
     }
 
     @GetMapping(path = "/{postId}")

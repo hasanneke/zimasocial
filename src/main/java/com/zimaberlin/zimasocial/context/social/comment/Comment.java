@@ -54,7 +54,7 @@ public class Comment {
 
     public CommentLike like(Author liker){
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.getCommentId(), authorId, liker.getAuthorId()));
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getCommentId(), authorId, liker.getAuthorId()));
         return new CommentLike(postId, liker.getAuthorId(), commentId);
     }
 
