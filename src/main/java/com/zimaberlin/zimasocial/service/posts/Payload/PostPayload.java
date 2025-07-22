@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.service.posts.Payload;
 
+import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import com.zimaberlin.zimasocial.entity.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -22,4 +23,7 @@ public class PostPayload {
 
     @Schema(description = "Selected media id")
     private int mediaId;
+
+    @Schema(description = "Selected TV media type (eg: movie, tv)")
+    private MovieMediaType movieMediaType;
 }

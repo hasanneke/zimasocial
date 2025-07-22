@@ -7,10 +7,12 @@ import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Embeddable
 @Getter
 @Setter
-public class BookJpa {
+public class BookMediaJpa {
     @Column(name = "book_title", length = 64)
     private String title;
     @Column(name = "book_summary", length = 256)
@@ -22,8 +24,19 @@ public class BookJpa {
     @Column(name = "page_count")
     private Integer pageCount;
     @Column(name = "book_cover_url")
-    private String coverUrl;
+    private String thumbnail;
+    @Column(name = "book_small_cover_url")
+    private String smallThumbnail;
     @Enumerated(EnumType.STRING)
     @Column(name = "book_provider")
     private BookProvider provider;
+    @Column(name = "book_publisher")
+    private String publisher;
+    @Column(name = "book_language")
+    private String language;
+    @Column(name = "book_publish_date")
+    private LocalDate publishDate;
+    @Column(name = "print_type")
+    private String printType;
+
 }

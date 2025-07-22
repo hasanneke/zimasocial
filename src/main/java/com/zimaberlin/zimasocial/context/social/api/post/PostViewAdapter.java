@@ -45,7 +45,6 @@ public class PostViewAdapter {
         postView.setUser(authorViewAdapter.authorViewFromAuthor(author));
         postView.setId( post.getPostId() );
         postView.setContent( post.getContent() );
-        postView.setUrl( post.getUrl() );
         postView.setType( post.getType() );
         postView.setLikeCount( post.getLikeCount() );
         postView.setCommentCount( post.getCommentCount() );

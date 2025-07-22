@@ -96,7 +96,6 @@ public class PostEntity {
 
     public void merge(Post post) {
         this.content = post.getContent();
-        this.url = post.getUrl();
         this.type = post.getType();
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();

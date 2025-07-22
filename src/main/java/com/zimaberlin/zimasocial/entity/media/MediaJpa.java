@@ -26,5 +26,5 @@ public class MediaJpa {
     @Embedded
     private MovieMediaJpa movie;
     @Embedded
-    private BookJpa book;
+    private BookMediaJpa book;
 }

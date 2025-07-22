@@ -22,5 +22,5 @@ public class SearchMovieMediaItem {
     private String movieGenres;
     private String originalLanguage;
     private MovieProvider movieProvider;
-
+    private MovieMediaType type;
 }

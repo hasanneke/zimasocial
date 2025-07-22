@@ -24,6 +24,9 @@ public class MediaDBAdapter {
                 .voteCount(movie.getVoteCount())
                 .voteAverage(movie.getVoteAverage())
                 .imdbScore(movie.getImdbScore())
+                .type(movie.getMovieMediaType())
+                .numberOfSeasons(movie.getNumberOfSeasons())
+                .numberOfEpisodes(movie.getNumberOfEpisodes())
                 .build();
     }
 }

@@ -53,6 +53,7 @@ public class PostControllerBridge {
                 Post post = postService.createMoviePost(
                         payload.getContent(),
                         payload.getMediaId(),
+                        payload.getMovieMediaType(),
                         language
                 );
                 return postViewAdapter.populated(post);

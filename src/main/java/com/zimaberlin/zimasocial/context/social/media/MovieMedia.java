@@ -23,6 +23,9 @@ public class MovieMedia {
         private String originalLanguage;
         private MovieProvider movieProvider;
         private String backdropUrl;
+        private MovieMediaType type;
+        private Integer numberOfEpisodes;
+        private Integer numberOfSeasons;
 
         public void assignId(UUID id){
                 this.id = id;

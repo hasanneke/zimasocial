@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
+import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import com.zimaberlin.zimasocial.context.social.media.SearchMovieMediaItem;
 import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
 import com.zimaberlin.zimasocial.entity.media.MovieProvider;
@@ -18,9 +19,14 @@ public class MovieSearcherAdapter implements MovieSearcher {
     }
 
     @Override
-    public SearchMovieMediaItem getMovie(Integer movieId, String language) {
-        MovieResponseView.Movie movie = searchMovieService.getMovie(movieId, language);
+    public SearchMovieMediaItem getMovieSearchItem(Integer movieId, MovieMediaType type, String language) {
+        MovieResponseView.Movie movie = searchMovieService.getMovie(movieId, type, language);
         return mapToMovie(movie);
+    }
+
+    @Override
+    public MovieResponseView.Movie getMovie(Integer movieId, MovieMediaType type, String language) {
+        return searchMovieService.getMovie(movieId, type, language);
     }
 
     private static SearchMovieMediaItem mapToMovie(MovieResponseView.Movie movie) {
@@ -36,6 +42,7 @@ public class MovieSearcherAdapter implements MovieSearcher {
                 .originalLanguage(movie.getOriginalLanguage())
                 .description(movie.getOverview())
                 .movieProvider(MovieProvider.TMDB)
+                .type(movie.getType())
                 .build();
     }
 

@@ -3,10 +3,7 @@ package com.zimaberlin.zimasocial.context.social.post;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
-import com.zimaberlin.zimasocial.context.social.media.MediaRepository;
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
-import com.zimaberlin.zimasocial.context.social.media.SearchMovieMediaItem;
+import com.zimaberlin.zimasocial.context.social.media.*;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
@@ -16,14 +13,12 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
-import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.Optional;
 
@@ -52,23 +47,24 @@ public class PostService {
     }
 
     @Transactional
-    public Post createMoviePost(String content, Integer movieId, String language) {
+    public Post createMoviePost(String content, Integer movieId, MovieMediaType type, String language) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Post post = new Post(content, PostType.movie, author.getAuthorId());
-        SearchMovieMediaItem searchMovieMediaItem = movieSearcher.getMovie(movieId, language);
+        MovieResponseView.Movie movieRes = movieSearcher.getMovie(movieId, type, language);
         MovieMedia movieMedia = MovieMedia.builder()
-                .movieProvider(searchMovieMediaItem.getMovieProvider())
-                .movieGenres(searchMovieMediaItem.getMovieGenres())
-                .originalLanguage(searchMovieMediaItem.getOriginalLanguage())
-                .name(searchMovieMediaItem.getName())
-                .description(searchMovieMediaItem.getDescription())
-                .imdbScore(searchMovieMediaItem.getImdbScore())
-                .posterUrl(searchMovieMediaItem.getPosterUrl())
-                .backdropUrl(searchMovieMediaItem.getBackdropUrl())
-                .releaseDate(searchMovieMediaItem.getReleaseDate())
-                .summary(searchMovieMediaItem.getSummary())
-                .voteAverage(searchMovieMediaItem.getVoteAverage())
-                .voteCount(searchMovieMediaItem.getVoteCount())
+                .movieProvider(movieRes.getProvider())
+                .originalLanguage(movieRes.getOriginalLanguage())
+                .name(movieRes.getTitle())
+                .description(movieRes.getOverview())
+                .posterUrl(movieRes.getPosterUrl())
+                .backdropUrl(movieRes.getBackdropUrl())
+                .releaseDate(movieRes.getReleaseDate())
+                .summary(movieRes.getOverview())
+                .voteAverage(movieRes.getVoteAverage())
+                .voteCount(movieRes.getVoteCount())
+                .type(movieRes.getType())
+                .numberOfEpisodes(movieRes.getNumberOfEpisodes())
+                .numberOfSeasons(movieRes.getNumberOfSeasons())
                 .build();
         MovieMedia savedMovie = mediaRepository.save(movieMedia);
         post.setMovie(savedMovie);
@@ -164,7 +160,7 @@ public class PostService {
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
         StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getAuthorId()));
-        return commentRepository.save(reply);
+        return savedReply;
     }
 
     @Transactional

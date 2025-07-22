@@ -2,7 +2,6 @@ package com.zimaberlin.zimasocial.controller;
 
 import com.zimaberlin.zimasocial.service.bookService.domain.BookResponseView;
 import com.zimaberlin.zimasocial.service.bookService.domain.SearchBookService;
-import com.zimaberlin.zimasocial.service.movieService.Impl.TDMBMovieService;
 import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
 import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
@@ -20,7 +19,7 @@ public class SearchMultimediaController {
     private final SearchBookService searchBookService;
 
     @Autowired
-    public SearchMultimediaController(SpotifyMusicClient spotifyMusicService, TDMBMovieService movieService, SearchBookService searchBookService) {
+    public SearchMultimediaController(SpotifyMusicClient spotifyMusicService, SearchMovieService movieService, SearchBookService searchBookService) {
         this.spotifyMusicService = spotifyMusicService;
         this.movieService = movieService;
         this.searchBookService = searchBookService;
@@ -51,11 +50,11 @@ public class SearchMultimediaController {
         return ResponseEntity.ok(responseView);
     }
 
-    @GetMapping(path = "/movies/{movieId}")
-    public ResponseEntity<MovieResponseView.Movie> getMovie(@PathVariable(name = "movieId") Integer movieId, @RequestParam(name = "language") String language){
-        MovieResponseView.Movie movie= movieService.getMovie(movieId, language);
-        return ResponseEntity.ok(movie);
-    }
+//    @GetMapping(path = "/movies/{movieId}")
+//    public ResponseEntity<MovieResponseView.Movie> getMovie(@PathVariable(name = "movieId") Integer movieId, @RequestParam(name = "language") String language){
+//        MovieResponseView.Movie movie= movieService.getMovie(movieId, language);
+//        return ResponseEntity.ok(movie);
+//    }
 
     @GetMapping(path = "/books/search")
     public ResponseEntity<BookResponseView> searchBooks(@RequestParam(name = "query") String query){

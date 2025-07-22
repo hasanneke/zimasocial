@@ -1,7 +1,5 @@
 package com.zimaberlin.zimasocial.service.movieService.domain;
 
-import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
-import com.zimaberlin.zimasocial.entity.media.MovieProvider;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,15 +8,16 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MovieResponseView {
+public class MultiMediaTVResponseView {
     private int page;
-    private List<Movie> results;
+    private List<MovieResponseView.Movie> results;
     private int totalPages;
     private int totalResults;
     private String provider;
+
     @Getter
     @Setter
-    public static class Movie {
+    public static class Media {
         private int id;
         private String title;
         private String posterUrl;
@@ -31,10 +30,7 @@ public class MovieResponseView {
         private double popularity;
         private String originalTitle;
         private String originalLanguage;
-        private MovieMediaType type;
-        private Integer numberOfSeasons;
-        private Integer numberOfEpisodes;
         private boolean adult;
-        private MovieProvider provider;
+        private TVMediaType type;
     }
 }

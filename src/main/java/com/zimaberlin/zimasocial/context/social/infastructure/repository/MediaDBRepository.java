@@ -37,6 +37,9 @@ public class MediaDBRepository implements MediaRepository {
                                 .releaseDate(movie.getReleaseDate())
                                 .voteCount(movie.getVoteCount())
                                 .voteAverage(movie.getVoteAverage())
+                                .movieMediaType(movie.getType())
+                                .numberOfSeasons(movie.getNumberOfSeasons())
+                                .numberOfEpisodes(movie.getNumberOfEpisodes())
                                 .build())
                         .build());
         movie.assignId(mediaJpa.getId());

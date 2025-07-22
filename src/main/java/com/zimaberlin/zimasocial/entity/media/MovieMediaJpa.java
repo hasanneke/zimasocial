@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.entity.media;
 
+import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,4 +39,11 @@ public class MovieMediaJpa {
     private String originalLanguage;
     @Enumerated(EnumType.STRING)
     private MovieProvider movieProvider;
+    @Column(name = "movie_media_type")
+    @Enumerated(EnumType.STRING)
+    private MovieMediaType movieMediaType;
+    @Column(name = "number_of_seasons")
+    private Integer numberOfSeasons;
+    @Column(name = "number_episodes")
+    private Integer numberOfEpisodes;
 }
