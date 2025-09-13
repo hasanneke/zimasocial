@@ -4,6 +4,7 @@ import com.zimaberlin.zimasocial.context.communication.notifications.CommentLike
 import com.zimaberlin.zimasocial.context.communication.notifications.CommentRepliedNotification;
 import com.zimaberlin.zimasocial.context.communication.notifications.Notification;
 import com.zimaberlin.zimasocial.context.communication.notifications.PostLikedNotification;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +12,6 @@ import java.util.Optional;
 
 public interface NotificationRepository {
     void save(Notification notification);
-    Optional<PostLikedNotification> getPostLikedNotification(Long actorId, Long postId);
-    Optional<CommentLikedNotification> getCommentLikedNotification(Long actorId, Long commentId);
+    Optional<PostLikedNotification> getPostLikedNotification(AuthorId actorId, Long postId);
+    Optional<CommentLikedNotification> getCommentLikedNotification(AuthorId actorId, Long commentId);
 }

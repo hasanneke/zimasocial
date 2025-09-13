@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 public class MovieMedia {
         private UUID id;
+        private String resourceId;
         private String name;
         private String posterUrl;
         private String description;

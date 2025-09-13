@@ -1,18 +1,22 @@
 package com.zimaberlin.zimasocial.entity.media;
 
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
 
 @Embeddable
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookMediaJpa {
+    @Column(name = "book_resource_id")
+    private String id;
     @Column(name = "book_title", length = 64)
     private String title;
     @Column(name = "book_summary", length = 256)
@@ -35,8 +39,23 @@ public class BookMediaJpa {
     @Column(name = "book_language")
     private String language;
     @Column(name = "book_publish_date")
-    private LocalDate publishDate;
+    private String publishDate;
     @Column(name = "print_type")
     private String printType;
 
+    public BookMediaJpa(BookMedia book) {
+        this.id = book.getResourceId();
+        this.title = book.getTitle();
+        this.summary = book.getSummary();
+        this.description = book.getDescription();
+        this.author = book.getAuthor();
+        this.pageCount = book.getPageCount();
+        this.thumbnail = book.getThumbnail();
+        this.smallThumbnail = book.getSmallThumbnail();
+        this.provider = book.getProvider();
+        this.publisher = book.getPublisher();
+        this.language = book.getLanguage();
+        this.publishDate = book.getPublishDate();
+        this.printType = book.getPrintType();
+    }
 }

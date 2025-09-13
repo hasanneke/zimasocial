@@ -1,4 +1,6 @@
 package com.zimaberlin.zimasocial.context.contentmoderation.report.content;
 
-public record PostContent(Long postId, Long authorId) {
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+
+public record PostContent(Long postId, AuthorId authorId) {
 }

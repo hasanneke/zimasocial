@@ -1,10 +1,9 @@
-package com.zimaberlin.zimasocial.service.bookService.impl;
+package com.zimaberlin.zimasocial.context.social.media.infastructure.book;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 @Getter
 @Setter
@@ -41,6 +40,8 @@ public class GoogleBookSearchResult {
             private String publishedDate;
             @JsonProperty("previewLink")
             private String previewLink;
+            @JsonProperty("language")
+            private String language;
             @Getter
             @Setter
             public static class BookImageLink {

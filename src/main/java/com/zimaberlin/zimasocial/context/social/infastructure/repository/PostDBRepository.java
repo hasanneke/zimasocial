@@ -1,28 +1,28 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.media.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.PostDBAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostRepository;
-import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
-import com.zimaberlin.zimasocial.repository.PostJpaRepository;
-import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
-import com.zimaberlin.zimasocial.repository.UserJpaRepository;
-import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
+import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -67,7 +67,7 @@ public class PostDBRepository implements PostRepository {
             UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
             specification = specification.and(PostSpecification.authorId(user.getId()));
         }
-
+        // Study Specification Pattern
         PostType type = switch (category) {
                 case any -> PostType.any;
                 case music -> PostType.music;
@@ -78,17 +78,15 @@ public class PostDBRepository implements PostRepository {
         if(type != PostType.any){
             specification = specification.and(PostSpecification.type(type));
         }
+        List<UserRelationEntity> blockRelations = userRelationJpaRepository.findAllBlockRelations(currentUser.getId());
+        specification = specification.and(PostSpecification.notBlocked(currentUser.getId(), blockRelations));
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
-        List<PostEntity> filterPostForBlockedAuthors = postEntityPage.get().filter(e->{
-            Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(currentUser.getId(), e.getUserId(), Relation.blocked);
-            return blockRelation.isEmpty();
-        }).toList();
-        return new PageImpl<>(filterPostForBlockedAuthors, page, postEntityPage.getTotalElements()).map(postDBAdapter::convertPostEntityToPost);
+        return postEntityPage.map(postDBAdapter::convertPostEntityToPost);
     }
 
     @Override
-    public Page<Post> findFollowingsPosts(Pageable page, Long authorId) {
-        return postJpaRepository.findFollowingsPosts(page, authorId).map(postDBAdapter::convertPostEntityToPost);
+    public Page<Post> findFollowingsPosts(Pageable page, AuthorId authorId) {
+        return postJpaRepository.findFollowingsPosts(page, authorId.getId()).map(postDBAdapter::convertPostEntityToPost);
     }
 
     @Override
@@ -105,19 +103,69 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
+    public Long nextSequence() {
+        return postJpaRepository.getNextSequence();
+    }
+
+    @Override
+    public List<Post> findAllByAuthorId(AuthorId authorId) {
+        return postJpaRepository.findAllByUserId(authorId.getId()).stream().map(postDBAdapter::convertPostEntityToPost).toList();
+    }
+
+    @Override
+    public List<Post> findAllInvisiblePostsByAuthorId(AuthorId authorId) {
+        return postJpaRepository.
+                findAllInvisiblePostsByUserId(authorId.getId()).
+                stream().map(postDBAdapter::convertPostEntityToPost).toList();
+    }
+
+    @Override
+    @Transactional
     public Post save(Post post) {
         PostEntity postEntity;
-        if(post.getPostId() != null){
-            postEntity = postJpaRepository.findById(post.getPostId()).orElseThrow(PostNotFoundException::new);
-            postEntity.merge(post);
-        }else{
-            postEntity = new PostEntity();
-            postEntity.merge(post);
-            UserEntity user = userRepository.findById(post.getAuthorId()).orElseThrow(UserNotFoundException::new);
-            postEntity.setUser(user);
+        postEntity = new PostEntity();
+        postEntity.merge(post);
+        UserEntity user = userRepository.findById(post.getAuthorId().getId()).orElseThrow(UserNotFoundException::new);
+        postEntity.setUser(user);
+        switch (post.getType()){
+            case PostType.book -> {
+                BookMedia book = post.getBook();
+                MediaJpa mediaJpa = MediaJpa.builder()
+                        .id(book.getId())
+                        .type(MediaType.BOOK)
+                        .book(new BookMediaJpa(book))
+                        .post(postEntity)
+                        .build();
+                mediaJpa.setPostId(post.getPostId());
+                postEntity.setMedia(mediaJpa);
+            }
+            case PostType.movie -> {
+                MovieMedia movie = post.getMovie();
+                MediaJpa mediaJpa = MediaJpa.builder()
+                        .id(movie.getId())
+                        .type(MediaType.MOVIE)
+                        .movie(new MovieMediaJpa(movie))
+                        .post(postEntity)
+                        .build();
+                mediaJpa.setPostId(post.getPostId());
+                postEntity.setMedia(mediaJpa);
+            }
         }
-        postEntity = postJpaRepository.save(postEntity);
-        return postDBAdapter.convertPostEntityToPost(postEntity);
+        PostEntity savedPost = postJpaRepository.save(postEntity);
+        return postDBAdapter.convertPostEntityToPost(savedPost);
+    }
 
+    @Override
+    public void makeInvisiblePostsOfAuthor(AuthorId authorId) {
+        List<PostEntity> postEntityList = postJpaRepository.findAllByUserId(authorId.getId());
+        postEntityList.forEach(e->e.setIsVisible(false));
+        postJpaRepository.saveAll(postEntityList);
+    }
+
+    @Override
+    public void makePostsVisibleOfAuthor(AuthorId authorId) {
+        List<PostEntity> postEntityList = postJpaRepository.findAllInvisiblePostsByUserId(authorId.getId());
+        postEntityList.forEach(e->e.setIsVisible(true));
+        postJpaRepository.saveAll(postEntityList);
     }
 }

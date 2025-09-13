@@ -28,43 +28,61 @@ public class AuthorService {
     public void follow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
         Author followed = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
-        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getAuthorId(), followed.getAuthorId());
+        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isPresent()){
-            throw new AuthorAlreadyFollowedException(followed.getAuthorId());
+            throw new AuthorAlreadyFollowedException(followed.getId());
         }
         followed.follow(follower);
-        authorRelationRepository.save(new FollowRelation(follower.getAuthorId(), followed.getAuthorId()));
+        authorRelationRepository.save(new FollowRelation(follower.getId(), followed.getId()));
+        authorRepository.save(follower);
+        authorRepository.save(followed);
     }
 
     @Transactional
     public void unfollow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
-        Author followed = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
-        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getAuthorId(), followed.getAuthorId());
+        Author followed = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
+        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isEmpty()){
-            throw new AuthorNotFollowed(followed.getAuthorId());
+            throw new AuthorNotFollowed(followed.getId());
         }
         followed.unfollow(follower);
         authorRelationRepository.delete(followRelation.get());
+        authorRepository.save(follower);
+        authorRepository.save(followed);
+    }
+
+    @Transactional
+    public void removeFollower(String slug) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        Author removedFollower = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(removedFollower.getId(), author.getId());
+        if(followRelation.isEmpty()){
+            throw new AuthorNotFollowed(removedFollower.getId());
+        }
+        author.unfollow(removedFollower);
+        authorRelationRepository.delete(followRelation.get());
+        authorRepository.save(author);
+        authorRepository.save(removedFollower);
     }
     @Transactional
     public void block(String slug) {
         Author blocker = authorRepository.getAuthenticatedAuthor();
         Author blocked = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
-        Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getAuthorId(), blocked.getAuthorId());
+        Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getId(), blocked.getId());
         if(blockRelation.isPresent()){
-            throw new AuthorAlreadyBlocked(blocked.getAuthorId());
+            throw new AuthorAlreadyBlocked(blocked.getId());
         }
-        authorRelationRepository.save(new BlockRelation(blocker.getAuthorId(), blocked.getAuthorId()));
+        authorRelationRepository.save(new BlockRelation(blocker.getId(), blocked.getId()));
     }
 
     @Transactional
     public void unblock(String slug) {
         Author blocker = authorRepository.getAuthenticatedAuthor();
         Author blocked = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
-        Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getAuthorId(), blocked.getAuthorId());
+        Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getId(), blocked.getId());
         if(blockRelation.isEmpty()){
-            throw new AuthorNotBlockedException(blocked.getAuthorId());
+            throw new AuthorNotBlockedException(blocked.getId().getId());
         }
         authorRelationRepository.delete(blockRelation.get());
     }

@@ -1,19 +1,19 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
-import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
-import com.zimaberlin.zimasocial.context.account.exception.CircularFollowException;
-import com.zimaberlin.zimasocial.context.account.exception.CircularUnfollowException;
-import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.exception.*;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
 public class Author {
-    private final Long authorId;
+    private final AuthorId id;
     private String slug;
     private String name;
     private String familyName;
@@ -23,14 +23,15 @@ public class Author {
     private Boolean isPrivate;
     private int followersCount;
     private int followingCount;
+    private LocalDate lastSlugChangedAt;
     private final LocalDateTime createdAt;
 
-    public Author(Long authorId, String slug, String name, String bio, String familyName, String avatarFileName,Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt) {
-        Assert.notNull(authorId, "Author Id cannot be null");
+    public Author(AuthorId id, String slug, String name, String bio, String familyName, String avatarFileName,Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt, LocalDate lastSlugChangedAt) {
+        Assert.notNull(id, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
         Assert.notNull(createdAt, "Created At cannot be null");
-        this.authorId = authorId;
+        this.id = id;
         this.slug = slug;
         this.name = name;
         this.familyName = familyName;
@@ -41,14 +42,15 @@ public class Author {
         this.followingCount = followingCount;
         this.createdAt = createdAt;
         this.isPrivate = isPrivate;
+        this.lastSlugChangedAt = lastSlugChangedAt;
     }
 
-    public Author(Long authorId, String slug, String name, LocalDateTime createdAt){
+    public Author(AuthorId authorId, String slug, String name, LocalDateTime createdAt){
         Assert.notNull(authorId, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
         Assert.notNull(createdAt, "Created At cannot be null");
-        this.authorId = authorId;
+        this.id = authorId;
         this.slug = slug;
         this.name = name;
         this.createdAt = createdAt;
@@ -67,9 +69,13 @@ public class Author {
         this.name = name;
     }
     public void updateSlug(String slug){
-        if(name.length() > 32){
-            throw new NameLengthExceededException();
+        if(lastSlugChangedAt != null && ChronoUnit.DAYS.between(lastSlugChangedAt, LocalDateTime.now()) < 7){
+            throw new SlugCannotBeChangedException("Last slug change hasn't passed 7 days");
         }
+        if(name.length() > 16){
+            throw new SlugLengthExceededException();
+        }
+        this.lastSlugChangedAt = LocalDate.now();
         this.slug = slug;
     }
 
@@ -92,7 +98,7 @@ public class Author {
         }
         decrementFollowerCount();
         follower.decrementFollowingCount();
-//        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
+        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
     }
 
     public void attachFileName(String fileName) {
@@ -116,11 +122,11 @@ public class Author {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Author author = (Author) o;
-        return Objects.equals(authorId, author.authorId);
+        return Objects.equals(id, author.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authorId);
+        return Objects.hash(id);
     }
 }

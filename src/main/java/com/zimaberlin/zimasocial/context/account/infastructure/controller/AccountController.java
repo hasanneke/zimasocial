@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     final AccountService accountService;
     @PatchMapping("/me/make-account-public")
-    public ResponseEntity<AuthorView> makeAccountPublic(){
+    public ResponseEntity<AuthorView> makeAccountPublic() {
         accountService.makeAccountPublic();
         return ResponseEntity.ok().build();
     }
     @PatchMapping("/me/make-account-private")
-    public ResponseEntity<AuthorView> makeAccountPrivate(){
+    public ResponseEntity<AuthorView> makeAccountPrivate() {
         accountService.makeAccountPrivate();
         return ResponseEntity.ok().build();
     }
@@ -32,11 +32,6 @@ public class AccountController {
     @GetMapping("/delete-account")
     public ResponseEntity<Void> deleteAccount(@RequestParam(name = "reason") DeleteReason reason) {
         accountService.deleteAccount(reason);
-        return ResponseEntity.ok().build();
-    }
-    @GetMapping("/activate-account")
-    public ResponseEntity<Void> activateAccount() {
-        accountService.activateAccount();
         return ResponseEntity.ok().build();
     }
 }

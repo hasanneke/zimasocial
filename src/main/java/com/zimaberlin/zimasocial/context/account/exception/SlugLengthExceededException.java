@@ -7,6 +7,6 @@ public class SlugLengthExceededException extends BadRequestException {
         super(message);
     }
     public SlugLengthExceededException(){
-        super("name_length_exceede", "Name length can be maximum 32 character");
+        super("slug_length_exceeded", "Slug length can be maximum 32 character");
     }
 }

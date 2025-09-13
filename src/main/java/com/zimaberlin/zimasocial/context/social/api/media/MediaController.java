@@ -1,5 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.api.media;
 import com.zimaberlin.zimasocial.context.social.media.*;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
+import com.zimaberlin.zimasocial.context.social.media.book.BookSearcher;
+import com.zimaberlin.zimasocial.context.social.media.book.SearchBookMediaItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MediaController {
     private final MovieSearcher movieSearcher;
-    private final MediaRepository mediaRepository;
+    private final BookSearcher bookSearcher;
+    private final MediaCollection mediaCollection;
     @GetMapping(path = "/movies/search")
     public ResponseEntity<List<SearchMovieMediaItem>> searchMovies(
             @RequestParam(name = "query") String query,
@@ -23,7 +28,17 @@ public class MediaController {
     }
     @GetMapping(path = "/movies/{movieId}")
     public ResponseEntity<MovieMedia> getMovie(@PathVariable(name = "movieId") UUID movieId){
-        MovieMedia movieMedia = mediaRepository.findMovieById(movieId).orElseThrow(MovieNotFoundException::new);
+        MovieMedia movieMedia = mediaCollection.findMovieById(movieId).orElseThrow(MovieNotFoundException::new);
         return ResponseEntity.ok(movieMedia);
+    }
+    @GetMapping(path = "/books")
+    public ResponseEntity<List<SearchBookMediaItem>> searchBooks(@RequestParam(name = "q") String query) {
+        List<SearchBookMediaItem> responseView = bookSearcher.search(query);
+        return ResponseEntity.ok(responseView);
+    }
+    @GetMapping(path = "/books/{bookId}")
+    public ResponseEntity<BookMedia> getBook(@RequestParam(name = "bookId") UUID bookId) {
+        BookMedia book = mediaCollection.findBookById(bookId).orElseThrow(BookNotFoundException::new);
+        return ResponseEntity.ok(book);
     }
 }

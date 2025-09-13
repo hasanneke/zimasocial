@@ -4,7 +4,9 @@ import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zimaberlin.zimasocial.context.social.media.*;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
+import com.zimaberlin.zimasocial.context.social.media.book.BookSearcher;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -29,58 +31,56 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final MovieSearcher movieSearcher;
-    private final MediaRepository mediaRepository;
+    private final BookSearcher bookSearcher;
+    private final MediaCollection mediaRepository;
     @Autowired
-    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository, MovieSearcher movieSearcher, MediaRepository mediaRepository) {
+    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository, MovieSearcher movieSearcher, MediaCollection mediaRepository, BookSearcher bookSearcher) {
         this.postRepository = postRepository;
         this.authorRepository = authorRepository;
         this.likeRepository = likeRepository;
         this.commentRepository=  commentRepository;
         this.movieSearcher = movieSearcher;
         this.mediaRepository = mediaRepository;
+        this.bookSearcher = bookSearcher;
     }
     @Transactional
     public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Post post = new Post(createPost.content(), createPost.type(), author.getAuthorId());
+        Post post = new Post(postRepository.nextSequence(), createPost.content(), createPost.type(), author.getId());
+        return postRepository.save(post);
+    }
+
+    @Transactional
+    public Post createBookPost(String content, String externalBookId) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        BookMedia book = bookSearcher.getBook(externalBookId).orElseThrow(BookNotFoundException::new);
+        Post post = new Post(postRepository.nextSequence(),
+                            content,
+                            author.getId(),
+                            book);
         return postRepository.save(post);
     }
 
     @Transactional
     public Post createMoviePost(String content, Integer movieId, MovieMediaType type, String language) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Post post = new Post(content, PostType.movie, author.getAuthorId());
-        MovieResponseView.Movie movieRes = movieSearcher.getMovie(movieId, type, language);
-        MovieMedia movieMedia = MovieMedia.builder()
-                .movieProvider(movieRes.getProvider())
-                .originalLanguage(movieRes.getOriginalLanguage())
-                .name(movieRes.getTitle())
-                .description(movieRes.getOverview())
-                .posterUrl(movieRes.getPosterUrl())
-                .backdropUrl(movieRes.getBackdropUrl())
-                .releaseDate(movieRes.getReleaseDate())
-                .summary(movieRes.getOverview())
-                .voteAverage(movieRes.getVoteAverage())
-                .voteCount(movieRes.getVoteCount())
-                .type(movieRes.getType())
-                .numberOfEpisodes(movieRes.getNumberOfEpisodes())
-                .numberOfSeasons(movieRes.getNumberOfSeasons())
-                .build();
-        MovieMedia savedMovie = mediaRepository.save(movieMedia);
-        post.setMovie(savedMovie);
-        postRepository.save(post);
-        return post;
+        MovieMedia movie = movieSearcher.getMovie(movieId, type, language);
+        Post post = new Post(postRepository.nextSequence(),
+                content,
+                author.getId(),
+                movie);
+        return postRepository.save(post);
     }
 
     @Transactional
     public void like(Long postId) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getAuthorId());
+        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isPresent()){
             throw new ConflictException("Post is already liked");
         }
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        PostLike postLike = post.like(author.getAuthorId());
+        PostLike postLike = post.like(author.getId());
         postRepository.save(post);
         likeRepository.save(postLike);
     }
@@ -89,7 +89,7 @@ public class PostService {
     public void unlikePost(Long postId) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getAuthorId());
+        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isEmpty()){
             throw new ConflictException("Post is not liked");
         }
@@ -108,10 +108,10 @@ public class PostService {
     public Comment comment(Long postId, String content) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment comment = post.comment(author.getAuthorId(), content);
+        Comment comment = post.comment(author.getId(), content);
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
-        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, savedComment.getCommentId(), author.getAuthorId(), post.getAuthorId()));
+        StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, savedComment.getCommentId(), author.getId(), post.getAuthorId()));
         return savedComment;
     }
 
@@ -128,7 +128,7 @@ public class PostService {
     public void likeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
+        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isEmpty()){
             CommentLike commentLike = comment.like(authenticatedAuthor);
             commentRepository.save(comment);
@@ -142,7 +142,7 @@ public class PostService {
     public void unlikeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getAuthorId());
+        Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isPresent()){
             comment.unlike();
             commentRepository.save(comment);
@@ -156,10 +156,10 @@ public class PostService {
     public Comment replyComment(Long parentId, String content) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
-        Comment reply = parent.reply(author.getAuthorId(), content);
+        Comment reply = parent.reply(author.getId(), content);
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getAuthorId()));
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId()));
         return savedReply;
     }
 
@@ -170,5 +170,13 @@ public class PostService {
         parent.removeReply(reply);
         commentRepository.delete(reply);
         commentRepository.save(parent);
+    }
+    public void makePostInvisible(Post post) {
+        post.makeInvisible();
+        postRepository.save(post);
+    }
+    public void makePostVisible(Post post) {
+        post.makeVisible();
+        postRepository.save(post);
     }
 }

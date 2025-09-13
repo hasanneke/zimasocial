@@ -33,4 +33,10 @@ public class AuthController {
         TokenResponse tokenResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }
+
+    @GetMapping(path = "/quick-login")
+    ResponseEntity<TokenResponse> quickLogin() throws TokenVerifier.VerificationException {
+        TokenResponse tokenResponse = authService.quickLogin();
+        return ResponseEntity.ok(tokenResponse);
+    }
 }

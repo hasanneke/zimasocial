@@ -123,10 +123,10 @@ public class NotificationEntity {
         return NotificationEntity.builder()
                 .type(NotificationType.USER_FOLLOWED_YOU)
                 .content(authorFollowedNotification.getMessage())
-                .targetId(authorFollowedNotification.getRecipientId())
+                .targetId(authorFollowedNotification.getRecipientId().getId())
                 .targetCollection(TargetCollection.profile)
-                .receiverUserId(authorFollowedNotification.getRecipientId())
-                .actorId(authorFollowedNotification.getActorId())
+                .receiverUserId(authorFollowedNotification.getRecipientId().getId())
+                .actorId(authorFollowedNotification.getActorId().getId())
                 .build();
     }
 }

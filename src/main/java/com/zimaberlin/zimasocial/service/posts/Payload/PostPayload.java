@@ -18,11 +18,8 @@ public class PostPayload {
     @Schema(description = "Post Content")
     private String content;
 
-    @Schema(description = "Post Url")
-    private String url;
-
     @Schema(description = "Selected media id")
-    private int mediaId;
+    private String mediaId;
 
     @Schema(description = "Selected TV media type (eg: movie, tv)")
     private MovieMediaType movieMediaType;

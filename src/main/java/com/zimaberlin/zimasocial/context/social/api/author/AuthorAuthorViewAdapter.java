@@ -25,12 +25,12 @@ public class AuthorAuthorViewAdapter {
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
         Optional<FollowRelation> followRelation =
                 authorRelationRepository
-                        .findFollowRelationBetween(authenticatedUser.getAuthorId(), author.getAuthorId());
+                        .findFollowRelationBetween(authenticatedUser.getId(), author.getId());
         Optional<BlockRelation> blockRelation =
-                authorRelationRepository.findBlockRelationBetween(authenticatedUser.getAuthorId(), author.getAuthorId());
+                authorRelationRepository.findBlockRelationBetween(authenticatedUser.getId(), author.getId());
 
         AuthorView authorView = new AuthorView();
-        authorView.setId(author.getAuthorId());
+        authorView.setId(author.getId().getId());
         authorView.setSlug(author.getSlug());
         authorView.setName(author.getName());
         authorView.setFamilyName(author.getFamilyName());

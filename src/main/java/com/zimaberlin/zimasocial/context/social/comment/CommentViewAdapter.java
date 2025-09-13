@@ -42,10 +42,10 @@ public class CommentViewAdapter {
         commentView.setLikeCount(comment.getLikeCount());
         commentView.setReplyCount(comment.getReplyCount());
 
-        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getAuthorId());
+        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getId());
         commentView.setIsLiked(like.isPresent());
 
-        boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), authenticatedAuthor.getAuthorId(), ResourceType.comment);
+        boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), authenticatedAuthor.getId(), ResourceType.comment);
         commentView.setIsReported(isCommentReported);
         return commentView;
     }

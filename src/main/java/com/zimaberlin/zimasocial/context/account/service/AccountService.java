@@ -24,8 +24,7 @@ public class AccountService {
         accountRepository.save(account);
     }
     @Transactional
-    public void activateAccount() {
-        Account account = accountRepository.getAuthenticatedAccount();
+    public void activateAccount(Account account) {
         account.activateAccount();
         accountRepository.save(account);
     }
@@ -48,7 +47,7 @@ public class AccountService {
         accountRepository.save(account);
     }
     @Transactional
-    public Account createAccount(CreateAccount createAccount) {
-        return accountRepository.createNewAccount(createAccount);
+    public Account createAccount(Account account) {
+        return accountRepository.createNewAccount(account);
     }
 }

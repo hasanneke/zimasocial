@@ -9,10 +9,12 @@ import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportService;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,14 +39,14 @@ public class ReportServiceTest {
     @InjectMocks
     private ReportService reportService;
 
-    private Author testAuthor = new Author(0L, "", "", LocalDateTime.now());
+    private Author testAuthor = new Author(new AuthorId(0L), "", "", LocalDateTime.now());
     private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
-    private PostContent dummyPostContent = new PostContent(0L,0L);
-    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, 0L);
+    private PostContent dummyPostContent = new PostContent(0L,new AuthorId(0L));
+    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorId(0L));
     @Test
     void testReportPost_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
-        when(reportRepository.checkReportExists(0L, 0L, ResourceType.post)).thenReturn(true);
+        when(reportRepository.checkReportExists(0L, new AuthorId(0L), ResourceType.post)).thenReturn(true);
 
         Assertions.assertThrows(ReportAlreadyMadeException.class,
                 ()-> reportService.reportPost(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));
@@ -58,13 +60,13 @@ public class ReportServiceTest {
         when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);
         when(contentRepository.getPost(any())).thenReturn(Optional.of(dummyPostContent));
         reportService.reportPost(request.getResourceId(), request.getReason(), request.getDescription());
-        verify(reportRepository, times(1)).save(new PostReport(request.getResourceId(), request.getReason(), testAuthor.getAuthorId(), dummyPostContent.authorId(), request.getDescription()));
+        verify(reportRepository, times(1)).save(new PostReport(request.getResourceId(), request.getReason(), testAuthor.getId(), dummyPostContent.authorId(), request.getDescription()));
     }
 
     @Test
     void testReportComment_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
-        when(reportRepository.checkReportExists(0L, 0L, ResourceType.comment)).thenReturn(true);
+        when(reportRepository.checkReportExists(0L,  new AuthorId(0L), ResourceType.comment)).thenReturn(true);
 
         Assertions.assertThrows(ReportAlreadyMadeException.class,
                 ()-> reportService.reportComment(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));
@@ -78,6 +80,6 @@ public class ReportServiceTest {
         when(reportRepository.checkReportExists(any(), any(), any())).thenReturn(false);
         when(contentRepository.getComment(any())).thenReturn(Optional.of(dummyCommentContent));
         reportService.reportComment(request.getResourceId(), request.getReason(), request.getDescription());
-        verify(reportRepository, times(1)).save(new CommentReport(request.getResourceId(), request.getReason(), testAuthor.getAuthorId(), dummyPostContent.authorId(), request.getDescription()));
+        verify(reportRepository, times(1)).save(new CommentReport(request.getResourceId(), request.getReason(), testAuthor.getId(), dummyPostContent.authorId(), request.getDescription()));
     }
 }

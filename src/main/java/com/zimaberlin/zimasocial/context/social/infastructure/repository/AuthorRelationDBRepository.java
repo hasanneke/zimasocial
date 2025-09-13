@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
 import com.zimaberlin.zimasocial.context.social.authorrelation.*;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
@@ -33,15 +34,15 @@ public class AuthorRelationDBRepository implements AuthorRelationRepository {
     }
 
     @Override
-    public Optional<FollowRelation> findFollowRelationBetween(Long followerId, Long followedId) {
-        Optional<UserRelationEntity> followRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(followerId, followedId, Relation.followed);
-        return followRelation.map(userRelationEntity -> new FollowRelation(userRelationEntity.getActorId(), userRelationEntity.getReceiverId()));
+    public Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId) {
+        Optional<UserRelationEntity> followRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(followerId.getId(), followedId.getId(), Relation.followed);
+        return followRelation.map(userRelationEntity -> new FollowRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
     }
 
     @Override
-    public Optional<BlockRelation> findBlockRelationBetween(Long blockerId, Long blockedId) {
-        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId, blockedId, Relation.blocked);
-        return blockRelation.map(userRelationEntity -> new BlockRelation(userRelationEntity.getActorId(), userRelationEntity.getReceiverId()));
+    public Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId) {
+        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId.getId(), blockedId.getId(), Relation.blocked);
+        return blockRelation.map(userRelationEntity -> new BlockRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
 
     }
 
@@ -82,8 +83,8 @@ public class AuthorRelationDBRepository implements AuthorRelationRepository {
     @Override
     public void save(AuthorRelation relation) {
         switch (relation){
-            case FollowRelation followRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(followRelation.getFollowerId()).receiverId(followRelation.getFollowedId()).relation(Relation.followed).build());
-            case BlockRelation blockRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(blockRelation.getBlockerId()).receiverId(blockRelation.getBlockedId()).relation(Relation.blocked).build());
+            case FollowRelation followRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(followRelation.getFollowerId().getId()).receiverId(followRelation.getFollowedId().getId()).relation(Relation.followed).build());
+            case BlockRelation blockRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(blockRelation.getBlockerId().getId()).receiverId(blockRelation.getBlockedId().getId()).relation(Relation.blocked).build());
             case MutedRelation mutedRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(mutedRelation.getMuterId()).receiverId(mutedRelation.getMutedId()).relation(Relation.muted).build());
             default -> throw new IllegalStateException("Unexpected value: " + relation);
         }
@@ -92,8 +93,8 @@ public class AuthorRelationDBRepository implements AuthorRelationRepository {
     @Override
     public void delete(AuthorRelation relation) {
         switch (relation){
-            case FollowRelation followRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(followRelation.getFollowerId(), followRelation.getFollowedId(), Relation.followed);
-            case BlockRelation blockRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(blockRelation.getBlockerId(), blockRelation.getBlockedId(), Relation.blocked);
+            case FollowRelation followRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(followRelation.getFollowerId().getId(), followRelation.getFollowedId().getId(), Relation.followed);
+            case BlockRelation blockRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(blockRelation.getBlockerId().getId(), blockRelation.getBlockedId().getId(), Relation.blocked);
             case MutedRelation mutedRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(mutedRelation.getMuterId(), mutedRelation.getMutedId(), Relation.muted);
             default -> throw new IllegalStateException("Unexpected value: " + relation);
         }

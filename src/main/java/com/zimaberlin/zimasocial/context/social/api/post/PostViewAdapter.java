@@ -32,8 +32,8 @@ public class PostViewAdapter {
 
     public PostView populated(Post post) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
-        boolean postReported = reportRepository.checkReportExists(post.getPostId(), authenticatedAuthor.getAuthorId(), ResourceType.post);
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(post.getPostId(), authenticatedAuthor.getAuthorId());
+        boolean postReported = reportRepository.checkReportExists(post.getPostId(), authenticatedAuthor.getId(), ResourceType.post);
+        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(post.getPostId(), authenticatedAuthor.getId());
 
         PostView postView = new PostView();
         if(like.isPresent()){
@@ -51,7 +51,9 @@ public class PostViewAdapter {
         postView.setCreatedAt( post.getCreatedAt() );
         postView.setUpdatedAt( post.getUpdatedAt() );
         postView.setMovie( post.getMovie() );
+        postView.setBook( post.getBook() );
         postView.addLinks();
+
 
         return postView;
     }

@@ -1,11 +1,12 @@
 package com.zimaberlin.zimasocial.entity.media;
 
+import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.UUID;
 
 @Embeddable
 @Builder
@@ -46,4 +47,23 @@ public class MovieMediaJpa {
     private Integer numberOfSeasons;
     @Column(name = "number_episodes")
     private Integer numberOfEpisodes;
+
+    public MovieMediaJpa(MovieMedia movieMedia) {
+        this.id = movieMedia.getResourceId();
+        this.name = movieMedia.getName();
+        this.posterUrl = movieMedia.getPosterUrl();
+        this.description = movieMedia.getDescription();
+        this.backdropUrl = movieMedia.getBackdropUrl();
+        this.summary = movieMedia.getSummary();
+        this.imdbScore = movieMedia.getImdbScore();
+        this.voteCount = movieMedia.getVoteCount();
+        this.voteAverage = movieMedia.getVoteAverage();
+        this.releaseDate = movieMedia.getReleaseDate();
+        this.movieGenres = movieMedia.getMovieGenres();
+        this.originalLanguage = movieMedia.getOriginalLanguage();
+        this.movieProvider = movieMedia.getMovieProvider();
+        this.movieMediaType = movieMedia.getType();
+        this.numberOfSeasons = movieMedia.getNumberOfSeasons();
+        this.numberOfEpisodes = movieMedia.getNumberOfEpisodes();
+    }
 }

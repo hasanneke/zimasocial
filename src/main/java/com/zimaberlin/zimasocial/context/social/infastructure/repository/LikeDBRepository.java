@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.LikeAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostLike;
@@ -29,14 +30,14 @@ public class LikeDBRepository implements LikeRepository {
 
     }
     @Override
-    public Optional<Like> findByPostIdAndAuthorId(Long postId, Long authorId) {
-        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(authorId, postId, LikeType.post);
+    public Optional<Like> findByPostIdAndAuthorId(Long postId, AuthorId authorId) {
+        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(authorId.getId(), postId, LikeType.post);
         return like.map(likeAdapter::convertLikeEntityToLikeForPost);
     }
 
     @Override
-    public Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, Long authorId) {
-        return likeJpaRepository.findByUserIdAndCommentId(authorId, commentId).map(likeAdapter::convertLikeEntityToLikeForComment);
+    public Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, AuthorId authorId) {
+        return likeJpaRepository.findByUserIdAndCommentId(authorId.getId(), commentId).map(likeAdapter::convertLikeEntityToLikeForComment);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class LikeDBRepository implements LikeRepository {
         LikeEntity likeEntity = LikeEntity.builder()
                 .commentId(like.getCommentId())
                 .postId(like.getPostId())
-                .userId(like.getAuthorId())
+                .userId(like.getAuthorId().getId())
                 .type(like instanceof PostLike ? LikeType.post : LikeType.comment)
                 .build();
         likeJpaRepository.save(likeEntity);
@@ -55,10 +56,10 @@ public class LikeDBRepository implements LikeRepository {
         LikeEntity likeEntity;
         if(like instanceof PostLike){
             likeEntity =
-                    likeJpaRepository.findByUserIdAndPostIdAndType(like.getAuthorId(), like.getPostId(), LikeType.post).orElseThrow(()-> new ConflictException("Post not liked"));
+                    likeJpaRepository.findByUserIdAndPostIdAndType(like.getAuthorId().getId(), like.getPostId(), LikeType.post).orElseThrow(()-> new ConflictException("Post not liked"));
         }else if(like instanceof CommentLike){
             likeEntity =
-                    likeJpaRepository.findByUserIdAndCommentId(like.getAuthorId(), like.getCommentId()).orElseThrow(()-> new ConflictException("Comment not liked"));
+                    likeJpaRepository.findByUserIdAndCommentId(like.getAuthorId().getId(), like.getCommentId()).orElseThrow(()-> new ConflictException("Comment not liked"));
         }else{
             throw new IllegalArgumentException("Unknown type of Like");
         }

@@ -1,12 +1,11 @@
-package com.zimaberlin.zimasocial.service.bookService.domain;
+package com.zimaberlin.zimasocial.context.social.media.infastructure.book;
 
+import com.zimaberlin.zimasocial.entity.media.BookProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.parameters.P;
 
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -25,10 +24,12 @@ public class BookResponseView {
         private String author;
         private String publisher;
         private String thumbnail;
+        private String smallThumbnail;
         private String selfUrl;
         private String publishedDate;
         private String previewLink;
         private String printType;
         private int pageCount;
     }
+    private BookProvider provider;
 }

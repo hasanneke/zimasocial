@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.context.account.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.account.infastructure.adapter.AccountUserAdapter;
-import com.zimaberlin.zimasocial.context.account.value.CreateAccount;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
@@ -32,14 +31,14 @@ public class AccountJpaRepository implements AccountRepository {
 
     @Override
     public void save(Account account) {
-        UserEntity user = CurrentUser.getCurrentUserProfile();
+        UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
         user.mergeAccount(account);
         userRepository.save(user);
     }
 
     @Override
-    public Account createNewAccount(CreateAccount createAccount) {
-        UserEntity user = new UserEntity(createAccount.email(), createAccount.name(), createAccount.familyName(), createAccount.authProvider(), createAccount.roles(), createAccount.slug());
+    public Account createNewAccount(Account account) {
+        UserEntity user = new UserEntity(account.getAccountId().getValue(), account.getEmail(), account.getName(), account.getFamilyName(), account.getAuthProvider(), account.getRoles(), account.getSlug());
         UserEntity createUserWithId = userRepository.save(user);
         return accountUserAdapter.convertUserEntityToAccount(createUserWithId);
     }
@@ -48,5 +47,10 @@ public class AccountJpaRepository implements AccountRepository {
     public Account findByUserId(Long userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return accountUserAdapter.convertUserEntityToAccount(user);
+    }
+
+    @Override
+    public Long nextId() {
+        return userRepository.nextId();
     }
 }

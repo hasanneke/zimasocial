@@ -21,10 +21,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping(path = "api/v1/authors")
 public class AuthorController {
-    private AuthorControllerBridge authorControllerBridge;
-    private AuthorService authorService;
-    private AuthorRepository authorRepository;
-    private AuthorAuthorViewAdapter authorAuthorViewMapper;
+    private final AuthorControllerBridge authorControllerBridge;
+    private final AuthorService authorService;
+    private final AuthorRepository authorRepository;
+    private final AuthorAuthorViewAdapter authorAuthorViewMapper;
 
     @Autowired
     public AuthorController(AuthorControllerBridge authorControllerBridge, AuthorService authorService, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
@@ -113,6 +113,14 @@ public class AuthorController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
         return new  HttpEntity<>(authorControllerBridge.getFollowers(slug, page, size));
+    }
+
+    @DeleteMapping(path = "/{slug}/followers/{targetSlug}")
+    public ResponseEntity<Void> removeFollower(
+            @PathVariable(name = "slug") String slug,
+            @PathVariable(name = "targetSlug") String targetSlug) {
+        authorService.removeFollower(targetSlug);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/{slug}/followings")

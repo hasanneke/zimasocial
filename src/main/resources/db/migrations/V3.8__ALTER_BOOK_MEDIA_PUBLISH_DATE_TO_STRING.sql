@@ -1,0 +1,2 @@
+ALTER TABLE media
+ALTER COLUMN book_publish_date TYPE VARCHAR(64);

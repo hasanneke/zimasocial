@@ -5,7 +5,6 @@ import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostService;
-import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.CommentPayload;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
@@ -20,8 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping(path = "/api/v2/posts")
@@ -46,9 +43,8 @@ public class PostController {
     public HttpEntity<PagedModel<PostView>> getPosts(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @RequestParam(name = "type") PostCategory category,
-            @RequestParam(name = "slug", required = false) String slug,
-            @RequestParam(name = "language", required = false, defaultValue = "en") String language) throws NoSuchMethodException {
+            @RequestParam(name = "type", defaultValue = "any") PostCategory category,
+            @RequestParam(name = "slug", required = false) String slug) throws NoSuchMethodException {
         return new HttpEntity<>(postControllerBridge.getPosts(page, size, category, slug));
     }
 

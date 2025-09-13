@@ -26,8 +26,11 @@ import java.util.*;
 @Table(name = "users")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
 public class UserEntity {
-    public UserEntity(){}
-    public UserEntity(String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug){
+    public UserEntity(Long id) {
+        this.id = id;
+    }
+    public UserEntity(Long id, String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug){
+        this.id = id;
         this.email = email;
         this.name = name;
         this.familyName = familyName;
@@ -36,7 +39,6 @@ public class UserEntity {
         this.slug = slug;
     }
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "slug", unique = true, length = 65)
@@ -73,6 +75,9 @@ public class UserEntity {
 
     @Column(name = "auth_provider")
     private String authProvider;
+
+    @Column(name = "last_slug_changed_at")
+    private LocalDate lastSlugChangedAt;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -129,6 +134,9 @@ public class UserEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    public UserEntity() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -179,6 +187,7 @@ public class UserEntity {
         this.disableDate = account.getDisableDate();
         this.deleteReason = account.getDeleteReason();
         this.disableReason = account.getDisableReason();
+        this.slug = account.getSlug();
     }
 
     public void margeAuthor(Author author){
@@ -187,6 +196,9 @@ public class UserEntity {
         this.slug = author.getSlug();
         this.bio = author.getBio();
         this.avatarFileName = author.getAvatarFileName();
+        this.followersCount = author.getFollowersCount();
+        this.followingCount = author.getFollowingCount();
+        this.lastSlugChangedAt = author.getLastSlugChangedAt();
     }
 
     public void mergeUser(User user){

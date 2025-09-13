@@ -1,4 +1,5 @@
 package com.zimaberlin.zimasocial.context.account.event;
 
-public record AccountDeletedEvent(Long userId) {
-}
+import com.zimaberlin.zimasocial.context.account.entity.AccountId;
+
+public record AccountDeletedEvent(AccountId accountId) { }

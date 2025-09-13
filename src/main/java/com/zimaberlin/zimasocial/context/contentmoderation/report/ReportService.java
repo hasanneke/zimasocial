@@ -33,21 +33,21 @@ public class ReportService {
     @Transactional
     public void reportPost(Long postId, ReportReason reason, String description) {
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
-        boolean reportExists = reportRepository.checkReportExists(postId, authenticatedUser.getAuthorId(), ResourceType.post);
+        boolean reportExists = reportRepository.checkReportExists(postId, authenticatedUser.getId(), ResourceType.post);
         if(reportExists){
             throw new ReportAlreadyMadeException();
         }
         PostContent post = contentRepository.getPost(postId).orElseThrow(CommentNotFoundException::new);
-        reportRepository.save(new PostReport(post.postId(), reason, authenticatedUser.getAuthorId(), post.authorId(), description));
+        reportRepository.save(new PostReport(post.postId(), reason, authenticatedUser.getId(), post.authorId(), description));
     }
     @Transactional
     public void reportComment(Long commentId, ReportReason reason, String description) {
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
-        boolean reportExists = reportRepository.checkReportExists(commentId, authenticatedUser.getAuthorId(), ResourceType.comment);
+        boolean reportExists = reportRepository.checkReportExists(commentId, authenticatedUser.getId(), ResourceType.comment);
         if(reportExists){
             throw new ReportAlreadyMadeException();
         }
         CommentContent comment = contentRepository.getComment(commentId).orElseThrow(CommentNotFoundException::new);
-        reportRepository.save(new CommentReport(comment.commentId(), reason, authenticatedUser.getAuthorId(), comment.authorId(), description));
+        reportRepository.save(new CommentReport(comment.commentId(), reason, authenticatedUser.getId(), comment.authorId(), description));
     }
 }

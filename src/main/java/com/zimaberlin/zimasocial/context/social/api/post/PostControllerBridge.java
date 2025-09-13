@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.api.post;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
@@ -52,10 +53,14 @@ public class PostControllerBridge {
             case PostType.movie -> {
                 Post post = postService.createMoviePost(
                         payload.getContent(),
-                        payload.getMediaId(),
+                        Integer.valueOf(payload.getMediaId()),
                         payload.getMovieMediaType(),
                         language
                 );
+                return postViewAdapter.populated(post);
+            }
+            case PostType.book ->  {
+                Post post = postService.createBookPost(payload.getContent(), payload.getMediaId());
                 return postViewAdapter.populated(post);
             }
             default -> {
@@ -71,21 +76,22 @@ public class PostControllerBridge {
         }
     }
     public PagedModel<PostView> getPosts(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "size", defaultValue = "20") Integer size,
-            @RequestParam(name = "type", required = false) PostCategory category,
-            @RequestParam(name = "slug", required = false) String slug
+           Integer page,
+           Integer size,
+           PostCategory category,
+          String slug
     ) throws NoSuchMethodException {
         Page<Post> postPage;
         if(category == PostCategory.followings){
-            Long authorId = authorRepository.getAuthenticatedAuthor().getAuthorId();
+            AuthorId authorId = authorRepository.getAuthenticatedAuthor().getId();
             postPage = postRepository.findFollowingsPosts(PageRequest.of(page, size), authorId);
         }else{
             postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()), slug, category);
         }
         PagedModel<PostView> pagedModel = PagedModel.of(
                 postViewAdapter.populated(postPage.getContent()),
-                new PagedModel.PageMetadata(postPage.getSize(),
+                new PagedModel.PageMetadata(
+                        postPage.getSize(),
                         postPage.getNumber(),
                         postPage.getTotalElements(),
                         postPage.getTotalPages()));
@@ -94,7 +100,6 @@ public class PostControllerBridge {
                 Integer.class,
                 Integer.class,
                 PostCategory.class,
-                String.class,
                 String.class);
 
         if(page + 1 < postPage.getTotalPages()){

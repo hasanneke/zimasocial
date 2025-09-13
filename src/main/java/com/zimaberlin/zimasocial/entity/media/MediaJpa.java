@@ -1,4 +1,5 @@
 package com.zimaberlin.zimasocial.entity.media;
+import com.zimaberlin.zimasocial.entity.PostEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,12 +11,15 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
 public class MediaJpa {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "post_id")
-    private Long postId;
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    private PostEntity post;
+    @Column(name = "post_id", insertable = false, updatable = false)
+    Long postId;
     @Column(name = "comment_id")
     private Long commentId;
     @Enumerated(EnumType.STRING)

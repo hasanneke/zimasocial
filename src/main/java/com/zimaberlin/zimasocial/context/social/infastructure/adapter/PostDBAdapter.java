@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
-import com.zimaberlin.zimasocial.context.social.media.BookMedia;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.PostEntity;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Component;
 public class PostDBAdapter {
     public Post convertPostEntityToPost(PostEntity post) {
         switch (post.getType()){
+            case PostType.any -> {
+                return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), new AuthorId(post.getUser().getId()));
+            }
             case PostType.movie -> {
                 MovieMedia movieDomain = null;
                 if(post.getMedia() != null && post.getMedia().getMovie() != null){
@@ -32,14 +36,17 @@ public class PostDBAdapter {
                             .movieGenres(movie.getMovieGenres())
                             .movieProvider(movie.getMovieProvider())
                             .build();
-                    return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), post.getUser().getId(), movieDomain);
+                    return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), new AuthorId(post.getUser().getId()), movieDomain);
                 }
+                return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), new AuthorId(post.getUser().getId()), movieDomain);
             }
             case PostType.book ->  {
+                BookMedia bookMedia = null;
                 if(post.getMedia() != null && post.getMedia().getBook() != null){
                     final BookMediaJpa bookMediaJpa = post.getMedia().getBook();
-                   BookMedia bookMedia = BookMedia
+                    bookMedia = BookMedia
                             .builder()
+                            .id(post.getMedia().getId())
                             .author(bookMediaJpa.getAuthor())
                             .title(bookMediaJpa.getTitle())
                             .publisher(bookMediaJpa.getPublisher())
@@ -51,8 +58,8 @@ public class PostDBAdapter {
                             .printType(bookMediaJpa.getPrintType())
                             .description(bookMediaJpa.getDescription())
                             .build();
-                    return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), post.getUser().getId(), bookMedia);
                 }
+                return new Post(post.getId(), post.getContent(), post.getLikeCount(), post.getCommentCount(), post.getCreatedAt(), post.getUpdatedAt(), new AuthorId(post.getUser().getId()), bookMedia);
             }
             default -> {}
         }

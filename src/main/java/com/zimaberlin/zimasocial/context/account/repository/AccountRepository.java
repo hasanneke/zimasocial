@@ -9,6 +9,7 @@ public interface AccountRepository {
     Account getAuthenticatedAccount();
     Optional<Account> findByEmailAndAuthProvider(String email, String provider);
     void save(Account account);
-    Account createNewAccount(CreateAccount createAccount);
+    Account createNewAccount(Account account);
     Account findByUserId(Long userId);
+    Long nextId();
 }

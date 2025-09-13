@@ -94,7 +94,7 @@ public class JWTService {
         RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
         tokenEntity.setToken(hashedRefreshToken);
         tokenEntity.setExpiresAt(refreshTokenExpirationDate);
-        UserEntity user = userRepository.findById(account.getUserId()).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
         tokenEntity.setUser(user);
 
         TokenResponse refreshToken = TokenResponse.builder()

@@ -33,7 +33,7 @@ public class NotificationControllerBeta {
 
     @GetMapping
     public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        Long authorId = authorRepository.getAuthenticatedAuthor().getAuthorId();
+        Long authorId = authorRepository.getAuthenticatedAuthor().getId().getId();
         Pageable pageable = PageRequest.of(page, size);
         Page<NotificationView> notificationsPage = notificationReadRepository.findByRecipientId(authorId, pageable);
 

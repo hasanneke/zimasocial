@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
@@ -31,12 +32,12 @@ public class AuthorDBRepository implements AuthorRepository {
     }
 
     @Override
-    public Optional<Author> findById(Long authorId) {
-        return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId).orElse(null)));
+    public Optional<Author> findById(AuthorId authorId) {
+        return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId.getId()).orElse(null)));
     }
 
     public void save(Author author){
-        UserEntity user = userRepository.findById(author.getAuthorId()).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findById(author.getId().getId()).orElseThrow(UserNotFoundException::new);
         user.margeAuthor(author);
         userRepository.save(user);
     }

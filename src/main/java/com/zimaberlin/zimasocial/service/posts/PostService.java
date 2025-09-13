@@ -126,7 +126,7 @@
 //        if(!isAlreadyLiked){
 //            LikeEntity like = LikeEntity.builder()
 //                            .postId(post.getId())
-//                            .userId(currentUser.getId())
+//                            .accountId(currentUser.getId())
 //                            .type(LikeType.post)
 //                            .build();
 //            post.incrementLikeCount();
@@ -197,7 +197,7 @@
 //            LikeEntity like = LikeEntity
 //                    .builder()
 //                    .postId(postId)
-//                    .userId(currentUser.getId())
+//                    .accountId(currentUser.getId())
 //                    .commentId(commentId)
 //                    .type(LikeType.comment)
 //                    .build();

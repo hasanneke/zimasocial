@@ -4,15 +4,16 @@ import com.zimaberlin.zimasocial.context.communication.notifications.CommentLike
 import com.zimaberlin.zimasocial.context.communication.notifications.CommentRepliedNotification;
 import com.zimaberlin.zimasocial.context.communication.notifications.PostCommentedNotification;
 import com.zimaberlin.zimasocial.context.communication.notifications.PostLikedNotification;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {
     public static PostLikedNotification convertNotificationEntityToPostLikedNotification(NotificationEntity notificationEntity) {
         return PostLikedNotification.builder()
                 .postId(notificationEntity.getPostId())
-                .actorId(notificationEntity.getActorId())
+                .actorId(new AuthorId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(notificationEntity.getReceiverUserId())
+                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -21,9 +22,9 @@ public class NotificationDBRepositoryAdapter {
         return PostCommentedNotification.builder()
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
-                .actorId(notificationEntity.getActorId())
+                .actorId(new AuthorId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(notificationEntity.getReceiverUserId())
+                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -31,9 +32,9 @@ public class NotificationDBRepositoryAdapter {
         return CommentLikedNotification.builder()
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
-                .actorId(notificationEntity.getActorId())
+                .actorId(new AuthorId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(notificationEntity.getReceiverUserId())
+                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -42,7 +43,7 @@ public class NotificationDBRepositoryAdapter {
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
                 .replyId(notificationEntity.getTargetId())
-                .actorId(notificationEntity.getActorId())
+                .actorId(new AuthorId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
                 .message(notificationEntity.getContent())
                 .build();

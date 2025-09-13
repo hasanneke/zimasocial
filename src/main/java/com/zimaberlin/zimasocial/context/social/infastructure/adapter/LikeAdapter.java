@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.post.PostLike;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
@@ -10,11 +11,11 @@ import org.springframework.stereotype.Component;
 public class LikeAdapter {
     public Like convertLikeEntityToLikeForPost(LikeEntity like) {
         if(like == null) return null;
-        return new PostLike(like.getPostId(), like.getUserId());
+        return new PostLike(like.getPostId(), new AuthorId(like.getUserId()));
     }
 
     public CommentLike convertLikeEntityToLikeForComment(LikeEntity like) {
         if(like == null) return null;
-        return new CommentLike(like.getPostId(), like.getUserId(), like.getCommentId());
+        return new CommentLike(like.getPostId(), new AuthorId(like.getUserId()), like.getCommentId());
     }
 }

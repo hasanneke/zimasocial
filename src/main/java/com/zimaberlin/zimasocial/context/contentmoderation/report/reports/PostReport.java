@@ -1,12 +1,13 @@
 package com.zimaberlin.zimasocial.context.contentmoderation.report.reports;
 
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
 
-public record PostReport(Long postId, ReportReason reason, Long reporterAuthorId, Long reportedAuthorId,
+public record PostReport(Long postId, ReportReason reason, AuthorId reporterAuthorId, AuthorId reportedAuthorId,
                          String description) {
     public PostReport {
         Assert.notNull(postId, "Post id cannot be null");

@@ -1,0 +1,2 @@
+CREATE SEQUENCE user_sequence START 1;
+CREATE SEQUENCE post_sequence START 1;

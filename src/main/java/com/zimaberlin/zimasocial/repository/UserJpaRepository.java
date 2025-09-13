@@ -19,4 +19,7 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findBySlug(String slug);
     @Query(value = "SELECT * FROM USERS u WHERE (u.name ILIKE %:query% OR u.slug ILIKE %:query%) AND IS_DELETED = false", nativeQuery = true)
     Page<UserEntity> searchUser(String query, Pageable pageable);
+
+    @Query(value = "SELECT nextval('user_sequence')")
+    Long nextId();
 }

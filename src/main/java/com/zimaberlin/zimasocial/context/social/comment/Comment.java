@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.comment;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -12,14 +13,14 @@ public class Comment {
     private Long commentId;
     private Long parentCommentId;
     private Long postId;
-    private Long authorId;
+    private AuthorId authorId;
     private String content;
     private int likeCount;
     private int replyCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Comment(Long commentId, Long parentCommentId, Long postId, Long authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Comment(Long commentId, Long parentCommentId, Long postId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.notNull(commentId, "Comment Id cannot be null");
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
@@ -33,7 +34,7 @@ public class Comment {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    public Comment(Long postId, Long parentCommentId, Long authorId, String content) {
+    public Comment(Long postId, Long parentCommentId, AuthorId authorId, String content) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
         this.parentCommentId = parentCommentId;
@@ -44,7 +45,7 @@ public class Comment {
         this.likeCount = 0;
         this.replyCount = 0;
     }
-    public Comment reply(Long replierAuthorId, String comment){
+    public Comment reply(AuthorId replierAuthorId, String comment){
         replyCount += 1;
         return new Comment(postId, commentId, replierAuthorId, comment);
     }
@@ -54,8 +55,8 @@ public class Comment {
 
     public CommentLike like(Author liker){
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getCommentId(), authorId, liker.getAuthorId()));
-        return new CommentLike(postId, liker.getAuthorId(), commentId);
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getCommentId(), authorId, liker.getId()));
+        return new CommentLike(postId, liker.getId(), commentId);
     }
 
     public void unlike(){

@@ -5,5 +5,6 @@ import com.zimaberlin.zimasocial.utility.TokenResponse;
 
 public interface AuthService {
     TokenResponse googleLogin(String token) throws TokenVerifier.VerificationException;
+    TokenResponse quickLogin() throws TokenVerifier.VerificationException;
     TokenResponse refreshToken(String refreshToken) throws TokenVerifier.VerificationException;
 }

@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.views.post;
 import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.context.social.api.post.PostController;
 import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.entity.PostType;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
@@ -28,6 +29,7 @@ public class PostView extends RepresentationModel<PostView> {
     private Boolean isReported;
     private Boolean isVisible;
     private MovieMedia movie;
+    private BookMedia book;
     public PostView addLinks() {
         this.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class)

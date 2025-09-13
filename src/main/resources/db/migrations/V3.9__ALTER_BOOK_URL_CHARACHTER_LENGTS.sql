@@ -1,0 +1,3 @@
+ALTER TABLE media
+ALTER COLUMN book_cover_url TYPE VARCHAR(1024),
+ALTER COLUMN book_small_cover_url TYPE VARCHAR(1024);

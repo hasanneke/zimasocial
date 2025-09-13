@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -23,10 +22,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "post")
-@SQLRestriction(value = "IS_DELETED IS FALSE")
+@SQLRestriction(value = "IS_DELETED IS false AND IS_VISIBLE IS true")
 public class PostEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "content")
@@ -48,6 +46,9 @@ public class PostEntity {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;
+
+    @Column(name = "is_visible")
+    private Boolean isVisible = true;
 
     @Column(name = "user_id",insertable = false, updatable = false)
     private Long userId;
@@ -71,12 +72,9 @@ public class PostEntity {
     @Column(name = "IS_DELETED", nullable = false)
     private Boolean isDeleted = false;
 
-    @OneToOne
-    @JoinColumn(name = "media_id", insertable = false, updatable = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "media_id")
     private MediaJpa media;
-
-    @Column(name = "media_id")
-    private UUID mediaId;
 
     @Override
     public boolean equals(Object o) {
@@ -95,13 +93,13 @@ public class PostEntity {
     }
 
     public void merge(Post post) {
+        this.id = post.getPostId();
         this.content = post.getContent();
         this.type = post.getType();
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
-        if (Objects.requireNonNull(post.getType()) == PostType.movie) {
-            mediaId = post.getMovie().getId();
-        }
+        this.userId = post.getAuthorId().getId();
+        this.isVisible = post.getIsVisible();
     }
 }
 

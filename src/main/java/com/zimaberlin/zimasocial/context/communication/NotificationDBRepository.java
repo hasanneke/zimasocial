@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.communication;
 
 import com.zimaberlin.zimasocial.context.communication.notifications.*;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
@@ -27,8 +28,8 @@ public class NotificationDBRepository implements NotificationRepository{
 
     @Override
     public void save(Notification notification) {
-        UserEntity recipient = userJpaRepository.findById(notification.getRecipientId()).orElse(null);
-        UserEntity actor = userJpaRepository.findById(notification.getActorId()).orElse(null);
+        UserEntity recipient = userJpaRepository.findById(notification.getRecipientId().getId()).orElse(null);
+        UserEntity actor = userJpaRepository.findById(notification.getActorId().getId()).orElse(null);
         NotificationEntity notificationEntity;
         switch (notification){
             case PostLikedNotification postLikedNotification -> {
@@ -53,12 +54,12 @@ public class NotificationDBRepository implements NotificationRepository{
     }
 
     @Override
-    public Optional<PostLikedNotification> getPostLikedNotification(Long actorId, Long postId) {
-        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId, postId, NotificationType.POST_LIKED, TargetCollection.post).map(NotificationDBRepositoryAdapter::convertNotificationEntityToPostLikedNotification);
+    public Optional<PostLikedNotification> getPostLikedNotification(AuthorId actorId, Long postId) {
+        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId.getId(), postId, NotificationType.POST_LIKED, TargetCollection.post).map(NotificationDBRepositoryAdapter::convertNotificationEntityToPostLikedNotification);
     }
 
     @Override
-    public Optional<CommentLikedNotification> getCommentLikedNotification(Long actorId, Long commentId) {
-        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId, commentId, NotificationType.COMMENT_LIKED, TargetCollection.comment).map(NotificationDBRepositoryAdapter::convertNotificationEntityToCommentLikedNotification);
+    public Optional<CommentLikedNotification> getCommentLikedNotification(AuthorId actorId, Long commentId) {
+        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId.getId(), commentId, NotificationType.COMMENT_LIKED, TargetCollection.comment).map(NotificationDBRepositoryAdapter::convertNotificationEntityToCommentLikedNotification);
     }
 }

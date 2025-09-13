@@ -1,4 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.comment;
 
-public record CommentRepliedEvent(Long parentCommentId, Long replyId, Long parentCommentOwnerId, Long replyerId) {
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+
+public record CommentRepliedEvent(Long parentCommentId, Long replyId, AuthorId parentCommentOwnerId, AuthorId replyerId) {
 }

@@ -1,4 +1,6 @@
 package com.zimaberlin.zimasocial.context.account.event;
 
-public record AccountDisabledEvent(Long userId) {
+import com.zimaberlin.zimasocial.context.account.entity.AccountId;
+
+public record AccountDisabledEvent(AccountId accountId) {
 }
