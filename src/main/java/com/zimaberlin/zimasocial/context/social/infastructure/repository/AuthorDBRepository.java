@@ -1,11 +1,15 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
+import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.repository.UserJpaRepository;
+import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +17,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class AuthorDBRepository implements AuthorRepository {
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
     private final UserJpaRepository userRepository;
+    private final UserRelationJpaRepository userRelationJpaRepository;
     @Autowired
-    public AuthorDBRepository(AuthorUserEntityAdapter authorUserEntityAdapter, UserJpaRepository userRepository) {
+    public AuthorDBRepository(AuthorUserEntityAdapter authorUserEntityAdapter, UserJpaRepository userRepository, UserRelationJpaRepository userRelationJpaRepository) {
         this.authorUserEntityAdapter = authorUserEntityAdapter;
         this.userRepository = userRepository;
+        this.userRelationJpaRepository = userRelationJpaRepository;
     }
 
     @Override
@@ -43,9 +50,28 @@ public class AuthorDBRepository implements AuthorRepository {
     }
 
     @Override
-    public Optional<Author> findBySlug(String slug) {
-        Optional<UserEntity> user = userRepository.findBySlug(slug);
+    public void saveAll(List<Author> authors) {
+        for (Author author : authors) {
+            save(author);
+        }
+    }
+
+    @Override
+    public Optional<Author> findBySlugAndIsDisabledFalse(String slug) {
+        Optional<UserEntity> user = userRepository.findBySlugAndIsDisabledFalse(slug);
         return user.map(authorUserEntityAdapter::convertUserEntityToAuthor);
+    }
+
+    @Override
+    public Optional<Author> findBySlugAndIsDisabledFalseAndNotBeingBlocked(String slug) {
+        UserEntity authenticatedUser = CurrentUser.getCurrentUserProfile();
+        Author userToBeFound = findBySlugAndIsDisabledFalse(slug).orElse(null);
+        assert userToBeFound != null;
+        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getId(), authenticatedUser.getId(), Relation.blocked);
+        if(blockRelation.isPresent()){
+            return Optional.empty();
+        }
+        return Optional.of(userToBeFound);
     }
 
     @Override

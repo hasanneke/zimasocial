@@ -14,10 +14,11 @@ import java.util.Optional;
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmailAndAuthProvider(String email, String authProvider);
     Optional<UserEntity> findBySlugAndIsDeletedIn(String slug, List<Boolean> deletedOptions);
-    @Query(value = "SELECT * FROM users WHERE slug = :slug AND IS_DELETED = FALSE", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE slug = :slug AND IS_DELETED = FALSE AND IS_DISABLED = FALSE", nativeQuery = true)
     Optional<UserEntity> findBySlugWithDeletedUsers(String slug);
     Optional<UserEntity> findBySlug(String slug);
-    @Query(value = "SELECT * FROM USERS u WHERE (u.name ILIKE %:query% OR u.slug ILIKE %:query%) AND IS_DELETED = false", nativeQuery = true)
+    Optional<UserEntity> findBySlugAndIsDisabledFalse(String slug);
+    @Query(value = "SELECT * FROM USERS u WHERE (u.name ILIKE %:query% OR u.slug ILIKE %:query%) AND IS_DELETED = false AND IS_DISABLED = false", nativeQuery = true)
     Page<UserEntity> searchUser(String query, Pageable pageable);
 
     @Query(value = "SELECT nextval('user_sequence')")

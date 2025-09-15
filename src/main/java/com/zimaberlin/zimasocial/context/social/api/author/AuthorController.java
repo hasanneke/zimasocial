@@ -4,6 +4,7 @@ import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.author.AuthorService;
 import com.zimaberlin.zimasocial.context.social.author.SlugAlreadyTakenException;
+import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,12 +12,15 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1/authors")
@@ -77,7 +81,7 @@ public class AuthorController {
     }
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
-        Optional<Author> author = authorRepository.findBySlug(slug);
+        Optional<Author> author = authorRepository.findBySlugAndIsDisabledFalse(slug);
         if(author.isPresent()){
             throw new SlugAlreadyTakenException(slug);
         }
@@ -143,5 +147,33 @@ public class AuthorController {
                                                      @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                      @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
         return new  HttpEntity<>(authorControllerBridge.searchAuthors(query, page, size));
+    }
+
+    @PostMapping("/{slug}/follow-requests")
+    public ResponseEntity<Void> getAllFollowRequests(@PathVariable(name = "slug") String slug) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{slug}/follow-requests")
+    public ResponseEntity<List<FollowRequestDTO>> requestToFollow() {
+        return ResponseEntity.ok(authorControllerBridge.getAllFollowRequests());
+    }
+
+    @PostMapping("/{slug}/follow-requests/{id}/accept")
+    public ResponseEntity<Void> acceptFollowRequest(@PathVariable(name = "id") String requestId) {
+        authorService.acceptFollowRequest(UUID.fromString(requestId));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{slug}/follow-requests/{id}")
+    public ResponseEntity<Void> deleteFollowRequest(@PathVariable(name = "id") String requestId) {
+        authorService.deleteFollowRequest(UUID.fromString(requestId));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{slug}/follow-requests-info")
+    public ResponseEntity<FollowRequestsInfo> getFollowRequestInfo() {
+        return ResponseEntity.ok(authorControllerBridge.getFollowRequestInfo());
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 
-public interface AuthorRelationRepository {
+public interface AuthorRelationCollection {
     Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId);
     Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId followedId);
     Optional<MutedRelation> findMutedRelationBetween(Long muterId, Long mutedId);

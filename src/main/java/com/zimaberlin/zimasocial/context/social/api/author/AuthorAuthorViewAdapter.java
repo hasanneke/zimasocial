@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.api.author;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationRepository;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zimaberlin.zimasocial.context.social.authorrelation.BlockRelation;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRelation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,11 @@ import java.util.Optional;
 
 @Component
 public class AuthorAuthorViewAdapter {
-    private final AuthorRelationRepository authorRelationRepository;
+    private final AuthorRelationCollection authorRelationRepository;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public AuthorAuthorViewAdapter(AuthorRelationRepository authorRelationRepository, AuthorRepository authorRepository) {
+    public AuthorAuthorViewAdapter(AuthorRelationCollection authorRelationRepository, AuthorRepository authorRepository) {
         this.authorRelationRepository = authorRelationRepository;
         this.authorRepository = authorRepository;
     }

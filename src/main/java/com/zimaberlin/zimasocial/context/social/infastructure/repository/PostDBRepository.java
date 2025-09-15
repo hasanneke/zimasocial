@@ -12,6 +12,7 @@ import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.PostDBAdapter;
 import com.zimaberlin.zimasocial.context.social.post.PostRepository;
+import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zimaberlin.zimasocial.repository.*;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class PostDBRepository implements PostRepository {
@@ -46,10 +48,7 @@ public class PostDBRepository implements PostRepository {
     }
     @Override
     public Optional<Post> findById(Long postId) {
-        PostEntity post = postJpaRepository.findById(postId).orElse(null);
-        if(post == null){
-            throw new PostNotFoundException();
-        }
+        PostEntity post = postJpaRepository.findByIdAndIsVisibleTrue(postId).orElseThrow(PostNotFoundException::new);
         return Optional.ofNullable(postDBAdapter.convertPostEntityToPost(post));
     }
 
@@ -79,7 +78,12 @@ public class PostDBRepository implements PostRepository {
             specification = specification.and(PostSpecification.type(type));
         }
         List<UserRelationEntity> blockRelations = userRelationJpaRepository.findAllBlockRelations(currentUser.getId());
+        List<UserRelationEntity> followRelations = userRelationJpaRepository.findByActorIdAndRelation(currentUser.getId(), Relation.followed);
+        List<Long> followedAuthors = followRelations.stream().map(UserRelationEntity::getReceiverId).toList();
+        
         specification = specification.and(PostSpecification.notBlocked(currentUser.getId(), blockRelations));
+        specification = specification.and(PostSpecification.isVisible());
+        specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
         return postEntityPage.map(postDBAdapter::convertPostEntityToPost);
     }

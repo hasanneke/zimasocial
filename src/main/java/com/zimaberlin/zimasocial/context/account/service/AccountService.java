@@ -5,6 +5,7 @@ import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
 import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
 import com.zimaberlin.zimasocial.context.account.value.DisableReason;
+import com.zimaberlin.zimasocial.utility.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class AccountService {
 
     @Transactional
     public void disableAccount(DisableReason reason) {
-        Account account = accountRepository.getAuthenticatedAccount();
+        Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.disableAccount(reason);
         accountRepository.save(account);
     }
@@ -30,19 +31,19 @@ public class AccountService {
     }
     @Transactional
     public void deleteAccount(DeleteReason reason) {
-        Account account = accountRepository.getAuthenticatedAccount();
+        Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.deleteAccount(reason);
         accountRepository.save(account);
     }
     @Transactional
     public void makeAccountPublic(){
-        Account account = accountRepository.getAuthenticatedAccount();
+        Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.makeAccountPublic();
         accountRepository.save(account);
     }
     @Transactional
     public void makeAccountPrivate(){
-        Account account = accountRepository.getAuthenticatedAccount();
+        Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.makeAccountPrivate();
         accountRepository.save(account);
     }

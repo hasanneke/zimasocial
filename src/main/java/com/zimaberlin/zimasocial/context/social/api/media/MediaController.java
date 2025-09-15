@@ -37,8 +37,8 @@ public class MediaController {
         return ResponseEntity.ok(responseView);
     }
     @GetMapping(path = "/books/{bookId}")
-    public ResponseEntity<BookMedia> getBook(@RequestParam(name = "bookId") UUID bookId) {
-        BookMedia book = mediaCollection.findBookById(bookId).orElseThrow(BookNotFoundException::new);
+    public ResponseEntity<BookMedia> getBook(@PathVariable(name = "bookId") String bookId) {
+        BookMedia book = mediaCollection.findBookById(UUID.fromString(bookId)).orElseThrow(BookNotFoundException::new);
         return ResponseEntity.ok(book);
     }
 }

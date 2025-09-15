@@ -1,10 +1,12 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
+import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.userRelation.Relation;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
-import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -32,6 +34,19 @@ public class PostSpecification {
           return root.get("userId")
                   .in(blockedOrBeingBlockedUserIds)
                   .not();
+       };
+    }
+
+    public static Specification<PostEntity> isVisible() {
+        return (root, query, builder) -> builder.equal(root.get("isVisible"), true);
+    }
+
+    public static Specification<PostEntity> isAuthorPublicOrAuthorFollowed(Long selfUserId, List<Long> followedAuthorIds) {
+       return (root, query, builder) -> {
+           Path<UserEntity> userEntityPath = root.get("user");
+           return builder.or(builder.equal(userEntityPath.get("isPrivate"), false),
+                   builder.equal(root.get("userId"), selfUserId),
+                   root.get("userId").in(followedAuthorIds));
        };
     }
 }

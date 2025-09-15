@@ -102,7 +102,7 @@ public class TodaysPostsGeneratorTest {
     void testCreateTodayPosts() {
         List<TodaysPost> existingTodaysPosts = List.of(TodaysPost.builder().id(0L).isDeleted(false).build(), TodaysPost.builder().id(1L).isDeleted(false).build());
         when(postJpaRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
-        when(todaysPostRepository.findTodaysPostByDate(LocalDate.now())).thenReturn(existingTodaysPosts);
+        when(todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1))).thenReturn(existingTodaysPosts);
         todaysPostGenerator.createTodaysPost();
         existingTodaysPosts.forEach(e->{
             Assertions.assertEquals(true, e.getIsDeleted());

@@ -22,7 +22,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "post")
-@SQLRestriction(value = "IS_DELETED IS false AND IS_VISIBLE IS true")
+@SQLRestriction(value = "IS_DELETED IS false")
 public class PostEntity {
     @Id
     private Long id;
@@ -65,7 +65,6 @@ public class PostEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

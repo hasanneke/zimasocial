@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class AuthorRelationDBRepository implements AuthorRelationRepository {
+public class AuthorRelationDBRepository implements AuthorRelationCollection {
     private final UserRelationJpaRepository userRelationJpaRepository;
     private final UserJpaRepository userRepository;
     private final AuthorUserEntityAdapter authorUserEntityAdapter;

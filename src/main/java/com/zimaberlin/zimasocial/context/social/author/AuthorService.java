@@ -1,33 +1,44 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
+import com.github.f4b6a3.uuid.UuidCreator;
+import com.zimaberlin.zimasocial.context.social.authorrelation.*;
 import com.zimaberlin.zimasocial.context.social.image.ImageService;
-import com.zimaberlin.zimasocial.context.social.authorrelation.BlockRelation;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRelation;
-import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthorService {
     private final AuthorRepository authorRepository;
-    private final AuthorRelationRepository authorRelationRepository;
+    private final AuthorRelationCollection authorRelationRepository;
     private final ImageService imageService;
+    private final FollowRequestCollection followRequestCollection;
     @Autowired
-    public AuthorService(AuthorRepository authorRepository, AuthorRelationRepository authorRelationRepository, ImageService imageService) {
+    public AuthorService(AuthorRepository authorRepository, AuthorRelationCollection authorRelationRepository, ImageService imageService, FollowRequestCollection followRequestCollection) {
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;
         this.imageService = imageService;
+        this.followRequestCollection = followRequestCollection;
+    }
+
+    @Transactional
+    public void requestToFollow(String slug) {
+        Author follower = authorRepository.getAuthenticatedAuthor();
+        Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        FollowRequest followRequest = followed.requestToFollow(follower.getId(), UuidCreator.getTimeOrdered());
+        followRequestCollection.save(followRequest);
     }
 
     @Transactional
     public void follow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
-        Author followed = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isPresent()){
             throw new AuthorAlreadyFollowedException(followed.getId());
@@ -41,34 +52,32 @@ public class AuthorService {
     @Transactional
     public void unfollow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
-        Author followed = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
+        Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isEmpty()){
             throw new AuthorNotFollowed(followed.getId());
         }
         followed.unfollow(follower);
         authorRelationRepository.delete(followRelation.get());
-        authorRepository.save(follower);
-        authorRepository.save(followed);
+        authorRepository.saveAll(List.of(follower, followed));
     }
 
     @Transactional
     public void removeFollower(String slug) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Author removedFollower = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        Author removedFollower = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(removedFollower.getId(), author.getId());
         if(followRelation.isEmpty()){
             throw new AuthorNotFollowed(removedFollower.getId());
         }
         author.unfollow(removedFollower);
         authorRelationRepository.delete(followRelation.get());
-        authorRepository.save(author);
-        authorRepository.save(removedFollower);
+        authorRepository.saveAll(List.of(author, removedFollower));
     }
     @Transactional
     public void block(String slug) {
         Author blocker = authorRepository.getAuthenticatedAuthor();
-        Author blocked = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
+        Author blocked = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getId(), blocked.getId());
         if(blockRelation.isPresent()){
             throw new AuthorAlreadyBlocked(blocked.getId());
@@ -79,7 +88,7 @@ public class AuthorService {
     @Transactional
     public void unblock(String slug) {
         Author blocker = authorRepository.getAuthenticatedAuthor();
-        Author blocked = authorRepository.findBySlug(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
+        Author blocked = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getId(), blocked.getId());
         if(blockRelation.isEmpty()){
             throw new AuthorNotBlockedException(blocked.getId().getId());
@@ -96,7 +105,7 @@ public class AuthorService {
     @Transactional
     public void updateSlug(String slug) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Optional<Author> checkAuthorWithSameSlug = authorRepository.findBySlug(slug);
+        Optional<Author> checkAuthorWithSameSlug = authorRepository.findBySlugAndIsDisabledFalse(slug);
         if(checkAuthorWithSameSlug.isPresent()){
             throw new SlugAlreadyTakenException(slug);
         }
@@ -128,5 +137,16 @@ public class AuthorService {
             author.removeProfilePhoto();
             authorRepository.save(author);
         }
+    }
+
+    public void acceptFollowRequest(UUID id) {
+        FollowRequest followRequest = followRequestCollection.findById(id).orElseThrow(FollowRequestNotFoundException::new);
+        followRequest.accept();
+        followRequestCollection.save(followRequest);
+    }
+
+    public void deleteFollowRequest(UUID id) {
+        FollowRequest followRequest = followRequestCollection.findById(id).orElseThrow(FollowRequestNotFoundException::new);
+        followRequestCollection.delete(followRequest);
     }
 }

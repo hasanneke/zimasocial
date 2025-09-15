@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
 import com.zimaberlin.zimasocial.context.account.exception.*;
+import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class Author {
@@ -115,6 +117,14 @@ public class Author {
     }
     private void decrementFollowerCount(){
         followersCount = getFollowersCount() - 1;
+    }
+
+    public FollowRequest requestToFollow(AuthorId followerAuthorId, UUID id) {
+        if(followerAuthorId.equals(this.id)){
+            throw new CircularFollowException();
+        }
+        StaticEventPublisher.publishEvent(new AuthorFollowRequestSentEvent(followerAuthorId, this.getId()));
+        return new FollowRequest(id, followerAuthorId, this.id, false, LocalDateTime.now());
     }
 
     @Override

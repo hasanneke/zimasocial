@@ -33,13 +33,15 @@ public class Account {
     private DeleteReason deleteReason;
     private DisableReason disableReason;
     private final Set<UserRole> roles;
-    public Account(AccountId accountId, String email, String authProvider, Set<UserRole> roles, Boolean isDisabled, LocalDate disableDate, LocalDate deleteDate, Boolean isDeleted, Boolean isPrivate, DeleteReason deleteReason, DisableReason disableReason) {
+    public Account(AccountId accountId, String email, String slug, String authProvider, Set<UserRole> roles, Boolean isDisabled, LocalDate disableDate, LocalDate deleteDate, Boolean isDeleted, Boolean isPrivate, DeleteReason deleteReason, DisableReason disableReason) {
         Assert.notNull(email, "User must have email address");
         Assert.notNull(authProvider, "User must have auth provider info");
         Assert.notNull(accountId, "Account id cannot be null");
         Assert.notNull(isDeleted, "Account is deleted cannot be null");
         Assert.notNull(isDisabled, "Is disabled cannot be null");
         Assert.notNull(isPrivate, "Is private cannot be null");
+        Assert.notNull(slug, "Slug cannot be null");
+        this.slug = slug;
         if(isDisabled) {
             if(disableDate == null){
                 throw new IllegalArgumentException("Disable date cannot be null if account is disabled");

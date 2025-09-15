@@ -22,24 +22,25 @@ import java.util.Set;
 public class AccountTest {
     @Test
     void testDisableAccount_WhenSuccess() {
-        try(MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class);){
-            Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), false, null, null, false, false, null, null);
+        try(MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class)){
+            AccountId accountId = new AccountId(0L);
+            Account testAccount = new Account(accountId, "", "", "", Set.of(), false, null, null, false, false, null, null);
             testAccount.disableAccount(DisableReason.SOMETHING_ELSE);
             Assertions.assertEquals(testAccount.getDisableReason(), DisableReason.SOMETHING_ELSE);
             Assertions.assertEquals(testAccount.getDisableDate(), LocalDate.now());
             Assertions.assertEquals(testAccount.getIsDisabled(), true);
-            mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountDisabledEvent(new AccountId(0L))));
+            mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountDisabledEvent(accountId)));
         }
     }
     @Test
     void testDisableAccount_WhenReasonIsNull_ThenThrowIllegalArgumentException() {
-        Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), false, null, null, false, false, null, null);
+        Account testAccount = new Account(new AccountId(0L), "", "", "", Set.of(), false, null, null, false, false, null, null);
         Assertions.assertThrows(IllegalArgumentException.class, ()-> testAccount.disableAccount(null));
     }
     @Test
     void testActivateAccount_WhenSuccess() {
         try(MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class)){
-            Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), true, LocalDate.now(), null, false, false, null, DisableReason.SOMETHING_ELSE);
+            Account testAccount = new Account(new AccountId(0L), "", "","", Set.of(), true, LocalDate.now(), null, false, false, null, DisableReason.SOMETHING_ELSE);
             testAccount.activateAccount();
             Assertions.assertNull(testAccount.getDisableReason());
             Assertions.assertNull(testAccount.getDisableDate());
@@ -50,14 +51,14 @@ public class AccountTest {
 
     @Test
     void testActivateAccount_WhenAccountIsNotDisabled_ThrowAccountIsNotDisabledException() {
-        Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), false, null, null, false, false, null, null);
+        Account testAccount = new Account(new AccountId(0L), "", "", "", Set.of(), false, null, null, false, false, null, null);
         Assertions.assertThrows(IllegalArgumentException.class, testAccount::activateAccount);
     }
 
     @Test
     void testDeleteAccount_WhenSuccess() {
         try(MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class)){
-            Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), false, null, null, false, false, null, null);
+            Account testAccount = new Account(new AccountId(0L), "", "", "", Set.of(), false, null, null, false, false, null, null);
             testAccount.deleteAccount(DeleteReason.SOMETHING_ELSE);
             Assertions.assertEquals(testAccount.getDeleteReason(), DeleteReason.SOMETHING_ELSE);
             Assertions.assertEquals(testAccount.getDeleteDate(), LocalDate.now());
@@ -68,7 +69,7 @@ public class AccountTest {
 
     @Test
     void deleteAccount_WhenDeleteReasonNotPassed_ThrowIllegalArgumentException() {
-        Account testAccount = new Account(new AccountId(0L), "", "", Set.of(), false, null, null, false, false, null, null);
+        Account testAccount = new Account(new AccountId(0L), "", "", "", Set.of(), false, null, null, false, false, null, null);
         Assertions.assertThrows(IllegalArgumentException.class, () -> testAccount.deleteAccount(null));
     }
 }

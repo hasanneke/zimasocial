@@ -20,4 +20,5 @@ public interface UserRelationJpaRepository extends JpaRepository<UserRelationEnt
     void deleteByActorIdAndReceiverIdAndRelation(Long actorId, Long receiverId, Relation relation);
     Page<UserRelationEntity> findByReceiverIdAndRelation(Long receiverId, Relation relation, Pageable pageable);
     Page<UserRelationEntity> findByActorIdAndRelation(Long actorId, Relation relation, Pageable pageable);
+    List<UserRelationEntity> findByActorIdAndRelation(Long actorId, Relation relation);
 }

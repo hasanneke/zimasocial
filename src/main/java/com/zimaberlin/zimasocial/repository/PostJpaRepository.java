@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaSpecificationExecutor<PostEntity> {
@@ -32,4 +33,5 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
             """, nativeQuery = true)
     List<PostEntity> findAllInvisiblePostsByUserId(Long userId);
     List<PostEntity> findAllByUserId(Long userId);
+    Optional<PostEntity> findByIdAndIsVisibleTrue(Long id);
 }
