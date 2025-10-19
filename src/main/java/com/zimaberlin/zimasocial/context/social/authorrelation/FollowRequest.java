@@ -10,11 +10,11 @@ import java.util.UUID;
 
 @Getter
 public class FollowRequest {
-    private UUID id;
-    private AuthorId followerAuthorId;
-    private AuthorId followedAuthorId;
+    private final UUID id;
+    private final AuthorId followerAuthorId;
+    private final AuthorId followedAuthorId;
     private Boolean isAccepted;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public FollowRequest(UUID id, AuthorId followerAuthorId, AuthorId followedAuthorId, Boolean isAccepted, LocalDateTime createdAt) {

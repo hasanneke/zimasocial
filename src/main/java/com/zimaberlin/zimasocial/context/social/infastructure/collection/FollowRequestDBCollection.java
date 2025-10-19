@@ -36,8 +36,8 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
     }
 
     @Override
-    public List<FollowRequest> findAllByFollowedAuthorId(AuthorId id) {
-        return followRequestDAOJpa.findByFollowedId(id.getId()).stream().map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest).toList();
+    public List<FollowRequest> findAllByFollowedAuthorIdAndUpdatedAtIsNull(AuthorId id) {
+        return followRequestDAOJpa.findByFollowedIdAndUpdatedAtIsNull(id.getId()).stream().map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest).toList();
     }
 
     @Override
@@ -52,6 +52,12 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
             return followRequest.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<FollowRequest> findByFollowedIdAndFollowerId(AuthorId followedId, AuthorId followerId) {
+        Optional<FollowRequestEntity> followRequestEntity = followRequestDAOJpa.findFirstByFollowedIdAndFollowerId(followedId.getId(), followerId.getId());
+        return followRequestEntity.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
     }
 
     @Override

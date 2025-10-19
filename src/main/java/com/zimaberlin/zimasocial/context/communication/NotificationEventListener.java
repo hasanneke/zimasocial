@@ -1,14 +1,16 @@
 package com.zimaberlin.zimasocial.context.communication;
 
+import com.zimaberlin.zimasocial.context.communication.chat.event.ChatMessageSentEvent;
+import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
 import com.zimaberlin.zimasocial.context.communication.notifications.*;
+import com.zimaberlin.zimasocial.context.social.author.AuthorFollowRequestSentEvent;
 import com.zimaberlin.zimasocial.context.social.author.AuthorFollowedEvent;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorFollowRequestAcceptedEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zimaberlin.zimasocial.context.social.post.PostCommentedEvent;
 import com.zimaberlin.zimasocial.context.social.post.PostLikedEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +28,8 @@ public class NotificationEventListener {
         }
         PostLikedNotification postLikedNotification = PostLikedNotification.builder()
                 .postId(postLikedEvent.postId())
-                .actorId(postLikedEvent.actorId())
-                .recipientId(postLikedEvent.postOwnerId())
+                .actorId(new RecipientId(postLikedEvent.actorId().getId()))
+                .recipientId(new RecipientId(postLikedEvent.postOwnerId().getId()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendPostLikedNotification(postLikedNotification);
@@ -40,8 +42,8 @@ public class NotificationEventListener {
         }
         PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
                 .postId(postCommentedEvent.postId())
-                .actorId(postCommentedEvent.actorId())
-                .recipientId(postCommentedEvent.commentOwnerId())
+                .actorId(new RecipientId(postCommentedEvent.actorId().getId()))
+                .recipientId(new RecipientId(postCommentedEvent.commentOwnerId().getId()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendPostCommentedNotification(postCommentedNotification);
@@ -56,8 +58,8 @@ public class NotificationEventListener {
         CommentLikedNotification commentLikedNotification = CommentLikedNotification.builder()
                 .postId(commentLikedEvent.postId())
                 .commentId(commentLikedEvent.commentId())
-                .actorId(new AuthorId(commentLikedEvent.likerAuthorId().getId()))
-                .recipientId(new AuthorId(commentLikedEvent.commentOwnerId().getId()))
+                .actorId(new RecipientId(commentLikedEvent.likerAuthorId().getId()))
+                .recipientId(new RecipientId(commentLikedEvent.commentOwnerId().getId()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendCommentLikedNotification(commentLikedNotification);
@@ -70,8 +72,8 @@ public class NotificationEventListener {
         }
         CommentRepliedNotification commentRepliedNotification = CommentRepliedNotification.builder()
                 .commentId(commentRepliedEvent.parentCommentId())
-                .actorId(commentRepliedEvent.replyerId())
-                .recipientId(commentRepliedEvent.parentCommentOwnerId())
+                .actorId(new RecipientId(commentRepliedEvent.replyerId().getId()))
+                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getId()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendCommentRepliedNotification(commentRepliedNotification);
@@ -81,10 +83,37 @@ public class NotificationEventListener {
     public void handleAuthorFollowedEvent(AuthorFollowedEvent authorFollowedEvent) {
         AuthorFollowedNotification authorFollowedNotification = AuthorFollowedNotification
                 .builder()
-                .actorId(authorFollowedEvent.follower().getId())
-                .recipientId(authorFollowedEvent.author().getId())
+                .actorId(new RecipientId(authorFollowedEvent.follower().getId().getId()))
+                .recipientId(new RecipientId(authorFollowedEvent.followed().getId().getId()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendAuthorFollowedYouNotification(authorFollowedNotification);
+    }
+
+    @EventListener
+    public void handleAuthorFollowedRequestAcceptedEvent(AuthorFollowRequestAcceptedEvent authorFollowRequestAcceptedEvent) {
+        AuthorFollowRequestAcceptedNotification authorFollowedNotification = AuthorFollowRequestAcceptedNotification
+                .builder()
+                .actorId(new RecipientId(authorFollowRequestAcceptedEvent.followedAuthorId().getId()))
+                .recipientId(new RecipientId(authorFollowRequestAcceptedEvent.followerAuthorId().getId()))
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationService.sendAuthorFollowedRequestAcceptedNotification(authorFollowedNotification);
+    }
+
+    @EventListener
+    public void handleAuthorFollowRequestSentEvent(AuthorFollowRequestSentEvent authorFollowRequestSentEvent) {
+        AuthorFollowRequestSentNotification authorFollowedNotification = AuthorFollowRequestSentNotification
+                .builder()
+                .actorId(new RecipientId(authorFollowRequestSentEvent.followerId().getId()))
+                .recipientId(new RecipientId(authorFollowRequestSentEvent.followedId().getId()))
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationService.sendAuthorSentFollowRequestNotification(authorFollowedNotification);
+    }
+
+    @EventListener
+    public void handleChatMessageSentEvent(ChatMessageSentEvent chatMessageSentEvent) {
+
     }
 }

@@ -1,31 +1,39 @@
 package com.zimaberlin.zimasocial.entity.user;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
 import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
+import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
+import com.zimaberlin.zimasocial.context.account.value.DisableReason;
+import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
 import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
-import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
-import com.zimaberlin.zimasocial.context.account.value.DisableReason;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Table(name = "users")
 @Entity
 @Getter
-@Table(name = "users")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class UserEntity {
+public class UserEntity implements Serializable {
     public UserEntity(Long id) {
         this.id = id;
     }
@@ -112,6 +120,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "author")
     @JsonIgnore
     private Set<TodaysPost> todaysPost =  new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<UserDeviceToken> deviceTokens = new HashSet<>();
 
     @Column(name = "is_disabled")
     private Boolean isDisabled = false;
@@ -204,5 +216,12 @@ public class UserEntity {
     public void mergeUser(User user){
         this.trustScore = user.getTrustScore();
         this.isDisabled = user.getIsBanned();
+    }
+    public void mergeRecipient(Recipient recipient) {
+        this.deviceTokens = recipient.getDeviceTokens().stream().map(UserDeviceToken::new).collect(Collectors.toSet());
+    }
+
+    public String getFullName(){
+        return name + " " + familyName;
     }
 }

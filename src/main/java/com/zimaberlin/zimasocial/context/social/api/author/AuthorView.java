@@ -8,7 +8,6 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorView extends RepresentationModel<AuthorView> {
-    private Long id;
     private String slug;
     private String name;
     private String familyName;
@@ -17,6 +16,9 @@ public class AuthorView extends RepresentationModel<AuthorView> {
     private int followerCount;
     private int followingCount;
     private boolean isFollowed;
+    private boolean isFollowingMe;
+    private boolean isFollowRequestSent;
+    private boolean isFollowRequestReceived;
     private Boolean isPrivate;
     private Boolean isBlocked;
 

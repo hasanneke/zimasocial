@@ -1,19 +1,16 @@
 package com.zimaberlin.zimasocial.context.communication;
 
-import com.zimaberlin.zimasocial.context.communication.notifications.CommentLikedNotification;
-import com.zimaberlin.zimasocial.context.communication.notifications.CommentRepliedNotification;
-import com.zimaberlin.zimasocial.context.communication.notifications.PostCommentedNotification;
-import com.zimaberlin.zimasocial.context.communication.notifications.PostLikedNotification;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.notifications.*;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {
     public static PostLikedNotification convertNotificationEntityToPostLikedNotification(NotificationEntity notificationEntity) {
         return PostLikedNotification.builder()
                 .postId(notificationEntity.getPostId())
-                .actorId(new AuthorId(notificationEntity.getActorId()))
+                .actorId(new RecipientId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
+                .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -22,9 +19,9 @@ public class NotificationDBRepositoryAdapter {
         return PostCommentedNotification.builder()
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
-                .actorId(new AuthorId(notificationEntity.getActorId()))
+                .actorId(new RecipientId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
+                .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -32,9 +29,9 @@ public class NotificationDBRepositoryAdapter {
         return CommentLikedNotification.builder()
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
-                .actorId(new AuthorId(notificationEntity.getActorId()))
+                .actorId(new RecipientId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
-                .recipientId(new AuthorId(notificationEntity.getReceiverUserId()))
+                .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                 .message(notificationEntity.getContent())
                 .build();
     }
@@ -43,9 +40,93 @@ public class NotificationDBRepositoryAdapter {
                 .postId(notificationEntity.getPostId())
                 .commentId(notificationEntity.getTargetId())
                 .replyId(notificationEntity.getTargetId())
-                .actorId(new AuthorId(notificationEntity.getActorId()))
+                .actorId(new RecipientId(notificationEntity.getActorId()))
                 .createdAt(notificationEntity.getCreatedAt())
                 .message(notificationEntity.getContent())
+                .build();
+    }
+
+    public static Notification convertToNotification(NotificationEntity notificationEntity) {
+        switch (notificationEntity.getType()){
+            case POST_LIKED -> {
+                return PostLikedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .postId(notificationEntity.getPostId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case COMMENT_LIKED -> {
+                return CommentLikedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .postId(notificationEntity.getPostId())
+                        .commentId(notificationEntity.getTargetId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case USER_FOLLOWED_YOU -> {
+                return AuthorFollowedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case USER_FOLLOW_REQUEST_ACCEPTED -> {
+                return AuthorFollowRequestAcceptedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case USER_SENT_FOLLOW_REQUEST -> {
+                return AuthorFollowRequestSentNotification.builder()
+                        .id(notificationEntity.getId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case POST_COMMENTED -> {
+                return PostCommentedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .postId(notificationEntity.getPostId())
+                        .commentId(notificationEntity.getTargetId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
+            case COMMENT_REPLIED -> {
+                return CommentRepliedNotification.builder()
+                        .id(notificationEntity.getId())
+                        .postId(notificationEntity.getPostId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .replyId(notificationEntity.getTargetId())
+                        .build();
+            }
+            case POST_DELETED, VERY_IMPORTANT, POST_SHARED, DANGER, WELCOME, NEWS, IMPORTANT -> {
+            }
+        }
+        return SimpleNotification.builder()
+                .id(notificationEntity.getId())
+                .actorId(new RecipientId(notificationEntity.getActorId()))
+                .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                .message(notificationEntity.getContent())
+                .isPushed(notificationEntity.getIsPushed())
                 .build();
     }
 }

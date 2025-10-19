@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.repository;
 
+import com.zimaberlin.zimasocial.context.communication.notifications.Notification;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +19,5 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
     Optional<NotificationEntity> findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
     Optional<NotificationEntity> findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
     Optional<NotificationEntity> findByActorIdAndTargetIdAndTypeAndTargetCollection(Long actorId, Long targetId, NotificationType type, TargetCollection collection);
+    List<NotificationEntity> findAllByIsPushedFalse();
 }

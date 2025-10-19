@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -81,6 +82,7 @@ public class PostControllerBridge {
            PostCategory category,
           String slug
     ) throws NoSuchMethodException {
+        System.out.println("Start getPosts at %s".formatted(LocalDateTime.now()));
         Page<Post> postPage;
         if(category == PostCategory.followings){
             AuthorId authorId = authorRepository.getAuthenticatedAuthor().getId();
@@ -95,7 +97,6 @@ public class PostControllerBridge {
                         postPage.getNumber(),
                         postPage.getTotalElements(),
                         postPage.getTotalPages()));
-
         Method method = PostController.class.getMethod("getPosts",
                 Integer.class,
                 Integer.class,
@@ -111,7 +112,7 @@ public class PostControllerBridge {
             Link link = linkTo(method, page - 1, size, category, slug).withRel(LinkRelation.of("previous"));
             pagedModel.add(link);
         }
-
+        System.out.println("End getPosts at %s".formatted(LocalDateTime.now()));
         return pagedModel;
     }
 

@@ -3,6 +3,9 @@ package com.zimaberlin.zimasocial.context.social.author;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zimaberlin.zimasocial.context.social.authorrelation.*;
 import com.zimaberlin.zimasocial.context.social.image.ImageService;
+import com.zimaberlin.zimasocial.exception.BadRequestException;
+import com.zimaberlin.zimasocial.exception.UnauthorizedException;
+import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AuthorService {
@@ -31,6 +33,14 @@ public class AuthorService {
     public void requestToFollow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
         Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
+        if(followRelation.isPresent()){
+            throw new AuthorAlreadyFollowedException(followed.getSlug());
+        }
+        Optional<FollowRequest> followRequestOpt = followRequestCollection.findByFollowedIdAndFollowerId(followed.getId(), follower.getId());
+        if(followRequestOpt.isPresent()){
+            throw new BadRequestException("Follow request is already sent");
+        }
         FollowRequest followRequest = followed.requestToFollow(follower.getId(), UuidCreator.getTimeOrdered());
         followRequestCollection.save(followRequest);
     }
@@ -38,12 +48,16 @@ public class AuthorService {
     @Transactional
     public void follow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
-        Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        Author followed = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(slug).orElseThrow(()->new AuthorNotFoundException(slug));
+        if(followed.getIsPrivate()){
+            throw new UnauthorizedException("User can't be follow directly without a follow request");
+        }
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isPresent()){
             throw new AuthorAlreadyFollowedException(followed.getId());
         }
         followed.follow(follower);
+        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(followed, follower));
         authorRelationRepository.save(new FollowRelation(follower.getId(), followed.getId()));
         authorRepository.save(follower);
         authorRepository.save(followed);
@@ -91,7 +105,7 @@ public class AuthorService {
         Author blocked = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         Optional<BlockRelation> blockRelation = authorRelationRepository.findBlockRelationBetween(blocker.getId(), blocked.getId());
         if(blockRelation.isEmpty()){
-            throw new AuthorNotBlockedException(blocked.getId().getId());
+            throw new AuthorNotBlockedException(blocked.getSlug());
         }
         authorRelationRepository.delete(blockRelation.get());
     }
@@ -139,14 +153,31 @@ public class AuthorService {
         }
     }
 
-    public void acceptFollowRequest(UUID id) {
-        FollowRequest followRequest = followRequestCollection.findById(id).orElseThrow(FollowRequestNotFoundException::new);
+    @Transactional
+    public void acceptFollowRequest(String followerSlug) {
+        Author followed = authorRepository.getAuthenticatedAuthor();
+        Author follower = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(followerSlug).orElseThrow(()-> new AuthorNotFoundException(followerSlug));
+        FollowRequest followRequest = followRequestCollection.findByFollowedIdAndFollowerId(followed.getId(), follower.getId()).orElseThrow(FollowRequestNotFoundException::new);
         followRequest.accept();
-        followRequestCollection.save(followRequest);
+        Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
+        if(followRelation.isPresent()){
+            throw new AuthorAlreadyFollowedException(followed.getId());
+        }
+        followed.follow(follower);
+        authorRelationRepository.save(new FollowRelation(follower.getId(), followed.getId()));
+        authorRepository.saveAll(List.of(follower, followed));
+        followRequestCollection.delete(followRequest);
     }
 
-    public void deleteFollowRequest(UUID id) {
-        FollowRequest followRequest = followRequestCollection.findById(id).orElseThrow(FollowRequestNotFoundException::new);
+    @Transactional
+    public void deleteFollowRequest(String followedAuthorSlug, String followerAuthorSlug) {
+        Author follower = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(followerAuthorSlug).orElseThrow(()-> new AuthorNotFoundException(followedAuthorSlug));
+        Author followed = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(followedAuthorSlug).orElseThrow(()-> new AuthorNotFoundException(followedAuthorSlug));;
+        Author performer = authorRepository.getAuthenticatedAuthor();
+        if(!(performer.getSlug().equals(follower.getSlug()) || performer.getSlug().equals(followed.getSlug()))){
+            throw new UnauthorizedException();
+        }
+        FollowRequest followRequest = followRequestCollection.findByFollowedIdAndFollowerId(followed.getId(), follower.getId()).orElseThrow(FollowRequestNotFoundException::new);
         followRequestCollection.delete(followRequest);
     }
 }

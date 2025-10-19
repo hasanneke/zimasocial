@@ -12,7 +12,6 @@ import lombok.Setter;
 public class DetailedAuthorView extends AuthorView {
     private String email;
     public void mergeAuthorView(AuthorView authorView) {
-        setId(authorView.getId());
         setSlug(authorView.getSlug());
         setName(authorView.getName());
         setFamilyName(authorView.getFamilyName());

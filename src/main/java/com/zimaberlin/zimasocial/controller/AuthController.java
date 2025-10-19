@@ -6,10 +6,7 @@ import com.zimaberlin.zimasocial.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,9 +18,13 @@ public class AuthController {
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-
+    @PostMapping(path = "/apple-login")
+    ResponseEntity<TokenResponse> appleLogin(@RequestParam String token) throws Exception {
+        TokenResponse tokenResponse = authService.appleLogin(token);
+        return ResponseEntity.ok(tokenResponse);
+    }
     @GetMapping(path = "/google-login")
-    ResponseEntity<TokenResponse> googleLogin(@RequestParam String token) throws TokenVerifier.VerificationException {
+    ResponseEntity<TokenResponse> googleLogin(@RequestParam String token) throws Exception {
         TokenResponse tokenResponse = authService.googleLogin(token);
         return ResponseEntity.ok(tokenResponse);
     }
@@ -37,6 +38,16 @@ public class AuthController {
     @GetMapping(path = "/quick-login")
     ResponseEntity<TokenResponse> quickLogin() throws TokenVerifier.VerificationException {
         TokenResponse tokenResponse = authService.quickLogin();
+        return ResponseEntity.ok(tokenResponse);
+    }
+    @GetMapping(path = "/quick-login-test")
+    ResponseEntity<TokenResponse> quickLoginTest() throws TokenVerifier.VerificationException {
+        TokenResponse tokenResponse = authService.quickLoginNext();
+        return ResponseEntity.ok(tokenResponse);
+    }
+    @GetMapping(path = "/quick-login-test2")
+    ResponseEntity<TokenResponse> quickLoginTest2() throws TokenVerifier.VerificationException {
+        TokenResponse tokenResponse = authService.quickLoginPrevious();
         return ResponseEntity.ok(tokenResponse);
     }
 }

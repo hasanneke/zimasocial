@@ -1,4 +1,4 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
-public record AuthorFollowedEvent(Author author, Author follower) {
+public record AuthorFollowedEvent(Author followed, Author follower) {
 }

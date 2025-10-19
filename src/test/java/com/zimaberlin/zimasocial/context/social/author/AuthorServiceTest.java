@@ -1,9 +1,8 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestCollection;
+import com.zimaberlin.zimasocial.TestUtil;
+import com.zimaberlin.zimasocial.context.social.authorrelation.*;
 import com.zimaberlin.zimasocial.context.social.image.ImageService;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +36,8 @@ public class AuthorServiceTest {
     private ImageService imageService;
     @Mock
     private FollowRequestCollection followRequestCollection;
+    @Mock
+    private AuthorRelationCollection authorRelationCollection;
     @InjectMocks
     private AuthorService authorService;
 
@@ -50,7 +51,6 @@ public class AuthorServiceTest {
     void requestToFollowAuthor_WhenAuthorFoundAndFollowRequestSuccess_ThenSaveFollowRequestToCollection() {
         Author followerAuthor = new Author(new AuthorId(0L), "", "", LocalDateTime.now());
         Author followedAuthor = new Author(new AuthorId(1L), "", "", LocalDateTime.now());
-
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(followerAuthor);
         when(authorRepository.findBySlugAndIsDisabledFalse(any(String.class))).thenReturn(Optional.of(followedAuthor));
 
@@ -70,19 +70,24 @@ public class AuthorServiceTest {
 
     @Test
     void testApproveFollowRequest() {
-        UUID id = UuidCreator.getTimeOrdered();
-        FollowRequest followRequest = new FollowRequest(id, new AuthorId(0L), new AuthorId(1L), false, LocalDateTime.now(), null);
-        when(followRequestCollection.findById(id)).thenReturn(Optional.of(followRequest));
-        authorService.acceptFollowRequest(id);
-        verify(followRequestCollection).save(followRequest);
+        String followerSlug = "followerSlug";
+        when(authorRepository.getAuthenticatedAuthor()).thenReturn(TestUtil.mockAuthor(1L));
+        when(authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(followerSlug)).thenReturn(Optional.of(TestUtil.mockAuthor(0L)));
+        FollowRequest followRequest = new FollowRequest(UUID.randomUUID(), new AuthorId(1L), new AuthorId(0L), false, LocalDateTime.now(), null);
+        when(followRequestCollection.findByFollowedIdAndFollowerId(any(AuthorId.class),any(AuthorId.class))).thenReturn(Optional.of(followRequest));
+        authorService.acceptFollowRequest(followerSlug);
+        verify(followRequestCollection).delete(followRequest);
     }
 
     @Test
     void testDeclineFollowRequest() {
+        when(authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked("2")).thenReturn(Optional.of(TestUtil.mockAuthor(1L, "1")));
+        when(authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked("1")).thenReturn(Optional.of(TestUtil.mockAuthor(0L, "2")));
+        when(authorRepository.getAuthenticatedAuthor()).thenReturn(TestUtil.mockAuthor(1L, "1"));
         UUID id = UuidCreator.getTimeOrdered();
         FollowRequest followRequest = new FollowRequest(id, new AuthorId(0L), new AuthorId(1L), false, LocalDateTime.now(), null);
-        when(followRequestCollection.findById(id)).thenReturn(Optional.of(followRequest));
-        authorService.deleteFollowRequest(id);
+        when(followRequestCollection.findByFollowedIdAndFollowerId(any(), any())).thenReturn(Optional.of(followRequest));
+        authorService.deleteFollowRequest("1", "2");
         verify(followRequestCollection).delete(followRequest);
     }
 }

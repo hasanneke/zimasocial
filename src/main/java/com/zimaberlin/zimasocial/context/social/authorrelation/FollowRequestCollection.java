@@ -10,8 +10,9 @@ public interface FollowRequestCollection {
     void save(FollowRequest followRequest);
     void delete(FollowRequest followRequest);
     Optional<FollowRequest> findById(UUID id);
-    List<FollowRequest> findAllByFollowedAuthorId(AuthorId id);
+    List<FollowRequest> findAllByFollowedAuthorIdAndUpdatedAtIsNull(AuthorId id);
     Integer countByFollowedAuthorId(AuthorId id);
     Optional<FollowRequest> findFirstByFollowedAuthorIdOrderByCreatedAtDesc(AuthorId id);
+    Optional<FollowRequest> findByFollowedIdAndFollowerId(AuthorId followerId, AuthorId followedId);
     Integer countByFollowedAuthorIdAndIsApprovedFalse(AuthorId id);
 }

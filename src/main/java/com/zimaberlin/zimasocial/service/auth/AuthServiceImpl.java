@@ -1,20 +1,20 @@
 package com.zimaberlin.zimasocial.service.auth;
 
-import com.google.api.client.json.webtoken.JsonWebSignature;
 import com.google.auth.oauth2.TokenVerifier;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.entity.AccountId;
+import com.zimaberlin.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
+import com.zimaberlin.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
 import com.zimaberlin.zimasocial.context.account.service.AccountService;
-import com.zimaberlin.zimasocial.entity.RefreshTokenEntity;
-import com.zimaberlin.zimasocial.repository.RefreshTokenRepository;
-import com.zimaberlin.zimasocial.utility.TokenResponse;
 import com.zimaberlin.zimasocial.entity.UserRole;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.repository.UserJpaRepository;
+import com.zimaberlin.zimasocial.service.auth.impl.AppleTokenVerifier;
+import com.zimaberlin.zimasocial.service.auth.impl.GoogleTokenVerifier;
 import com.zimaberlin.zimasocial.utility.JWTService;
+import com.zimaberlin.zimasocial.utility.TokenResponse;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +31,47 @@ public class AuthServiceImpl implements AuthService {
     private final UserJpaRepository userRepository;
     private final JWTService jwtService;
     private final Random random = new Random();
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenJpaRepository refreshTokenRepository;
 
     @Override
-    public TokenResponse googleLogin(String token) throws TokenVerifier.VerificationException {
-        TokenVerifier tokenVerifier = TokenVerifier.newBuilder().build();
-        JsonWebSignature jsonWebSignature = tokenVerifier.verify(token);
-        String email = (String) jsonWebSignature.getPayload().get("email");
-        String name = (String) jsonWebSignature.getPayload().get("name");
-        String familyName = (String) jsonWebSignature.getPayload().get("family_name");
+    public TokenResponse appleLogin(String token) throws Exception {
+        OAuthTokenVerifier oAuthTokenVerifier = new AppleTokenVerifier();
+        OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "apple");
+        if(account.isPresent()){
+            if(account.get().getIsDisabled()){
+                accountService.activateAccount(account.get());
+            }
+            return createToken(account.get());
+        }
+        String slug = generateUniqueSlug(oAuthTokenResult.getName());
+        Account newAccount = new Account(new AccountId(accountRepository.nextId()), oAuthTokenResult.getEmail(), oAuthTokenResult.getName(), oAuthTokenResult.getSurname(), "apple", Set.of(UserRole.regular), slug);
+        accountService.createAccount(newAccount);
+        return createToken(newAccount);
+    }
+
+    @Override
+    public TokenResponse googleLogin(String token) throws Exception {
+        OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
+        OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
+        if(account.isPresent()){
+            if(account.get().getIsDisabled()){
+                accountService.activateAccount(account.get());
+            }
+            return createToken(account.get());
+        }
+        String slug = generateUniqueSlug(oAuthTokenResult.getName());
+        Account newAccount = new Account(new AccountId(accountRepository.nextId()), oAuthTokenResult.getEmail(), oAuthTokenResult.getName(), oAuthTokenResult.getSurname(), "google", Set.of(UserRole.regular), slug);
+        accountService.createAccount(newAccount);
+        return createToken(newAccount);
+    }
+
+    @Override
+    public TokenResponse quickLogin() throws TokenVerifier.VerificationException {
+        String email = String.format("testmail%s@example.com", random.nextInt());
+        String name = "acc%s".formatted(UUID.randomUUID().toString().substring(0, 8));
+        String familyName = String.format("accountsur%s", random.nextInt());
         Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "google");
         if(account.isPresent()){
             if(account.get().getIsDisabled()){
@@ -54,12 +86,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse quickLogin() throws TokenVerifier.VerificationException {
-        String email = String.format("testmail%s@example.com", random.nextInt());
-        String name = "acc%s".formatted(UUID.randomUUID().toString().substring(0, 8));
-        String familyName = String.format("accountsur%s", random.nextInt());
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "google");
-
+    public TokenResponse quickLoginNext() throws TokenVerifier.VerificationException {
+        String email = "hasansabbah0@example.com";
+        String name = "Hasan Sabbah";
+        String familyName = "Sabbah";
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "test");
         if(account.isPresent()){
             if(account.get().getIsDisabled()){
                 accountService.activateAccount(account.get());
@@ -67,7 +98,24 @@ public class AuthServiceImpl implements AuthService {
             return createToken(account.get());
         }
         String slug = generateUniqueSlug(name);
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "google", Set.of(UserRole.regular), slug);
+        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "test", Set.of(UserRole.regular), slug);
+        accountService.createAccount(newAccount);
+        return createToken(newAccount);
+    }
+    @Override
+    public TokenResponse quickLoginPrevious() throws TokenVerifier.VerificationException {
+        String email = "zimablue0@example.com";
+        String name = "Zima Blue";
+        String familyName = "Blue";
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "test");
+        if(account.isPresent()){
+            if(account.get().getIsDisabled()){
+                accountService.activateAccount(account.get());
+            }
+            return createToken(account.get());
+        }
+        String slug = generateUniqueSlug(name);
+        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "test", Set.of(UserRole.regular), slug);
         accountService.createAccount(newAccount);
         return createToken(newAccount);
     }

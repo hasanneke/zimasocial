@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ResponseError.
                 builder().
                 timeStamp(System.currentTimeMillis()).
-                errorCode("conflict").
+                errorCode(ex.getCode()).
                 message(ex.getMessage()).build(),
                 HttpStatus.CONFLICT);
     }

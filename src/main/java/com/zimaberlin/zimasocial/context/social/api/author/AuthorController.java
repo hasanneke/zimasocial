@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.apache.coyote.BadRequestException;
+import org.checkerframework.checker.units.qual.N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
@@ -148,32 +149,31 @@ public class AuthorController {
                                                      @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
         return new  HttpEntity<>(authorControllerBridge.searchAuthors(query, page, size));
     }
-
-    @PostMapping("/{slug}/follow-requests")
-    public ResponseEntity<Void> getAllFollowRequests(@PathVariable(name = "slug") String slug) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @GetMapping("/{slug}/follow-requests")
-    public ResponseEntity<List<FollowRequestDTO>> requestToFollow() {
+    public ResponseEntity<List<FollowRequestDTO>> getAllFollowRequests() {
         return ResponseEntity.ok(authorControllerBridge.getAllFollowRequests());
     }
 
-    @PostMapping("/{slug}/follow-requests/{id}/accept")
-    public ResponseEntity<Void> acceptFollowRequest(@PathVariable(name = "id") String requestId) {
-        authorService.acceptFollowRequest(UUID.fromString(requestId));
+    @PostMapping("/{slug}/follow-requests")
+    public ResponseEntity<Void> requestToFollow(@PathVariable(name = "slug") String slug) {
+        authorService.requestToFollow(slug);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{slug}/follow-requests/{id}")
-    public ResponseEntity<Void> deleteFollowRequest(@PathVariable(name = "id") String requestId) {
-        authorService.deleteFollowRequest(UUID.fromString(requestId));
+    @PatchMapping("/{slug}/follow-requests/{followerSlug}/accept")
+    public ResponseEntity<Void> acceptFollowRequest(@PathVariable(name = "followerSlug") String followerSlug) {
+        authorControllerBridge.acceptFollowRequest(followerSlug);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{followedSlug}/follow-requests/{followerSlug}")
+    public ResponseEntity<Void> deleteFollowRequest(@PathVariable(name = "followedSlug") String followedAuthorSlug, @PathVariable(name = "followerSlug") String followerAuthorSlug) {
+        authorService.deleteFollowRequest(followedAuthorSlug, followerAuthorSlug);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{slug}/follow-requests-info")
-    public ResponseEntity<FollowRequestsInfo> getFollowRequestInfo() {
-        return ResponseEntity.ok(authorControllerBridge.getFollowRequestInfo());
+    public ResponseEntity<FollowRequestsInfo> getFollowRequestInfo(@PathVariable(name = "slug") String followedAuthorSlug) {
+        return ResponseEntity.ok(authorControllerBridge.getFollowRequestInfo(followedAuthorSlug));
     }
 }

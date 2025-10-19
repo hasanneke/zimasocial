@@ -4,6 +4,8 @@ public enum NotificationType {
     POST_LIKED,
     COMMENT_LIKED,
     USER_FOLLOWED_YOU,
+    USER_SENT_FOLLOW_REQUEST,
+    USER_FOLLOW_REQUEST_ACCEPTED,
     POST_COMMENTED,
     COMMENT_REPLIED,
     POST_DELETED,
@@ -12,5 +14,6 @@ public enum NotificationType {
     NEWS,
     IMPORTANT,
     VERY_IMPORTANT,
-    DANGER
+    DANGER,
+    NEW_MESSAGE
 }

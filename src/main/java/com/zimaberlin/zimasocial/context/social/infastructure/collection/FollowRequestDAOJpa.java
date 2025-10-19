@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRequestDAOJpa extends JpaRepository<FollowRequestEntity, UUID> {
-    List<FollowRequestEntity> findByFollowedId(Long id);
+    List<FollowRequestEntity> findByFollowedIdAndUpdatedAtIsNull(Long id);
     Optional<FollowRequestEntity> findFirstByFollowedIdOrderByCreatedAtDesc(Long id);
+    Optional<FollowRequestEntity> findFirstByFollowedIdAndFollowerId(Long followerId, Long followedId);
     Integer countByFollowedIdAndIsAcceptedFalse(Long id);
 }

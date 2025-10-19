@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.context.social.api.author;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.AuthorService;
 import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestCollection;
@@ -22,15 +23,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Component
 public class AuthorControllerBridge {
     private final AuthorRepository authorRepository;
+    private final AuthorService authorService;
     private final AuthorRelationCollection authorRelationRepository;
     private final AuthorAuthorViewAdapter authorAuthorViewMapper;
     private final FollowRequestCollection followRequestCollection;
+    private final FollowRequestFollowRequestDTOAdapter followRequestFollowRequestDTOAdapter;
     @Autowired
-    public AuthorControllerBridge(AuthorRepository authorRepository, AuthorRelationCollection authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper, FollowRequestCollection followRequestCollection) {
+    public AuthorControllerBridge(AuthorRepository authorRepository, AuthorService authorService, AuthorRelationCollection authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper, FollowRequestCollection followRequestCollection, FollowRequestFollowRequestDTOAdapter followRequestFollowRequestDTOAdapter) {
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;
         this.authorAuthorViewMapper = authorAuthorViewMapper;
         this.followRequestCollection = followRequestCollection;
+        this.followRequestFollowRequestDTOAdapter = followRequestFollowRequestDTOAdapter;
+        this.authorService = authorService;
     }
 
     public DetailedAuthorView getMe() {
@@ -72,7 +77,7 @@ public class AuthorControllerBridge {
 
     PagedModel<AuthorView> getFollowings(String slug, int page, int size) throws NoSuchMethodException {
         Page<Author> followersPage = authorRelationRepository.findFollowings(slug, page, size);
-        List<AuthorView> authorViewList = followersPage.get().map(e-> authorAuthorViewMapper.authorViewFromAuthor(e)).toList();
+        List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthor).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
                 new PagedModel.PageMetadata(followersPage.getSize(),
@@ -150,18 +155,11 @@ public class AuthorControllerBridge {
 
     List<FollowRequestDTO> getAllFollowRequests() {
         Author author = authorRepository.getAuthenticatedAuthor();
-        List<FollowRequest> followRequests = followRequestCollection.findAllByFollowedAuthorId(author.getId());
-        List<FollowRequestDTO> followRequestDTOS = followRequests.stream().map(e->{
-            Author follower = authorRepository.findById(e.getFollowerAuthorId()).orElse(null);
-            if(follower != null){
-                return new FollowRequestDTO(e, authorAuthorViewMapper.authorViewFromAuthor(follower));
-            }
-            return null;
-        }).toList();
-        return followRequestDTOS.stream().filter(e->e.getFollowerAuthor() != null).toList();
+        List<FollowRequest> followRequests = followRequestCollection.findAllByFollowedAuthorIdAndUpdatedAtIsNull(author.getId());
+        return followRequests.stream().map(followRequestFollowRequestDTOAdapter::followRequestDTOFromFollowRequest).toList();
     }
 
-    FollowRequestsInfo getFollowRequestInfo() {
+    FollowRequestsInfo getFollowRequestInfo(String followedAuthorSlug) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Optional<FollowRequest> latestFollowRequest = followRequestCollection.findFirstByFollowedAuthorIdOrderByCreatedAtDesc(author.getId());
         Integer waitingFollowRequestsCount = followRequestCollection.countByFollowedAuthorId(author.getId());
@@ -172,6 +170,10 @@ public class AuthorControllerBridge {
             }
         }
         return new FollowRequestsInfo(waitingFollowRequestsCount);
+    }
+
+    void acceptFollowRequest(String followerSlug) {
+        authorService.acceptFollowRequest(followerSlug);
     }
 }
 

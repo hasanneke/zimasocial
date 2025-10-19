@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,7 +42,7 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
 
     @Override
     public List<TodaysPost> selectTodaysPosts() {
-        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDate.now().minusDays(1).atStartOfDay(), LocalDate.now().atStartOfDay());
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.movie))

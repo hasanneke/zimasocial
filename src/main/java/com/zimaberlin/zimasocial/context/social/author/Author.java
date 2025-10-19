@@ -9,7 +9,6 @@ import org.springframework.util.Assert;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -91,7 +90,6 @@ public class Author {
         }
         incrementFollowerCount();
         follower.incrementFollowingCount();
-        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
     }
 
     public void unfollow(Author follower){

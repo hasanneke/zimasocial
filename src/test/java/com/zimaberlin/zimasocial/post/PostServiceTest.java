@@ -6,6 +6,8 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
+import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
@@ -70,5 +72,28 @@ public class PostServiceTest {
         when(bookSearcher.getBook(searchedBookId)).thenReturn(Optional.empty());
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(authenticatedAuthor);
         Assertions.assertThrows(BookNotFoundException.class, () -> postService.createBookPost("", searchedBookId));
+    }
+    @Test
+    void testCreateMoviePost_WhenMovieExists_CreatePostWithMovie() {
+        Author authenticatedAuthor = new Author(new AuthorId(0L), "", "", LocalDateTime.now());
+        Integer movieId = 123;
+        MovieMediaType movieType = MovieMediaType.movie;
+        String language = "en";
+        MovieMedia searchMovieMediaItem = MovieMedia.builder().build();
+
+        when(authorRepository.getAuthenticatedAuthor()).thenReturn(authenticatedAuthor);
+        when(movieSearcher.getMovie(movieId, movieType, language)).thenReturn(searchMovieMediaItem);
+        when(postRepository.nextSequence()).thenReturn(1L);
+
+        postService.createMoviePost("Test content", movieId, movieType, language);
+
+        ArgumentCaptor<Post> argumentCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(argumentCaptor.capture());
+        Post savedPost = argumentCaptor.getValue();
+
+        Assertions.assertNotNull(savedPost.getMovie());
+        Assertions.assertEquals(PostType.movie, savedPost.getType());
+        Assertions.assertEquals("Test content", savedPost.getContent());
+        Assertions.assertEquals(authenticatedAuthor.getId(), savedPost.getAuthorId());
     }
 }

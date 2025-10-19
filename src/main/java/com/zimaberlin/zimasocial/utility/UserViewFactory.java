@@ -21,13 +21,15 @@ public class UserViewFactory {
     }
 
     public AuthorView populated(UserEntity entity)  {
-        Optional<UserRelationEntity> followRelation =
+        Optional<UserRelationEntity> followingRelation =
                 userRelationJpaRepository
                 .findByActorIdAndReceiverIdAndRelation(CurrentUser.getCurrentUserProfile().getId(), entity.getId(), Relation.followed);
+        Optional<UserRelationEntity> followMeRelation =
+                userRelationJpaRepository
+                        .findByActorIdAndReceiverIdAndRelation(entity.getId(), CurrentUser.getCurrentUserProfile().getId(), Relation.followed);
         Optional<UserRelationEntity> blockRelation =
                 userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(CurrentUser.getCurrentUserProfile().getId(), entity.getId(), Relation.blocked);
         AuthorView authorView = new AuthorView();
-        authorView.setId(entity.getId());
         authorView.setSlug(entity.getSlug());
         authorView.setName(entity.getName());
         authorView.setFamilyName(entity.getFamilyName());
@@ -35,7 +37,8 @@ public class UserViewFactory {
         authorView.setBio(entity.getBio());
         authorView.setFollowerCount(entity.getFollowersCount());
         authorView.setFollowingCount(entity.getFollowingCount());
-        authorView.setFollowed(followRelation.isPresent());
+        authorView.setFollowed(followingRelation.isPresent());
+        authorView.setFollowingMe(followMeRelation.isPresent());
         authorView.setIsPrivate(entity.isPrivate());
         authorView.setIsBlocked(blockRelation.isPresent());
         authorView.addLinks();

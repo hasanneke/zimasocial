@@ -1,5 +1,7 @@
 package com.zimaberlin.zimasocial.context.communication.controller;
 
+import com.zimaberlin.zimasocial.context.communication.NotificationService;
+import com.zimaberlin.zimasocial.context.communication.infastructure.DeviceTokenPayload;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +12,9 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
 
@@ -23,12 +24,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RequestMapping(path = "/api/v2/notifications")
 public class NotificationControllerBeta {
     private final NotificationQuery notificationReadRepository;
+    private final NotificationService notificationService;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public NotificationControllerBeta(NotificationQuery notificationReadRepository, AuthorRepository authorRepository) {
+    public NotificationControllerBeta(NotificationQuery notificationReadRepository, NotificationService notificationService, AuthorRepository authorRepository) {
         this.notificationReadRepository = notificationReadRepository;
+        this.notificationService = notificationService;
         this.authorRepository = authorRepository;
+    }
+
+    @PostMapping("/device-tokens")
+    public ResponseEntity<Void> sendDeviceToken(@RequestBody DeviceTokenPayload deviceToken) {
+        notificationService.saveDeviceToken(deviceToken.getToken());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping

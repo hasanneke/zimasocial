@@ -23,4 +23,10 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
 
     @Query(value = "SELECT nextval('user_sequence')")
     Long nextId();
+
+    @Query("SELECT user FROM UserEntity user LEFT JOIN FETCH user.deviceTokens WHERE user.id = :id")
+    UserEntity findByIdWithDeviceTokens(Long id);
+
+    @Query("SELECT user FROM UserEntity user LEFT JOIN FETCH user.deviceTokens WHERE user.id = :id")
+    Optional<UserEntity> findByIdWithDeviceTokensOpt(Long id);
 }

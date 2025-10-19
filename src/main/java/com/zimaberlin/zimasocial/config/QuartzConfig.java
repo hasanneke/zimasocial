@@ -1,7 +1,9 @@
 package com.zimaberlin.zimasocial.config;
 
+import com.zimaberlin.zimasocial.batch.pushnotifications.PushNotificationsJob;
 import com.zimaberlin.zimasocial.batch.todaysposts.TodaysPostJob;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -11,15 +13,21 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 @Configuration
 public class QuartzConfig {
     @Bean
-    public Scheduler scheduler(Trigger trigger, JobDetail job, SchedulerFactoryBean factory)
+    public Scheduler scheduler(@Qualifier("todaysPostTrigger") Trigger todaysPostTrigger,
+                               @Qualifier("todaysPostJobDetail") JobDetail todaysPostJobDetail,
+                               @Qualifier("pushNotificationsTrigger") Trigger pushNotificationsTrigger,
+                               @Qualifier("pushNotificationsJobDetail") JobDetail pushNotificationsJobDetail,
+                               SchedulerFactoryBean factory)
             throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
         scheduler.deleteJob(JobKey.jobKey("Qrtz_Todays_Posts_Job_Detail"));
-        scheduler.scheduleJob(job, trigger);
+        scheduler.deleteJob(JobKey.jobKey("Qrtz_Push_Notifications_JobDetail"));
+        scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
+        scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
         scheduler.start();
         return scheduler;
     }
-    @Bean
+    @Bean(name = "todaysPostJobDetail")
     public JobDetail todaysPostJobDetail() {
         return JobBuilder.newJob().ofType(TodaysPostJob.class)
                 .storeDurably()
@@ -27,14 +35,31 @@ public class QuartzConfig {
                 .withDescription("Invoke TodaysPostsJob")
                 .build();
     }
-    @Bean
-    public Trigger trigger(JobDetail jobDetail){
+    @Bean(name = "todaysPostTrigger")
+    public Trigger todaysPostTrigger(@Qualifier("todaysPostJobDetail") JobDetail jobDetail){
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Todays_Post_Trigger")
                 .withDescription("Quartz Todays Posts Trigger")
                 .withSchedule(cronSchedule("0 5 0 * * ?")
                         .withMisfireHandlingInstructionFireAndProceed())
+                .build();
+    }
+    @Bean(name = "pushNotificationsJobDetail")
+    public JobDetail pushNotificationsJobDetail() {
+        return JobBuilder.newJob().ofType(PushNotificationsJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Push_Notifications_JobDetail")
+                .withDescription("Invoke TodaysPostsJob")
+                .build();
+    }
+    @Bean(name = "pushNotificationsTrigger")
+    public Trigger pushNotificationsTrigger(@Qualifier("pushNotificationsJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Push_Notifications_Trigger")
+                .withDescription("Quartz Triggers push notifications for mobile clients")
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2))
                 .build();
     }
 }

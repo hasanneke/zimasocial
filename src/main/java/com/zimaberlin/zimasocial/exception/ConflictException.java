@@ -1,5 +1,8 @@
 package com.zimaberlin.zimasocial.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ConflictException extends RuntimeException{
     private String code;
     public ConflictException(String code,  String message) {

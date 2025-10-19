@@ -60,6 +60,7 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public Page<Post> findAll(Pageable page, String slug, PostCategory category) {
+        System.out.println("Start findAll at %s".formatted(LocalDateTime.now()));
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         Specification<PostEntity> specification = Specification.where(null);
         if(slug != null){
@@ -85,6 +86,7 @@ public class PostDBRepository implements PostRepository {
         specification = specification.and(PostSpecification.isVisible());
         specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
+        System.out.println("End findAll at %s".formatted(LocalDateTime.now()));
         return postEntityPage.map(postDBAdapter::convertPostEntityToPost);
     }
 

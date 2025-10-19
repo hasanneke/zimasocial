@@ -15,9 +15,11 @@ import java.util.UUID;
 public class MediaJpa {
     @Id
     private UUID id;
-    @OneToOne
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
     @Column(name = "post_id", insertable = false, updatable = false)
     Long postId;
     @Column(name = "comment_id")

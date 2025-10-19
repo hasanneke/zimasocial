@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.entity;
+package com.zimaberlin.zimasocial.context.account.infastructure.entity;
 
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
