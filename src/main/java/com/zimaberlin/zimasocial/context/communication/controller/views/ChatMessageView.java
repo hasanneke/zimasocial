@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.context.communication.controller.views;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessage;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
@@ -11,7 +11,7 @@ public class ChatMessageView {
     private final UUID id;
     private final String message;
     private final Long senderId;
-    private final LocalDateTime sentAt;
+    private final OffsetDateTime sentAt;
 
     public ChatMessageView(ChatMessage chatMessage) {
         this.id = chatMessage.id().value();

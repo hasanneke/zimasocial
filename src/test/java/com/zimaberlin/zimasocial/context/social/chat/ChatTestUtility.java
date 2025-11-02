@@ -8,6 +8,7 @@ import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -47,6 +48,6 @@ public class ChatTestUtility {
                 new ChatRoomId(UUID.randomUUID()),
                 new AuthorId(senderId),
                 message,
-                LocalDateTime.now());
+                OffsetDateTime.now());
     }
 }

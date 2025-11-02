@@ -1,10 +1,11 @@
 package com.zimaberlin.zimasocial.views.notification;
+
+import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
-import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class NotificationView {
     private String content;
     private String url;
     private NotificationType type;
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     private TargetCollection targetCollection;
     private Long targetId;
     private Long postId;

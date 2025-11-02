@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,8 +74,8 @@ public class JWTService {
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-        LocalDateTime tokenExpirationDate = LocalDateTime.now().plusHours(1);
-        LocalDateTime refreshTokenExpirationDate = LocalDateTime.now().plusDays(1);
+        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusHours(1);
+        OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusDays(1);
         String token = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
@@ -99,7 +100,7 @@ public class JWTService {
 
         TokenResponse refreshToken = TokenResponse.builder()
                 .token(hashedRefreshToken)
-                .expireDate(LocalDateTime.now().plusDays(1))
+                .expireDate(OffsetDateTime.now().plusDays(1))
                 .build();
 
         refreshTokenRepository.save(tokenEntity);

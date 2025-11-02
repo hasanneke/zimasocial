@@ -7,7 +7,7 @@ import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 public class ChatRoom {
@@ -38,7 +38,7 @@ public class ChatRoom {
         if(!(sender.equals(participant1) || sender.equals(participant2))){
             throw new AuthorIsNotInRoom();
         }
-        ChatMessage chatMessage = new ChatMessage(chatMessageId, id, sender.getId(), message, LocalDateTime.now());
+        ChatMessage chatMessage = new ChatMessage(chatMessageId, id, sender.getId(), message, OffsetDateTime.now());
         this.lastMessage = chatMessage;
         StaticEventPublisher.publishEvent(new ChatMessageSentEvent(sender, receiver, chatMessage));
         return chatMessage;

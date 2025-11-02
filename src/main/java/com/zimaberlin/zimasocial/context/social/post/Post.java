@@ -1,4 +1,5 @@
 package com.zimaberlin.zimasocial.context.social.post;
+
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
@@ -9,7 +10,7 @@ import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Getter
@@ -19,8 +20,8 @@ public class Post {
     private PostType type;
     private int likeCount;
     private int commentCount;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private final AuthorId authorId;
     private MovieMedia movie;
     private BookMedia book;
@@ -29,7 +30,7 @@ public class Post {
     private String bookId;
     private Boolean isVisible;
 
-    public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId) {
+    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
         Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
@@ -43,7 +44,7 @@ public class Post {
         this.authorId = authorId;
         this.isVisible = true;
     }
-    public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId, MovieMedia movie) {
+    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, MovieMedia movie) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
         Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
@@ -59,7 +60,7 @@ public class Post {
         this.isVisible = true;
     }
 
-    public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId, BookMedia book) {
+    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, BookMedia book) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
         Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
@@ -76,7 +77,7 @@ public class Post {
         this.isVisible = true;
     }
 
-    public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId, MusicMedia music) {
+    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, MusicMedia music) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
         Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
@@ -97,7 +98,7 @@ public class Post {
         this.type = type;
         this.likeCount = 0;
         this.commentCount = 0;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
         this.isVisible = true;
     }
@@ -107,7 +108,7 @@ public class Post {
         this.type = type;
         this.likeCount = 0;
         this.commentCount = 0;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
         this.isVisible = true;
     }
@@ -117,7 +118,7 @@ public class Post {
         this.type = PostType.book;
         this.likeCount = 0;
         this.commentCount = 0;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
         this.book = book;
         this.bookId = book.getResourceId();
@@ -129,7 +130,7 @@ public class Post {
         this.type = PostType.movie;
         this.likeCount = 0;
         this.commentCount = 0;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
         this.movie = movie;
         this.isVisible = true;
@@ -141,7 +142,7 @@ public class Post {
         this.type = PostType.music;
         this.likeCount = 0;
         this.commentCount = 0;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
         this.music = music;
         this.musicId = music.getResourceId();
@@ -162,7 +163,7 @@ public class Post {
     }
     public void unliked() {
         likeCount = likeCount - 1;
-        updatedAt = LocalDateTime.now();
+        updatedAt = OffsetDateTime.now();
     }
     public void setMovie(MovieMedia movie) {
         this.movie = movie;

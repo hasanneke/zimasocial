@@ -2,15 +2,18 @@ package com.zimaberlin.zimasocial.views.post;
 
 import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.context.social.api.post.PostController;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.entity.PostType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,8 +28,8 @@ public class PostView extends RepresentationModel<PostView> {
     private int commentCount = 0;
     private boolean isLiked = false;
     private AuthorView user;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private Boolean isReported;
     private Boolean isVisible;
     private MovieMedia movie;

@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Table(name = "chat_message")
@@ -37,7 +38,7 @@ public class ChatMessageJpaEntity {
     private Long senderId;
     @Column(name = "created_at")
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     public ChatMessage toDomain() {
         return new ChatMessage(new ChatMessageId(id), new ChatRoomId(chatRoomId), new AuthorId(senderId), content, createdAt);

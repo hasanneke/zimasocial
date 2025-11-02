@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @SuperBuilder
 @Getter
@@ -15,7 +15,7 @@ public sealed class Notification permits AuthorFollowRequestAcceptedNotification
     RecipientId recipientId;
     RecipientId actorId;
     String message;
-    LocalDateTime createdAt;
+    OffsetDateTime createdAt;
     boolean isPushed;
     public void push(){
         this.isPushed = true;
