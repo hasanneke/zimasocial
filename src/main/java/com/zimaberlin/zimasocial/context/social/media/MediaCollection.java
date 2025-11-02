@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.media;
 
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 
 import java.util.Optional;
 import java.util.UUID;

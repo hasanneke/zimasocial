@@ -1,15 +1,22 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
+import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.entity.media.MediaJpa;
+import com.zimaberlin.zimasocial.entity.media.MovieMediaJpa;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.context.social.post.Post;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -97,8 +104,55 @@ public class PostEntity {
         this.type = post.getType();
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
-        this.userId = post.getAuthorId().getId();
+        this.userId = post.getAuthorId().getValue();
         this.isVisible = post.getIsVisible();
+    }
+
+    public Post convertToPostDomain() {
+        switch (this.getType()){
+            case PostType.any -> {
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()));
+            }
+            case PostType.movie -> {
+                MovieMedia movieDomain = null;
+                if(this.getMedia() != null && this.getMedia().getMovie() != null){
+                    final MovieMediaJpa movie = this.getMedia().getMovie();
+                    movieDomain = MovieMedia
+                            .builder()
+                            .id(this.getMedia().getId())
+                            .description(movie.getDescription())
+                            .originalLanguage(movie.getOriginalLanguage())
+                            .posterUrl(movie.getPosterUrl())
+                            .summary(movie.getSummary())
+                            .releaseDate(movie.getReleaseDate())
+                            .voteAverage(movie.getVoteAverage())
+                            .voteCount(movie.getVoteCount())
+                            .imdbScore(movie.getImdbScore())
+                            .name(movie.getName())
+                            .movieGenres(movie.getMovieGenres())
+                            .movieProvider(movie.getMovieProvider())
+                            .build();
+                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain);
+                }
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain);
+            }
+            case PostType.book ->  {
+                BookMedia bookMedia = null;
+                if(this.getMedia() != null && this.getMedia().getBook() != null){
+                    bookMedia = this.getMedia().getBook().toBookMedia(this.getMedia().getId());
+                }
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), bookMedia);
+            }
+            case PostType.music -> {
+                MusicMedia musicMedia;
+                if(this.getMedia() != null && this.getMedia().getSong() != null){
+                    musicMedia = this.getMedia().getSong().toMusicMedia(this.getMedia().getId());
+                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), musicMedia);
+                }
+            }
+            default -> {}
+        }
+        return null;
     }
 }
 

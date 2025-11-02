@@ -36,6 +36,7 @@ public class AuthorAuthorViewAdapter {
         Optional<FollowRequest> followRequestSent =
                 followRequestCollection.findByFollowedIdAndFollowerId(author.getId(), authenticatedUser.getId());
         AuthorView authorView = new AuthorView();
+        authorView.setId(author.getId().getValue());
         authorView.setSlug(author.getSlug());
         authorView.setName(author.getName());
         authorView.setFamilyName(author.getFamilyName());

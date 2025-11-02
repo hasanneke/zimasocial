@@ -35,13 +35,13 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
 
     @Override
     public Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId) {
-        Optional<UserRelationEntity> followRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(followerId.getId(), followedId.getId(), Relation.followed);
+        Optional<UserRelationEntity> followRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(followerId.getValue(), followedId.getValue(), Relation.followed);
         return followRelation.map(userRelationEntity -> new FollowRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
     }
 
     @Override
     public Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId) {
-        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId.getId(), blockedId.getId(), Relation.blocked);
+        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId.getValue(), blockedId.getValue(), Relation.blocked);
         return blockRelation.map(userRelationEntity -> new BlockRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
 
     }
@@ -58,7 +58,7 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
         Page<UserRelationEntity> followedRelations = userRelationJpaRepository.findByReceiverIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
         List<UserEntity> followers = followedRelations.map(e->
              userRepository.findById(e.getActorId()).orElseThrow(UserNotFoundException::new)).stream().toList();
-        return new PageImpl<>(followers.stream().map(authorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size),followedRelations.getTotalElements());
+        return new PageImpl<>(followers.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size),followedRelations.getTotalElements());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
         Page<UserRelationEntity> followingRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
         List<UserEntity> followings = followingRelations.map(e->
                 userRepository.findById(e.getReceiverId()).orElseThrow(UserNotFoundException::new)).stream().toList();
-        return new PageImpl<>(followings.stream().map(authorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
+        return new PageImpl<>(followings.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
     }
 
     @Override
@@ -76,15 +76,15 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
         Page<UserRelationEntity> blockedRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.blocked, PageRequest.of(page, size));
         List<UserEntity> blockedAuthors = blockedRelations.map(e->
                 userRepository.findById(e.getReceiverId()).orElseThrow(UserNotFoundException::new)).stream().toList();
-        return new PageImpl<>(blockedAuthors.stream().map(authorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), blockedRelations.getTotalElements());
+        return new PageImpl<>(blockedAuthors.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), blockedRelations.getTotalElements());
 
     }
 
     @Override
     public void save(AuthorRelation relation) {
         switch (relation){
-            case FollowRelation followRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(followRelation.getFollowerId().getId()).receiverId(followRelation.getFollowedId().getId()).relation(Relation.followed).build());
-            case BlockRelation blockRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(blockRelation.getBlockerId().getId()).receiverId(blockRelation.getBlockedId().getId()).relation(Relation.blocked).build());
+            case FollowRelation followRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(followRelation.getFollowerId().getValue()).receiverId(followRelation.getFollowedId().getValue()).relation(Relation.followed).build());
+            case BlockRelation blockRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(blockRelation.getBlockerId().getValue()).receiverId(blockRelation.getBlockedId().getValue()).relation(Relation.blocked).build());
             case MutedRelation mutedRelation -> userRelationJpaRepository.save(UserRelationEntity.builder().actorId(mutedRelation.getMuterId()).receiverId(mutedRelation.getMutedId()).relation(Relation.muted).build());
             default -> throw new IllegalStateException("Unexpected value: " + relation);
         }
@@ -93,8 +93,8 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
     @Override
     public void delete(AuthorRelation relation) {
         switch (relation){
-            case FollowRelation followRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(followRelation.getFollowerId().getId(), followRelation.getFollowedId().getId(), Relation.followed);
-            case BlockRelation blockRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(blockRelation.getBlockerId().getId(), blockRelation.getBlockedId().getId(), Relation.blocked);
+            case FollowRelation followRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(followRelation.getFollowerId().getValue(), followRelation.getFollowedId().getValue(), Relation.followed);
+            case BlockRelation blockRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(blockRelation.getBlockerId().getValue(), blockRelation.getBlockedId().getValue(), Relation.blocked);
             case MutedRelation mutedRelation -> userRelationJpaRepository.deleteByActorIdAndReceiverIdAndRelation(mutedRelation.getMuterId(), mutedRelation.getMutedId(), Relation.muted);
             default -> throw new IllegalStateException("Unexpected value: " + relation);
         }

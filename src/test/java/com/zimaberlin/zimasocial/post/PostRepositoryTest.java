@@ -1,11 +1,10 @@
 package com.zimaberlin.zimasocial.post;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.infastructure.adapter.PostDBAdapter;
 import com.zimaberlin.zimasocial.context.social.infastructure.repository.PostDBRepository;
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.context.social.post.Post;
 import com.zimaberlin.zimasocial.context.social.post.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
@@ -47,19 +46,19 @@ public class PostRepositoryTest {
     private PostRepository postRepository;
     @BeforeEach
     void setUp() {
-        postRepository = new PostDBRepository(postJpaRepository,  new PostDBAdapter(), userRepository, todaysPostRepository, userRelationJpaRepository);
+        postRepository = new PostDBRepository(postJpaRepository, userRepository, todaysPostRepository, userRelationJpaRepository);
     }
     @Test
     void testSaveAnyPost() {
         AuthorId authorId = new AuthorId(0L);
         Long postId = 0L;
         Post post = new Post(postId, "", PostType.any, authorId);
-        UserEntity user = new UserEntity(authorId.getId());
+        UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);
         returnedEntity.setType(PostType.any);
         returnedEntity.setUser(user);
-        when(userRepository.findById(authorId.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(authorId.getValue())).thenReturn(Optional.of(user));
         when(postJpaRepository.save(returnedEntity)).thenReturn(returnedEntity);
         postRepository.save(post);
 
@@ -67,7 +66,7 @@ public class PostRepositoryTest {
         verify(postJpaRepository).save(postEntityArgumentCaptor.capture());
         PostEntity postEntity = postEntityArgumentCaptor.getValue();
 
-        Assertions.assertEquals(postEntity.getUserId(), authorId.getId());
+        Assertions.assertEquals(postEntity.getUserId(), authorId.getValue());
         Assertions.assertEquals(postEntity.getContent(), post.getContent());
         Assertions.assertEquals(postEntity.getType(), post.getType());
     }
@@ -94,12 +93,12 @@ public class PostRepositoryTest {
                 .build();
 
         Post post = new Post(postId, "", authorId, movieMedia);
-        UserEntity user = new UserEntity(authorId.getId());
+        UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);
         returnedEntity.setType(PostType.movie);
         returnedEntity.setUser(user);
-        when(userRepository.findById(authorId.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(authorId.getValue())).thenReturn(Optional.of(user));
         when(postJpaRepository.save(returnedEntity)).thenReturn(returnedEntity);
         postRepository.save(post);
 
@@ -107,7 +106,7 @@ public class PostRepositoryTest {
         verify(postJpaRepository).save(postEntityArgumentCaptor.capture());
         PostEntity postEntity = postEntityArgumentCaptor.getValue();
 
-        Assertions.assertEquals(postEntity.getUserId(), authorId.getId());
+        Assertions.assertEquals(postEntity.getUserId(), authorId.getValue());
         Assertions.assertEquals(postEntity.getContent(), post.getContent());
         Assertions.assertEquals(postEntity.getType(), post.getType());
 
@@ -149,20 +148,20 @@ public class PostRepositoryTest {
                 .build();
 
         Post post = new Post(postId, "", authorId, bookMedia);
-        UserEntity user = new UserEntity(authorId.getId());
+        UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);
         returnedEntity.setType(PostType.movie);
         returnedEntity.setUser(user);
 
-        when(userRepository.findById(authorId.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(authorId.getValue())).thenReturn(Optional.of(user));
         when(postJpaRepository.save(returnedEntity)).thenReturn(returnedEntity);
         postRepository.save(post);
         ArgumentCaptor<PostEntity> postEntityArgumentCaptor = ArgumentCaptor.forClass(PostEntity.class);
         verify(postJpaRepository).save(postEntityArgumentCaptor.capture());
         PostEntity postEntity = postEntityArgumentCaptor.getValue();
 
-        Assertions.assertEquals(postEntity.getUserId(), authorId.getId());
+        Assertions.assertEquals(postEntity.getUserId(), authorId.getValue());
         Assertions.assertEquals(postEntity.getContent(), post.getContent());
         Assertions.assertEquals(postEntity.getType(), post.getType());
 

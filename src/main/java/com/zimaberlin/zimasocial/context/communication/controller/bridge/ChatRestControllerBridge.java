@@ -1,19 +1,20 @@
 package com.zimaberlin.zimasocial.context.communication.controller.bridge;
 
+import com.zimaberlin.zimasocial.context.common.SimplePagedModel;
 import com.zimaberlin.zimasocial.context.communication.RecipientNotFoundException;
-import com.zimaberlin.zimasocial.context.communication.chat.application.ChatServiceApplication;
-import com.zimaberlin.zimasocial.context.communication.chat.entity.ChatMessage;
-import com.zimaberlin.zimasocial.context.communication.chat.entity.ChatRoom;
-import com.zimaberlin.zimasocial.context.communication.chat.entity.ChatRoomId;
-import com.zimaberlin.zimasocial.context.communication.chat.repository.ChatMessageRepository;
 import com.zimaberlin.zimasocial.context.communication.controller.views.ChatMessageView;
 import com.zimaberlin.zimasocial.context.communication.controller.views.ChatRoomView;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
-import com.zimaberlin.zimasocial.context.communication.repository.RecipientRepository;
+import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.chat.application.ChatServiceApplication;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessage;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
+import com.zimaberlin.zimasocial.context.social.chat.repository.ChatMessageRepository;
+import com.zimaberlin.zimasocial.context.social.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -21,19 +22,25 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class ChatRestControllerBridge {
-    private final RecipientRepository recipientRepository;
+    private final AuthorRepository recipientRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatServiceApplication chatServiceApplication;
+    private final ChatRoomRepository chatRoomRepository;
     public ChatRoomView createRoomWith(String slug){
-        Recipient recipient = recipientRepository.findBySlug(slug).orElseThrow(RecipientNotFoundException::new);
-        Recipient me = recipientRepository.getAuthenticatedRecipient();
-        ChatRoom room = chatServiceApplication.createOrFindRoomWithParticipant(recipient.getRecipientId());
+        Author author = recipientRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(RecipientNotFoundException::new);
+        Author me = recipientRepository.getAuthenticatedAuthor();
+        ChatRoom room = chatServiceApplication.createOrFindRoomWithParticipant(author.getId());
         return new ChatRoomView(room, me);
     }
 
-    public PagedModel<ChatMessageView> getMessages(UUID chatId, PageRequest request) {
+    public SimplePagedModel<ChatMessageView> getMessages(UUID chatId, PageRequest request) {
         Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdOrderBySentAtDesc(new ChatRoomId(chatId), request);
-        return PagedModel.of(chatMessages.getContent().stream().map(ChatMessageView::new).toList(),
-                new PagedModel.PageMetadata(request.getPageSize(), request.getPageNumber(), chatMessages.getTotalElements(), chatMessages.getTotalPages()));
+        return SimplePagedModel.of(chatMessages.getContent().stream().map(ChatMessageView::new).toList(), chatMessages.getTotalElements(), chatMessages.getTotalPages());
+    }
+
+    public SimplePagedModel<ChatRoomView> getChats(PageRequest request) {
+        Author recipient = recipientRepository.getAuthenticatedAuthor();
+        Page<ChatRoom> chatRooms = chatRoomRepository.findByParticipantIn(recipient.getId(), request);
+        return SimplePagedModel.of(chatRooms.getContent().stream().map(e->new ChatRoomView(e, recipient)).toList(),  chatRooms.getTotalElements(), chatRooms.getTotalPages());
     }
 }

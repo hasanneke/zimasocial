@@ -1,9 +1,14 @@
 package com.zimaberlin.zimasocial.context.social.api.media;
-import com.zimaberlin.zimasocial.context.social.media.*;
+
+import com.zimaberlin.zimasocial.context.social.media.BookSearcher;
+import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
+import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
-import com.zimaberlin.zimasocial.context.social.media.book.BookSearcher;
 import com.zimaberlin.zimasocial.context.social.media.book.SearchBookMediaItem;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieNotFoundException;
+import com.zimaberlin.zimasocial.context.social.media.movie.SearchMovieMediaItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface AuthorRelationCollection {
     Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId);
-    Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId followedId);
+    Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId);
     Optional<MutedRelation> findMutedRelationBetween(Long muterId, Long mutedId);
     Page<Author> findFollowers(String slug, int page, int size);
     Page<Author> findFollowings(String slug,int page, int size);

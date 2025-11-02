@@ -8,6 +8,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorView extends RepresentationModel<AuthorView> {
+    private Long id;
     private String slug;
     private String name;
     private String familyName;

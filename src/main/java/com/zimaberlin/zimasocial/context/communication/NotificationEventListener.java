@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.communication;
 
-import com.zimaberlin.zimasocial.context.communication.chat.event.ChatMessageSentEvent;
+import com.zimaberlin.zimasocial.context.social.chat.event.ChatMessageSentEvent;
 import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
 import com.zimaberlin.zimasocial.context.communication.notifications.*;
 import com.zimaberlin.zimasocial.context.social.author.AuthorFollowRequestSentEvent;
@@ -28,8 +28,8 @@ public class NotificationEventListener {
         }
         PostLikedNotification postLikedNotification = PostLikedNotification.builder()
                 .postId(postLikedEvent.postId())
-                .actorId(new RecipientId(postLikedEvent.actorId().getId()))
-                .recipientId(new RecipientId(postLikedEvent.postOwnerId().getId()))
+                .actorId(new RecipientId(postLikedEvent.actorId().getValue()))
+                .recipientId(new RecipientId(postLikedEvent.postOwnerId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendPostLikedNotification(postLikedNotification);
@@ -42,8 +42,8 @@ public class NotificationEventListener {
         }
         PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
                 .postId(postCommentedEvent.postId())
-                .actorId(new RecipientId(postCommentedEvent.actorId().getId()))
-                .recipientId(new RecipientId(postCommentedEvent.commentOwnerId().getId()))
+                .actorId(new RecipientId(postCommentedEvent.actorId().getValue()))
+                .recipientId(new RecipientId(postCommentedEvent.commentOwnerId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendPostCommentedNotification(postCommentedNotification);
@@ -58,8 +58,8 @@ public class NotificationEventListener {
         CommentLikedNotification commentLikedNotification = CommentLikedNotification.builder()
                 .postId(commentLikedEvent.postId())
                 .commentId(commentLikedEvent.commentId())
-                .actorId(new RecipientId(commentLikedEvent.likerAuthorId().getId()))
-                .recipientId(new RecipientId(commentLikedEvent.commentOwnerId().getId()))
+                .actorId(new RecipientId(commentLikedEvent.likerAuthorId().getValue()))
+                .recipientId(new RecipientId(commentLikedEvent.commentOwnerId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendCommentLikedNotification(commentLikedNotification);
@@ -72,8 +72,8 @@ public class NotificationEventListener {
         }
         CommentRepliedNotification commentRepliedNotification = CommentRepliedNotification.builder()
                 .commentId(commentRepliedEvent.parentCommentId())
-                .actorId(new RecipientId(commentRepliedEvent.replyerId().getId()))
-                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getId()))
+                .actorId(new RecipientId(commentRepliedEvent.replyerId().getValue()))
+                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendCommentRepliedNotification(commentRepliedNotification);
@@ -83,8 +83,8 @@ public class NotificationEventListener {
     public void handleAuthorFollowedEvent(AuthorFollowedEvent authorFollowedEvent) {
         AuthorFollowedNotification authorFollowedNotification = AuthorFollowedNotification
                 .builder()
-                .actorId(new RecipientId(authorFollowedEvent.follower().getId().getId()))
-                .recipientId(new RecipientId(authorFollowedEvent.followed().getId().getId()))
+                .actorId(new RecipientId(authorFollowedEvent.follower().getId().getValue()))
+                .recipientId(new RecipientId(authorFollowedEvent.followed().getId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendAuthorFollowedYouNotification(authorFollowedNotification);
@@ -94,8 +94,8 @@ public class NotificationEventListener {
     public void handleAuthorFollowedRequestAcceptedEvent(AuthorFollowRequestAcceptedEvent authorFollowRequestAcceptedEvent) {
         AuthorFollowRequestAcceptedNotification authorFollowedNotification = AuthorFollowRequestAcceptedNotification
                 .builder()
-                .actorId(new RecipientId(authorFollowRequestAcceptedEvent.followedAuthorId().getId()))
-                .recipientId(new RecipientId(authorFollowRequestAcceptedEvent.followerAuthorId().getId()))
+                .actorId(new RecipientId(authorFollowRequestAcceptedEvent.followedAuthorId().getValue()))
+                .recipientId(new RecipientId(authorFollowRequestAcceptedEvent.followerAuthorId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendAuthorFollowedRequestAcceptedNotification(authorFollowedNotification);
@@ -105,8 +105,8 @@ public class NotificationEventListener {
     public void handleAuthorFollowRequestSentEvent(AuthorFollowRequestSentEvent authorFollowRequestSentEvent) {
         AuthorFollowRequestSentNotification authorFollowedNotification = AuthorFollowRequestSentNotification
                 .builder()
-                .actorId(new RecipientId(authorFollowRequestSentEvent.followerId().getId()))
-                .recipientId(new RecipientId(authorFollowRequestSentEvent.followedId().getId()))
+                .actorId(new RecipientId(authorFollowRequestSentEvent.followerId().getValue()))
+                .recipientId(new RecipientId(authorFollowRequestSentEvent.followedId().getValue()))
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationService.sendAuthorSentFollowRequestNotification(authorFollowedNotification);

@@ -39,18 +39,18 @@ public class ReportEntity  {
     }
     public static ReportEntity buildPostReport(PostReport report) {
         return ReportEntity.builder()
-                .id(new ReportId(report.postId(), report.reporterAuthorId().getId(), ResourceType.post))
+                .id(new ReportId(report.postId(), report.reporterAuthorId().getValue(), ResourceType.post))
                 .reportReason(report.reason())
                 .description(report.description())
-                .reportedUserId(report.reportedAuthorId().getId())
+                .reportedUserId(report.reportedAuthorId().getValue())
                 .build();
     }
     public static ReportEntity buildCommentReport(CommentReport report) {
         return ReportEntity.builder()
-                .id(new ReportId(report.commentId(), report.reporterAuthorId().getId(), ResourceType.comment))
+                .id(new ReportId(report.commentId(), report.reporterAuthorId().getValue(), ResourceType.comment))
                 .reportReason(report.reason())
                 .description(report.description())
-                .reportedUserId(report.reportedAuthorId().getId())
+                .reportedUserId(report.reportedAuthorId().getValue())
                 .build();
     }
 }

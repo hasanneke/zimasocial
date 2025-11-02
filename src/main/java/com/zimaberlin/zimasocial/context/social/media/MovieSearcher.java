@@ -1,6 +1,8 @@
 package com.zimaberlin.zimasocial.context.social.media;
 
-import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
+import com.zimaberlin.zimasocial.context.social.media.movie.SearchMovieMediaItem;
 
 import java.util.List;
 

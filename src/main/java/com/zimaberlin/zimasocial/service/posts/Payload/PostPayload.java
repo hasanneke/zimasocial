@@ -1,9 +1,8 @@
 package com.zimaberlin.zimasocial.service.posts.Payload;
 
-import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.entity.PostType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Schema(description = "Post creation request")

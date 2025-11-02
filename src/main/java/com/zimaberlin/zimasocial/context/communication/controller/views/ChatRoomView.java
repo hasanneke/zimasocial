@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.communication.controller.views;
 
-import com.zimaberlin.zimasocial.context.communication.chat.entity.ChatRoom;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
+import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -10,9 +10,14 @@ import java.util.UUID;
 public class ChatRoomView {
     private final UUID id;
     private final RecipientView otherParticipant;
+    private ChatMessageView lastMessage;
 
-    public ChatRoomView(ChatRoom chatRoom, Recipient me) {
-        this.id = chatRoom.id().value();
+    public ChatRoomView(ChatRoom chatRoom, Author me) {
+        this.id = chatRoom.getId().value();
         this.otherParticipant = new RecipientView(chatRoom.getOtherParticipant(me));
+        if(chatRoom.getLastMessage() != null){
+            this.lastMessage = new ChatMessageView(chatRoom.getLastMessage());
+        }
     }
+
 }

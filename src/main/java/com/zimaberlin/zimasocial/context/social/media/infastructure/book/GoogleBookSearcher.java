@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.media.infastructure.book;
 
 import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.book.BookSearcher;
+import com.zimaberlin.zimasocial.context.social.media.BookSearcher;
 import com.zimaberlin.zimasocial.context.social.media.book.SearchBookMediaItem;
 import com.zimaberlin.zimasocial.entity.media.BookProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -121,12 +123,15 @@ public class GoogleBookSearcher implements BookSearcher {
     private GoogleBookSearchResult searchGoogleBook(String query){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
-                .fromUriString(String.format("%s/books/v1/volumes", baseUrl))
-                .queryParam("q", query);
+        URI uriComponentsBuilder = UriComponentsBuilder
+                .fromHttpUrl(String.format("%s/books/v1/volumes", baseUrl))
+                .encode(StandardCharsets.UTF_8)
+                .queryParam("q", query)
+                .build()
+                .toUri();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<GoogleBookSearchResult> request = new HttpEntity<>(headers);
-        ResponseEntity<GoogleBookSearchResult> response = restTemplate.exchange(uriComponentsBuilder.toUriString(),
+        ResponseEntity<GoogleBookSearchResult> response = restTemplate.exchange(uriComponentsBuilder,
                 HttpMethod.GET,
                 request,
                 GoogleBookSearchResult.class);

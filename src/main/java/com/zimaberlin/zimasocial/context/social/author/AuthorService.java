@@ -69,7 +69,7 @@ public class AuthorService {
         Author followed = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(follower.getId(), followed.getId());
         if(followRelation.isEmpty()){
-            throw new AuthorNotFollowed(followed.getId());
+            throw new AuthorNotFollowedException(followed.getId());
         }
         followed.unfollow(follower);
         authorRelationRepository.delete(followRelation.get());
@@ -82,7 +82,7 @@ public class AuthorService {
         Author removedFollower = authorRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(()->new AuthorNotFoundException(slug));
         Optional<FollowRelation> followRelation = authorRelationRepository.findFollowRelationBetween(removedFollower.getId(), author.getId());
         if(followRelation.isEmpty()){
-            throw new AuthorNotFollowed(removedFollower.getId());
+            throw new AuthorNotFollowedException(removedFollower.getId());
         }
         author.unfollow(removedFollower);
         authorRelationRepository.delete(followRelation.get());

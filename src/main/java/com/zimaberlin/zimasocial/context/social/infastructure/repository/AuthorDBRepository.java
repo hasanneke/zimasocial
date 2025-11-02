@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
@@ -40,11 +39,11 @@ public class AuthorDBRepository implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(AuthorId authorId) {
-        return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId.getId()).orElse(null)));
+        return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId.getValue()).orElse(null)));
     }
 
     public void save(Author author){
-        UserEntity user = userRepository.findById(author.getId().getId()).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findById(author.getId().getValue()).orElseThrow(UserNotFoundException::new);
         user.margeAuthor(author);
         userRepository.save(user);
     }
@@ -59,7 +58,7 @@ public class AuthorDBRepository implements AuthorRepository {
     @Override
     public Optional<Author> findBySlugAndIsDisabledFalse(String slug) {
         Optional<UserEntity> user = userRepository.findBySlugAndIsDisabledFalse(slug);
-        return user.map(authorUserEntityAdapter::convertUserEntityToAuthor);
+        return user.map(AuthorUserEntityAdapter::convertUserEntityToAuthor);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class AuthorDBRepository implements AuthorRepository {
         UserEntity authenticatedUser = CurrentUser.getCurrentUserProfile();
         Author userToBeFound = findBySlugAndIsDisabledFalse(slug).orElse(null);
         assert userToBeFound != null;
-        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getId(), authenticatedUser.getId(), Relation.blocked);
+        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getValue(), authenticatedUser.getId(), Relation.blocked);
         if(blockRelation.isPresent()){
             return Optional.empty();
         }
@@ -77,6 +76,6 @@ public class AuthorDBRepository implements AuthorRepository {
     @Override
     public Page<Author> search(String query, int page, int size) {
         Page<UserEntity> userEntities = userRepository.searchUser(query, PageRequest.of(page, size));
-        return userEntities.map(authorUserEntityAdapter::convertUserEntityToAuthor);
+        return userEntities.map(AuthorUserEntityAdapter::convertUserEntityToAuthor);
     }
 }

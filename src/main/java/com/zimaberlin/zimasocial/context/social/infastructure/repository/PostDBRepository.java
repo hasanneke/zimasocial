@@ -2,19 +2,22 @@ package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.context.social.post.Post;
+import com.zimaberlin.zimasocial.context.social.post.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.media.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
-import com.zimaberlin.zimasocial.context.social.infastructure.adapter.PostDBAdapter;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
-import com.zimaberlin.zimasocial.repository.*;
+import com.zimaberlin.zimasocial.repository.PostJpaRepository;
+import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
+import com.zimaberlin.zimasocial.repository.UserJpaRepository;
+import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
@@ -29,19 +32,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class PostDBRepository implements PostRepository {
     private final PostJpaRepository postJpaRepository;
-    private final PostDBAdapter postDBAdapter;
     private final UserJpaRepository userRepository;
     private final TodaysPostRepository todaysPostRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
     @Autowired
-    public PostDBRepository(PostJpaRepository postJpaRepository, PostDBAdapter postDBAdapter, UserJpaRepository userRepository, TodaysPostRepository todaysPostRepository, UserRelationJpaRepository userRelationJpaRepository) {
+    public PostDBRepository(PostJpaRepository postJpaRepository, UserJpaRepository userRepository, TodaysPostRepository todaysPostRepository, UserRelationJpaRepository userRelationJpaRepository) {
         this.postJpaRepository = postJpaRepository;
-        this.postDBAdapter = postDBAdapter;
         this.userRepository = userRepository;
         this.todaysPostRepository = todaysPostRepository;
         this.userRelationJpaRepository = userRelationJpaRepository;
@@ -49,13 +49,13 @@ public class PostDBRepository implements PostRepository {
     @Override
     public Optional<Post> findById(Long postId) {
         PostEntity post = postJpaRepository.findByIdAndIsVisibleTrue(postId).orElseThrow(PostNotFoundException::new);
-        return Optional.ofNullable(postDBAdapter.convertPostEntityToPost(post));
+        return Optional.ofNullable(post.convertToPostDomain());
     }
 
     @Override
     public List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
         List<PostEntity> postEntityPage = postJpaRepository.findAllByCreatedAtBetween(start, end);
-        return postEntityPage.stream().map(postDBAdapter::convertPostEntityToPost).toList();
+        return postEntityPage.stream().map(PostEntity::convertToPostDomain).toList();
     }
 
     @Override
@@ -87,18 +87,18 @@ public class PostDBRepository implements PostRepository {
         specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
         System.out.println("End findAll at %s".formatted(LocalDateTime.now()));
-        return postEntityPage.map(postDBAdapter::convertPostEntityToPost);
+        return postEntityPage.map(PostEntity::convertToPostDomain);
     }
 
     @Override
     public Page<Post> findFollowingsPosts(Pageable page, AuthorId authorId) {
-        return postJpaRepository.findFollowingsPosts(page, authorId.getId()).map(postDBAdapter::convertPostEntityToPost);
+        return postJpaRepository.findFollowingsPosts(page, authorId.getValue()).map(PostEntity::convertToPostDomain);
     }
 
     @Override
     public List<Post> findTodaysPosts() {
         List<TodaysPost> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
-        return todaysPosts.stream().map((e)-> postDBAdapter.convertPostEntityToPost(e.getPost())).toList();
+        return todaysPosts.stream().map((e)-> e.getPost().convertToPostDomain()).toList();
     }
 
     @Override
@@ -115,14 +115,14 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public List<Post> findAllByAuthorId(AuthorId authorId) {
-        return postJpaRepository.findAllByUserId(authorId.getId()).stream().map(postDBAdapter::convertPostEntityToPost).toList();
+        return postJpaRepository.findAllByUserId(authorId.getValue()).stream().map(PostEntity::convertToPostDomain).toList();
     }
 
     @Override
     public List<Post> findAllInvisiblePostsByAuthorId(AuthorId authorId) {
         return postJpaRepository.
-                findAllInvisiblePostsByUserId(authorId.getId()).
-                stream().map(postDBAdapter::convertPostEntityToPost).toList();
+                findAllInvisiblePostsByUserId(authorId.getValue()).
+                stream().map(PostEntity::convertToPostDomain).toList();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class PostDBRepository implements PostRepository {
         PostEntity postEntity;
         postEntity = new PostEntity();
         postEntity.merge(post);
-        UserEntity user = userRepository.findById(post.getAuthorId().getId()).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findById(post.getAuthorId().getValue()).orElseThrow(UserNotFoundException::new);
         postEntity.setUser(user);
         switch (post.getType()){
             case PostType.book -> {
@@ -156,21 +156,32 @@ public class PostDBRepository implements PostRepository {
                 mediaJpa.setPostId(post.getPostId());
                 postEntity.setMedia(mediaJpa);
             }
+            case PostType.music -> {
+                MusicMedia music = post.getMusic();
+                MediaJpa mediaJpa = MediaJpa.builder()
+                        .id(music.getId())
+                        .type(MediaType.MUSIC)
+                        .song(new MusicMediaJpa(music))
+                        .post(postEntity)
+                        .build();
+                mediaJpa.setPostId(post.getPostId());
+                postEntity.setMedia(mediaJpa);
+            }
         }
         PostEntity savedPost = postJpaRepository.save(postEntity);
-        return postDBAdapter.convertPostEntityToPost(savedPost);
+        return savedPost.convertToPostDomain();
     }
 
     @Override
     public void makeInvisiblePostsOfAuthor(AuthorId authorId) {
-        List<PostEntity> postEntityList = postJpaRepository.findAllByUserId(authorId.getId());
+        List<PostEntity> postEntityList = postJpaRepository.findAllByUserId(authorId.getValue());
         postEntityList.forEach(e->e.setIsVisible(false));
         postJpaRepository.saveAll(postEntityList);
     }
 
     @Override
     public void makePostsVisibleOfAuthor(AuthorId authorId) {
-        List<PostEntity> postEntityList = postJpaRepository.findAllInvisiblePostsByUserId(authorId.getId());
+        List<PostEntity> postEntityList = postJpaRepository.findAllInvisiblePostsByUserId(authorId.getValue());
         postEntityList.forEach(e->e.setIsVisible(true));
         postJpaRepository.saveAll(postEntityList);
     }

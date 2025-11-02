@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.service.musicService.impl;
 
+import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.service.musicService.domain.MusicResponseView;
 import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 public class SpotifyMusicClient implements SearchMusicClient {
     private final RestTemplate restTemplate;
+    private String accessToken;
     String baseUrl;
 
     @Autowired
@@ -26,18 +30,21 @@ public class SpotifyMusicClient implements SearchMusicClient {
     private SpotifyResponse.SpotifyTracks searchTracks(String query, int offset, int limit) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUrl)
+        URI uriBuilder = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("type", "track")
                 .queryParam("q", query)
                 .queryParam("offset", offset)
-                .queryParam("limit", limit);
+                .queryParam("limit", limit)
+                .encode(StandardCharsets.UTF_8)
+                .build()
+                .toUri();
 
-        headers.set("Authorization", "Bearer BQC9m1VXpZiwQ4f6l5DxWPDw8sKX4WnKVErqhb00OYx_4EJXtjFSpOp1qbn3xR47TQJ0-gLF0bGsktigxP5v2lth1HZfGUbXB7Q7e45NDamRE5o5vh8");
+        headers.set("Authorization", "Bearer %s".formatted(accessToken));
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         // Create request entity
         HttpEntity<SpotifyResponse> request = new HttpEntity<>(headers);
 
-        ResponseEntity<SpotifyResponse> response = restTemplate.exchange(uriBuilder.toUriString(), HttpMethod.GET,request, SpotifyResponse.class);
+        ResponseEntity<SpotifyResponse> response = restTemplate.exchange(uriBuilder, HttpMethod.GET,request, SpotifyResponse.class);
         return response.getBody().getTracks();
     }
 
@@ -47,17 +54,14 @@ public class SpotifyMusicClient implements SearchMusicClient {
         MusicResponseView musicResponseView = new MusicResponseView();
 
         // SET META DATA
-        musicResponseView.setHref(tracks.getHref());
-        musicResponseView.setNext(tracks.getNext());
         musicResponseView.setOffset(tracks.getOffset());
         musicResponseView.setLimit(tracks.getLimit());
-        musicResponseView.setPrevious(tracks.getPrevious());
+        musicResponseView.setTotal(tracks.getTotal());
         // SET TRACKS
         List<MusicResponseView.MusicView> domainTracks = tracks.getItems().stream().map((track)->{
             MusicResponseView.MusicView musicView = new MusicResponseView.MusicView();
             musicView.setId(track.getId());
             musicView.setName(track.getName());
-            musicView.setHref(track.getHref());
             musicView.setType(track.getType());
             musicView.setUri(track.getUri());
             musicView.setPreviewUrl(track.getPreview_url());
@@ -65,8 +69,8 @@ public class SpotifyMusicClient implements SearchMusicClient {
             SpotifyResponse.Artist artist= track.getArtists().getFirst();
             SpotifyResponse.Album album = track.getAlbum();
 
-            MusicResponseView.MusicView.Artist domainArtist = new MusicResponseView.MusicView.Artist();
-            MusicResponseView.MusicView.Album domainAlbum = new MusicResponseView.MusicView.Album();
+            MusicMedia.Artist domainArtist = new MusicMedia.Artist();
+            MusicMedia.Album domainAlbum = new MusicMedia.Album();
 
             domainAlbum.setAlbumType(album.getAlbum_type());
             domainAlbum.setName(album.getName());
@@ -74,7 +78,6 @@ public class SpotifyMusicClient implements SearchMusicClient {
             domainAlbum.setImageUrl(album.getImages().getFirst().getUrl());
             domainAlbum.setUri(album.getUri());
 
-            domainArtist.setHref(artist.getHref());
             domainArtist.setId(artist.getId());
             domainArtist.setName(artist.getName());
             domainArtist.setUri(artist.getUri());
@@ -92,15 +95,34 @@ public class SpotifyMusicClient implements SearchMusicClient {
     @Override
     public MusicResponseView.MusicView getMusic(String id) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth("your-spotify-access-token");
+        headers.set("Authorization", "Bearer %s".formatted(accessToken));
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", "Bearer %s".formatted(accessToken));
         HttpEntity<Void> request = new HttpEntity<>(headers);
-        ResponseEntity<MusicResponseView.MusicView> response = restTemplate.exchange(  // Note: changed to exchange
+        ResponseEntity<SpotifyResponse.SpotifyMusic> response = restTemplate.exchange(  // Note: changed to exchange
                 "https://api.spotify.com/v1/tracks/{id}",
                 HttpMethod.GET,
                 request,
-                MusicResponseView.MusicView.class,
+                SpotifyResponse.SpotifyMusic.class,
                 id
         );
-        return response.getBody();
+        MusicResponseView.MusicView musicView = new MusicResponseView.MusicView();
+        MusicMedia.Artist artist = new MusicMedia.Artist();
+        artist.setName(response.getBody().getArtists().getFirst().getName());
+        MusicMedia.Album album = new MusicMedia.Album();
+        album.setImageUrl(response.getBody().getAlbum().getImages().stream().findFirst().get().getUrl());
+        musicView.setId(response.getBody().getId());
+        musicView.setProvider("spotify");
+        musicView.setName(response.getBody().getName());
+        musicView.setArtist(artist);
+        musicView.setType(response.getBody().getType());
+        musicView.setPreviewUrl(response.getBody().getPreview_url());
+        musicView.setUri(response.getBody().getUri());
+        return musicView;
+    }
+
+    @Override
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }

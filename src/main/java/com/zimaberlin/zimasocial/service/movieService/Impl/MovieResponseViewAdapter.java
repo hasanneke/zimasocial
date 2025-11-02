@@ -1,8 +1,8 @@
 package com.zimaberlin.zimasocial.service.movieService.Impl;
 
-import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.entity.media.MovieProvider;
-import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
+import com.zimaberlin.zimasocial.context.social.media.infastructure.movie.MovieResponseView;
 
 public class MovieResponseViewAdapter {
     public static MovieResponseView.Movie convertTDMBMovieToDomain(TDMBMultiMediaTVMovieSearchResponse.Item e) {

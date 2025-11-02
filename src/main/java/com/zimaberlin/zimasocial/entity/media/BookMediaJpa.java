@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 
+import java.util.UUID;
+
 
 @Embeddable
 @Getter
@@ -57,5 +59,23 @@ public class BookMediaJpa {
         this.language = book.getLanguage();
         this.publishDate = book.getPublishDate();
         this.printType = book.getPrintType();
+    }
+
+    public BookMedia toBookMedia(UUID mediaId) {
+        return BookMedia
+                .builder()
+                .id(mediaId)
+                .resourceId(getId())
+                .author(this.getAuthor())
+                .title(this.getTitle())
+                .publisher(this.getPublisher())
+                .pageCount(this.getPageCount())
+                .publishDate(this.getPublishDate())
+                .language(this.getLanguage())
+                .thumbnail(this.getThumbnail())
+                .smallThumbnail(this.getSmallThumbnail())
+                .printType(this.getPrintType())
+                .description(this.getDescription())
+                .build();
     }
 }

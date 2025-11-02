@@ -2,7 +2,8 @@ package com.zimaberlin.zimasocial.context.social.post;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -23,6 +24,9 @@ public class Post {
     private final AuthorId authorId;
     private MovieMedia movie;
     private BookMedia book;
+    private MusicMedia music;
+    private String musicId;
+    private String bookId;
     private Boolean isVisible;
 
     public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId) {
@@ -68,6 +72,24 @@ public class Post {
         this.updatedAt = updatedAt;
         this.authorId = authorId;
         this.book = book;
+        this.bookId = book.getResourceId();
+        this.isVisible = true;
+    }
+
+    public Post(Long postId, String content, int likeCount, int commentCount, LocalDateTime createdAt, LocalDateTime updatedAt, AuthorId authorId, MusicMedia music) {
+        Assert.notNull(postId, "Post Id cannot be null");
+        Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
+        Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
+        this.postId = postId;
+        this.content = content;
+        this.type = PostType.music;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.authorId = authorId;
+        this.music = music;
+        this.musicId = music.getResourceId();
         this.isVisible = true;
     }
     protected Post( String content, PostType type, AuthorId authorId) {
@@ -98,6 +120,7 @@ public class Post {
         this.createdAt = LocalDateTime.now();
         this.authorId = authorId;
         this.book = book;
+        this.bookId = book.getResourceId();
         this.isVisible = true;
     }
     public Post(Long postId, String content, AuthorId authorId, MovieMedia movie) {
@@ -111,6 +134,20 @@ public class Post {
         this.movie = movie;
         this.isVisible = true;
     }
+
+    public Post(Long postId, String content, AuthorId authorId, MusicMedia music) {
+        this.postId = postId;
+        this.content = content;
+        this.type = PostType.music;
+        this.likeCount = 0;
+        this.commentCount = 0;
+        this.createdAt = LocalDateTime.now();
+        this.authorId = authorId;
+        this.music = music;
+        this.musicId = music.getResourceId();
+        this.isVisible = true;
+    }
+
     public PostLike like(AuthorId likerAuthorId) {
         likeCount += 1;
         StaticEventPublisher.publishEvent(new PostLikedEvent(postId, authorId, likerAuthorId));

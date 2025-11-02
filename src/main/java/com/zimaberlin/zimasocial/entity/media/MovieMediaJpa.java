@@ -1,12 +1,11 @@
 package com.zimaberlin.zimasocial.entity.media;
 
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.MovieMediaType;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Embeddable
 @Builder

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.entity.media.BookMediaJpa;
 import com.zimaberlin.zimasocial.entity.media.MediaJpa;

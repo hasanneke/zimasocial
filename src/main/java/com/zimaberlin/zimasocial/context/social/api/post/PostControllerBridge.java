@@ -22,7 +22,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -64,6 +63,10 @@ public class PostControllerBridge {
                 Post post = postService.createBookPost(payload.getContent(), payload.getMediaId());
                 return postViewAdapter.populated(post);
             }
+            case PostType.music -> {
+                Post post = postService.createMusicPost(payload.getContent(), payload.getMediaId());
+                return postViewAdapter.populated(post);
+            }
             default -> {
                 payload.setType(PostType.any);
                 Post post = postService.createPost(
@@ -80,7 +83,7 @@ public class PostControllerBridge {
            Integer page,
            Integer size,
            PostCategory category,
-          String slug
+           String slug
     ) throws NoSuchMethodException {
         System.out.println("Start getPosts at %s".formatted(LocalDateTime.now()));
         Page<Post> postPage;

@@ -37,17 +37,17 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
 
     @Override
     public List<FollowRequest> findAllByFollowedAuthorIdAndUpdatedAtIsNull(AuthorId id) {
-        return followRequestDAOJpa.findByFollowedIdAndUpdatedAtIsNull(id.getId()).stream().map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest).toList();
+        return followRequestDAOJpa.findByFollowedIdAndUpdatedAtIsNull(id.getValue()).stream().map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest).toList();
     }
 
     @Override
     public Integer countByFollowedAuthorId(AuthorId id) {
-        return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getId());
+        return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getValue());
     }
 
     @Override
     public Optional<FollowRequest> findFirstByFollowedAuthorIdOrderByCreatedAtDesc(AuthorId id) {
-        Optional<FollowRequestEntity> followRequest = followRequestDAOJpa.findFirstByFollowedIdOrderByCreatedAtDesc(id.getId());
+        Optional<FollowRequestEntity> followRequest = followRequestDAOJpa.findFirstByFollowedIdOrderByCreatedAtDesc(id.getValue());
         if (followRequest.isPresent()){
             return followRequest.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
         }
@@ -56,12 +56,12 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
 
     @Override
     public Optional<FollowRequest> findByFollowedIdAndFollowerId(AuthorId followedId, AuthorId followerId) {
-        Optional<FollowRequestEntity> followRequestEntity = followRequestDAOJpa.findFirstByFollowedIdAndFollowerId(followedId.getId(), followerId.getId());
+        Optional<FollowRequestEntity> followRequestEntity = followRequestDAOJpa.findFirstByFollowedIdAndFollowerId(followedId.getValue(), followerId.getValue());
         return followRequestEntity.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
     }
 
     @Override
     public Integer countByFollowedAuthorIdAndIsApprovedFalse(AuthorId id) {
-        return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getId());
+        return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getValue());
     }
 }

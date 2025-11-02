@@ -9,6 +9,6 @@ import java.util.stream.Collectors;
 
 public class UserEntityRecipientConverter {
     public static Recipient toRecipient(UserEntity user) {
-        return new Recipient(new RecipientId(user.getId()), user.getSlug(), user.getDeviceTokens().stream().map(e->new DeviceToken(e.getId(), e.getToken(), new RecipientId(e.getUserId()))).collect(Collectors.toSet()) , user.getEmail(), user.getFullName(), user.getAvatarFileName());
+        return new Recipient(new RecipientId(user.getId()), user.getSlug(), user.getDeviceTokens().stream().map(e->new DeviceToken(e.getId(), e.getToken(), new RecipientId(e.getUserId()))).collect(Collectors.toSet()) , user.getEmail(), user.getFullName(), user.getAvatarFileName(), user.isPrivate());
     }
 }

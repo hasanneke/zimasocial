@@ -35,7 +35,7 @@ public class ReportDBRepository implements ReportRepository {
     @Override
     public boolean checkReportExists(Long resourceId, AuthorId reporterId, ResourceType resourceType) {
         return reportJpaRepository.findById(ReportId.builder()
-                .reporterId(reporterId.getId())
+                .reporterId(reporterId.getValue())
                 .resourceId(resourceId)
                 .resourceType(resourceType)
                 .build()).isPresent();

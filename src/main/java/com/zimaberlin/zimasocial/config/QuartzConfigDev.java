@@ -1,0 +1,86 @@
+package com.zimaberlin.zimasocial.config;
+
+import com.zimaberlin.zimasocial.batch.pushnotifications.PushNotificationsJob;
+import com.zimaberlin.zimasocial.batch.spotifytokenrequester.SpotifyTokenRequesterJob;
+import com.zimaberlin.zimasocial.batch.todaysposts.TodaysPostJob;
+import org.quartz.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+
+@Configuration
+@Profile({"dev"})
+public class QuartzConfigDev {
+    @Bean
+    public Scheduler scheduler(@Qualifier("todaysPostTrigger") Trigger todaysPostTrigger,
+                               @Qualifier("todaysPostJobDetail") JobDetail todaysPostJobDetail,
+                               @Qualifier("spotifyTokenRefresherJobDetail") JobDetail spotifyTokenRefresherJobDetail,
+                               @Qualifier("spotifyTokenRefresherTrigger") Trigger spotifyTokenRefresherTrigger,
+                               SchedulerFactoryBean factory)
+            throws SchedulerException {
+        Scheduler scheduler = factory.getScheduler();
+        scheduler.deleteJob(JobKey.jobKey("Qrtz_Todays_Posts_Job_Detail"));
+        scheduler.deleteJob(JobKey.jobKey("Qrtz_Push_Notifications_JobDetail"));
+        scheduler.deleteJob(JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail"));
+        scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
+        scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
+        scheduler.start();
+        return scheduler;
+    }
+    @Bean(name = "todaysPostJobDetail")
+    public JobDetail todaysPostJobDetail() {
+        return JobBuilder.newJob().ofType(TodaysPostJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Todays_Posts_Job_Detail")
+                .withDescription("Invoke TodaysPostsJob")
+                .build();
+    }
+    @Bean(name = "todaysPostTrigger")
+    public Trigger todaysPostTrigger(@Qualifier("todaysPostJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Todays_Post_Trigger")
+                .withDescription("Quartz Todays Posts Trigger")
+                .withSchedule(cronSchedule("0 5 0 * * ?")
+                        .withMisfireHandlingInstructionFireAndProceed())
+                .build();
+    }
+    @Bean(name = "pushNotificationsJobDetail")
+    public JobDetail pushNotificationsJobDetail() {
+        return JobBuilder.newJob().ofType(PushNotificationsJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Push_Notifications_JobDetail")
+                .withDescription("Invoke TodaysPostsJob")
+                .build();
+    }
+    @Bean(name = "pushNotificationsTrigger")
+    public Trigger pushNotificationsTrigger(@Qualifier("pushNotificationsJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Push_Notifications_Trigger")
+                .withDescription("Quartz Triggers push notifications for mobile clients")
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2))
+                .build();
+    }
+    @Bean(name = "spotifyTokenRefresherJobDetail")
+    public JobDetail spotifyTokenRefresherJobDetail() {
+        return JobBuilder.newJob().ofType(SpotifyTokenRequesterJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Spotify_Token_Refresh_JobDetail")
+                .withDescription("Invoke SpotiTokenRefresher")
+                .build();
+    }
+    @Bean(name = "spotifyTokenRefresherTrigger")
+    public Trigger spotifyTokenRefresherTrigger(@Qualifier("spotifyTokenRefresherJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Spoti_Token_Refresher_Trigger")
+                .withDescription("Quartz refreshes spotify access token")
+                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
+                .build();
+    }
+}

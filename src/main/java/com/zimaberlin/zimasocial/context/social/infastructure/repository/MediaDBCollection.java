@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.MediaDBAdapter;
 import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
-import com.zimaberlin.zimasocial.context.social.media.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.entity.media.*;
 import com.zimaberlin.zimasocial.repository.MediaJpaRepository;

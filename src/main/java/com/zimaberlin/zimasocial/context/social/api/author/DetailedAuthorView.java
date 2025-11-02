@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
-import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +11,7 @@ import lombok.Setter;
 public class DetailedAuthorView extends AuthorView {
     private String email;
     public void mergeAuthorView(AuthorView authorView) {
+        setId(authorView.getId());
         setSlug(authorView.getSlug());
         setName(authorView.getName());
         setFamilyName(authorView.getFamilyName());

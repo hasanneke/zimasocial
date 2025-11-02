@@ -1,0 +1,17 @@
+package com.zimaberlin.zimasocial.context.social.chat.repository;
+
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Optional;
+public interface ChatRoomRepository {
+    ChatRoomId nextId();
+    Optional<ChatRoom> findById(ChatRoomId id);
+    void save(ChatRoom chatRoom);
+    Optional<ChatRoom> findByParticipantsBetween(AuthorId participant1, AuthorId participant2);
+    Page<ChatRoom> findByParticipantIn(AuthorId recipientId, PageRequest pageRequest);
+    void delete(ChatRoom chatRoom);
+}

@@ -3,13 +3,14 @@ package com.zimaberlin.zimasocial.context.social.media;
 import com.zimaberlin.zimasocial.context.social.infastructure.adapter.MediaDBAdapter;
 import com.zimaberlin.zimasocial.context.social.infastructure.repository.MediaDBCollection;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.entity.media.*;
 import com.zimaberlin.zimasocial.repository.MediaJpaRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 

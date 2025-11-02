@@ -29,8 +29,8 @@ public class FollowRequestEntity {
 
     public FollowRequestEntity(FollowRequest followRequest) {
         this.id = followRequest.getId();
-        this.followerId = followRequest.getFollowerAuthorId().getId();
-        this.followedId = followRequest.getFollowedAuthorId().getId();
+        this.followerId = followRequest.getFollowerAuthorId().getValue();
+        this.followedId = followRequest.getFollowedAuthorId().getValue();
         this.isAccepted = followRequest.getIsAccepted();
         this.createdAt = followRequest.getCreatedAt();
         this.updatedAt = followRequest.getUpdatedAt();

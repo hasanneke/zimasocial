@@ -1,6 +1,6 @@
 //package com.zimaberlin.zimasocial.service.movieService.Impl;
 //
-//import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
+//import com.zimaberlin.zimasocial.context.social.media.infastructure.movie.MovieResponseView;
 //import com.zimaberlin.zimasocial.service.movieService.domain.SearchMovieService;
 //import com.zimaberlin.zimasocial.service.movieService.domain.TVShowResponseView;
 //import org.springframework.beans.factory.annotation.Autowired;

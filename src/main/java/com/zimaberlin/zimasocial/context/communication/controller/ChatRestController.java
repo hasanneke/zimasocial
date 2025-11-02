@@ -1,14 +1,14 @@
 package com.zimaberlin.zimasocial.context.communication.controller;
 
-import com.zimaberlin.zimasocial.context.communication.chat.application.ChatServiceApplication;
-import com.zimaberlin.zimasocial.context.communication.chat.entity.ChatRoomId;
+import com.zimaberlin.zimasocial.context.common.SimplePagedModel;
+import com.zimaberlin.zimasocial.context.social.chat.application.ChatServiceApplication;
+import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
 import com.zimaberlin.zimasocial.context.communication.controller.bridge.ChatRestControllerBridge;
 import com.zimaberlin.zimasocial.context.communication.controller.request.ChatMessageRequest;
 import com.zimaberlin.zimasocial.context.communication.controller.views.ChatMessageView;
 import com.zimaberlin.zimasocial.context.communication.controller.views.ChatRoomView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,9 +33,21 @@ public class ChatRestController {
     }
 
     @GetMapping(path = "/{chatId}/messages")
-    public ResponseEntity<PagedModel<ChatMessageView>> getMessages(@PathVariable(name = "chatId") UUID chatId,
+    public ResponseEntity<SimplePagedModel<ChatMessageView>> getMessages(@PathVariable(name = "chatId") UUID chatId,
                                                                    @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                    @RequestParam(name = "size", defaultValue = "20") Integer size) {
         return ResponseEntity.ok(chatRestControllerBridge.getMessages(chatId, PageRequest.of(page, size)));
+    }
+
+    @GetMapping
+    public ResponseEntity<SimplePagedModel<ChatRoomView>> getChats(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                   @RequestParam(name = "size", defaultValue = "20") Integer size) {
+        return ResponseEntity.ok(chatRestControllerBridge.getChats(PageRequest.of(page, size)));
+    }
+
+    @DeleteMapping(path = "/{chatId}")
+    public ResponseEntity<Void> deleteChat(@PathVariable(name = "chatId") UUID chatId) {
+        chatServiceApplication.deleteChat(new ChatRoomId(chatId));
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,30 +1,34 @@
 package com.zimaberlin.zimasocial.context.social.post;
 
+import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
-import com.zimaberlin.zimasocial.context.social.media.*;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
-import com.zimaberlin.zimasocial.context.social.media.book.BookSearcher;
-import com.zimaberlin.zimasocial.exception.ConflictException;
-import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.like.Like;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
+import com.zimaberlin.zimasocial.context.social.media.BookSearcher;
+import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
+import com.zimaberlin.zimasocial.context.social.media.MusicSearcher;
+import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
+import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
+import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
+import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
-import com.zimaberlin.zimasocial.service.movieService.domain.MovieResponseView;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final AuthorRepository authorRepository;
@@ -32,17 +36,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final MovieSearcher movieSearcher;
     private final BookSearcher bookSearcher;
-    private final MediaCollection mediaRepository;
-    @Autowired
-    public PostService(PostRepository postRepository, AuthorRepository authorRepository, LikeRepository likeRepository, CommentRepository commentRepository, MovieSearcher movieSearcher, MediaCollection mediaRepository, BookSearcher bookSearcher) {
-        this.postRepository = postRepository;
-        this.authorRepository = authorRepository;
-        this.likeRepository = likeRepository;
-        this.commentRepository=  commentRepository;
-        this.movieSearcher = movieSearcher;
-        this.mediaRepository = mediaRepository;
-        this.bookSearcher = bookSearcher;
-    }
+    private final MusicSearcher musicSearcher;
     @Transactional
     public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
@@ -69,6 +63,17 @@ public class PostService {
                 content,
                 author.getId(),
                 movie);
+        return postRepository.save(post);
+    }
+
+    @Transactional
+    public Post createMusicPost(String content, String id) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        MusicMedia music = musicSearcher.get(id).orElseThrow(()->new DataNotFoundException("Music not found"));
+        Post post = new Post(postRepository.nextSequence(),
+                content,
+                author.getId(),
+                music);
         return postRepository.save(post);
     }
 

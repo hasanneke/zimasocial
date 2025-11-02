@@ -10,6 +10,7 @@ import com.zimaberlin.zimasocial.context.account.value.DisableReason;
 import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
 import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
 import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import jakarta.persistence.*;
@@ -223,5 +224,9 @@ public class UserEntity implements Serializable {
 
     public String getFullName(){
         return name + " " + familyName;
+    }
+
+    public Author toDomain() {
+        return new Author(new AuthorId(this.getId()), this.getSlug(), this.getName(),  this.getBio(), this.getFamilyName(), this.getAvatarFileName(), this.isPrivate(), this.getEmail(), this.getFollowersCount(), this.getFollowingCount(), this.getCreatedAt(), this.getLastSlugChangedAt());
     }
 }

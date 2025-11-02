@@ -14,12 +14,14 @@ public class Recipient {
     private final String slug;
     private final Set<DeviceToken> deviceTokens;
     private final String email;
+    private final Boolean isPrivate;
     public Recipient(RecipientId recipientId,
                      String slug,
                      Set<DeviceToken> deviceTokens,
                      String email,
                      String fullName,
-                     String avatarUrl) {
+                     String avatarUrl,
+                     Boolean privateAccount) {
         this.recipientId = recipientId;
         this.slug = slug;
         if (deviceTokens.isEmpty()){
@@ -30,6 +32,7 @@ public class Recipient {
         this.email = email;
         this.fullName = fullName;
         this.avatarUrl = avatarUrl;
+        this.isPrivate = privateAccount;
     }
 
     public void addToken(DeviceToken deviceToken) {

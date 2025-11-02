@@ -3,14 +3,14 @@ package com.zimaberlin.zimasocial.context.social.author;
 import java.util.Objects;
 
 public class AuthorId {
-    private final Long id;
+    private final Long value;
 
     public AuthorId(Long id) {
-        this.id = id;
+        this.value = id;
     }
 
-    public Long getId() {
-        return id;
+    public Long getValue() {
+        return value;
     }
 
     @Override
@@ -18,11 +18,11 @@ public class AuthorId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuthorId authorId = (AuthorId) o;
-        return Objects.equals(id, authorId.id);
+        return Objects.equals(value, authorId.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(value);
     }
 }
