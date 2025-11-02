@@ -1,0 +1,98 @@
+spring:
+  quartz:
+    job-store-type: "jdbc"
+    properties:
+      org:
+        quartz:
+          jobStore:
+            tablePrefix: "QUARTZ.QRTZ_"
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  devtools:
+    restart:
+      enabled: true
+  boot:
+    admin:
+      client:
+        service-base-url: http://localhost:8282
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  application:
+    name: zimasocial
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 500KB
+      max-request-size: 500KB
+  datasource:
+    url: jdbc:postgresql://dpg-d43ko6hr0fns73f6eu80-a.frankfurt-postgres.render.com/zimasocial
+    username: zimaberlin
+    password: t1ucZ5KnapB2MyY1yjmw4QAL1148Kj6R
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      format_sql: true
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+          jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+          scope:
+            - email
+            - profile
+            - openid
+      client:
+        registration:
+          google:
+            client-id: 584169392701-fddlu0av81lthm2jj0eq20hed8k7ruv7.apps.googleusercontent.com
+            client-secret: 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
+            scope: openid,profile,email
+  flyway:
+    locations: classpath:db/migrations
+    enabled: true
+    default-schema: public
+server:
+  port: 8081
+
+jwt:
+  secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com:
+      zimasocial:
+        app: TRACE
+
+aws:
+  access:
+    key:
+      id: AKIARSU7K5OF2DN6RANH
+  secret:
+    access:
+      key: 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
+  s3:
+    bucket: zimapublic
+    region: eu-central-1
+
+mediaprovider:
+  movie:
+    baseurl: https://api.themoviedb.org/3
+    apikey: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MzliYTVlMDYwNWVhZGQ2ZjFhOWY5NGU4NWNlYTU4NCIsIm5iZiI6MTczMDczNzgxNC4yOTQ1NjQsInN1YiI6IjY3MjhmNjM5NTkxODEzN2NmYzM5YzI0YSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JL7yTW0W-j_xvqXm84mHIkmd-pat0dkCeGp-QV1Onwc
+  spotify:
+    clientId: 95ab647256b140eb9aa7cb7fdd7d126e
+    clientSecret: 6678fd1040a64d929afa806168fe27dc
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    endpoint:
+      health:
+        show-detail: always
