@@ -5,6 +5,7 @@ import com.zimaberlin.zimasocial.context.social.infastructure.adapter.AuthorUser
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 import com.zimaberlin.zimasocial.repository.NotificationJpaRepository;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +16,13 @@ public class NotificationReadDBQuery implements NotificationQuery {
     private final NotificationJpaRepository notificationJpaRepository;
     private final AuthorAuthorViewAdapter authorViewAdapter;
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
+    private final EntityManager entityManager;
     @Autowired
-    public NotificationReadDBQuery(NotificationJpaRepository notificationJpaRepository, AuthorAuthorViewAdapter authorViewAdapter, AuthorUserEntityAdapter authorUserEntityAdapter) {
+    public NotificationReadDBQuery(NotificationJpaRepository notificationJpaRepository, AuthorAuthorViewAdapter authorViewAdapter, AuthorUserEntityAdapter authorUserEntityAdapter, EntityManager entityManager) {
         this.notificationJpaRepository = notificationJpaRepository;
         this.authorViewAdapter = authorViewAdapter;
         this.authorUserEntityAdapter = authorUserEntityAdapter;
+        this.entityManager = entityManager;
     }
 
     @Override
