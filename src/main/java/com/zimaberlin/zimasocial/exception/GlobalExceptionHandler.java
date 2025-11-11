@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.exception;
 
 import com.google.auth.oauth2.TokenVerifier;
-import com.zimaberlin.zimasocial.context.social.author.SlugCannotBeChangedException;
 import com.zimaberlin.zimasocial.utility.ResponseError;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
@@ -103,7 +102,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(com.zimaberlin.zimasocial.exception.BadRequestException.class)
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ResponseError> handleGenericException(BadRequestException ex) {
         logger.severe(Arrays.toString(ex.getStackTrace()));

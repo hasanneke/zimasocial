@@ -128,8 +128,7 @@ public class PostDBRepository implements PostRepository {
     @Override
     @Transactional
     public Post save(Post post) {
-        PostEntity postEntity;
-        postEntity = new PostEntity();
+        PostEntity postEntity = postJpaRepository.findById(post.getPostId()).orElse(new PostEntity());
         postEntity.merge(post);
         UserEntity user = userRepository.findById(post.getAuthorId().getValue()).orElseThrow(UserNotFoundException::new);
         postEntity.setUser(user);

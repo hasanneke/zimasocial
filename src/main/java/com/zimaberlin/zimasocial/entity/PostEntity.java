@@ -68,8 +68,8 @@ public class PostEntity {
     @JsonIgnore
     private Set<TodaysPost> todaysPosts =  new HashSet<>();
 
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
-    @Column(name = "created_at")
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")

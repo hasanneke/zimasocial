@@ -24,12 +24,12 @@ spring:
       max-file-size: 500KB
       max-request-size: 500KB
   datasource:
-    url: jdbc:postgresql://dpg-d43ko6hr0fns73f6eu80-a.frankfurt-postgres.render.com/zimasocial
-    username: zimaberlin
-    password: t1ucZ5KnapB2MyY1yjmw4QAL1148Kj6R
+    url: jdbc:postgresql://zimadb.cn0oq4k4gnmz.eu-central-1.rds.amazonaws.com/zimasocial
+    username: zima
+    password: test123123
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
     properties:
@@ -66,6 +66,8 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.engine.jdbc.connections: TRACE
+    com.zaxxer.hikari: DEBUG
     com:
       zimasocial:
         app: TRACE
