@@ -73,13 +73,13 @@ public class JWTService {
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusSeconds(10);
+        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusMinutes(15);
         OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusMonths(2);
         String token = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
                 .signWith(getSigningKey())
                 .compact();
 
