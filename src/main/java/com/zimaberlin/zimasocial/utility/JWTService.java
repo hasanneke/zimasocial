@@ -3,8 +3,8 @@ package com.zimaberlin.zimasocial.utility;
 
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
-import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
+import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import io.jsonwebtoken.Claims;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,13 +73,13 @@ public class JWTService {
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusHours(1);
-        OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusDays(1);
+        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusSeconds(10);
+        OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusMonths(2);
         String token = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60))
                 .signWith(getSigningKey())
                 .compact();
 
@@ -88,19 +87,19 @@ public class JWTService {
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 24 * 7))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 60))
                 .signWith(getSigningKey())
                 .compact();
 
         RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
-        tokenEntity.setToken(token);
+        tokenEntity.setToken(hashedRefreshToken);
         tokenEntity.setExpiresAt(refreshTokenExpirationDate);
         UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
         tokenEntity.setUser(user);
 
         TokenResponse refreshToken = TokenResponse.builder()
                 .token(hashedRefreshToken)
-                .expireDate(OffsetDateTime.now().plusDays(1))
+                .expireDate(refreshTokenExpirationDate)
                 .build();
 
         refreshTokenRepository.save(tokenEntity);

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -123,11 +124,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public TokenResponse refreshToken(String refreshToken) throws TokenVerifier.VerificationException {
-        boolean expired = jwtService.isTokenExpired(refreshToken);
-        if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
-
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByTokenAndRevoked(refreshToken, false)
                 .orElseThrow(()->new DataNotFoundException("Refresh token not found"));
+        boolean expired = refreshTokenEntity.getExpiresAt().isBefore(OffsetDateTime.now());
+        if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
         refreshTokenEntity.setRevoked(true);
         refreshTokenRepository.save(refreshTokenEntity);
 
