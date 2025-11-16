@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -123,7 +124,7 @@ public class AuthorService {
         if(checkAuthorWithSameSlug.isPresent()){
             throw new SlugAlreadyTakenException(slug);
         }
-        author.updateSlug(slug);
+        author.updateSlug(slug.trim().toLowerCase(Locale.ENGLISH));
         authorRepository.save(author);
     }
     @Transactional

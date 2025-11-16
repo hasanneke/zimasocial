@@ -139,11 +139,8 @@ public class AuthServiceImpl implements AuthService {
     private String generateUniqueSlug(String name) {
         String slug = getTrimmedName(name);
 
-        // Keep trying until we find a unique slug
-        int attempt = 0;
         while (userRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
-            attempt++;
-            slug = slug + random.nextInt(10000);
+            slug = slug + random.nextInt(10000000);
         }
 
         return slug;

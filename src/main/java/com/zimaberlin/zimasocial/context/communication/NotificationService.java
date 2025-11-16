@@ -50,11 +50,15 @@ public class NotificationService {
     public void sendAuthorSentFollowRequestNotification(AuthorFollowRequestSentNotification authorFollowRequestSentNotification) {
         notificationRepository.save(authorFollowRequestSentNotification);
     }
-
+    public void sendChatMessageSentNotification(ChatMessageSentNotification chatMessageSentNotification) {
+        notificationRepository.save(chatMessageSentNotification);
+    }
     @Transactional
     public void saveDeviceToken(String token) {
         Recipient recipient = recipientRepository.getAuthenticatedRecipient();
         recipient.addToken(new DeviceToken(token, recipient.getRecipientId()));
         recipientRepository.save(recipient);
     }
+
+
 }

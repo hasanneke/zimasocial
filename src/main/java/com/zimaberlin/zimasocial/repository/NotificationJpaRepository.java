@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.repository;
 
-import com.zimaberlin.zimasocial.context.communication.notifications.Notification;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;

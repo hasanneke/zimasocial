@@ -18,6 +18,8 @@ public class QuartzConfigDev {
     @Bean
     public Scheduler scheduler(@Qualifier("todaysPostTrigger") Trigger todaysPostTrigger,
                                @Qualifier("todaysPostJobDetail") JobDetail todaysPostJobDetail,
+                               @Qualifier("pushNotificationsTrigger") Trigger pushNotificationsTrigger,
+                               @Qualifier("pushNotificationsJobDetail") JobDetail pushNotificationsJobDetail,
                                @Qualifier("spotifyTokenRefresherJobDetail") JobDetail spotifyTokenRefresherJobDetail,
                                @Qualifier("spotifyTokenRefresherTrigger") Trigger spotifyTokenRefresherTrigger,
                                SchedulerFactoryBean factory)
@@ -26,6 +28,7 @@ public class QuartzConfigDev {
         scheduler.deleteJob(JobKey.jobKey("Qrtz_Todays_Posts_Job_Detail"));
         scheduler.deleteJob(JobKey.jobKey("Qrtz_Push_Notifications_JobDetail"));
         scheduler.deleteJob(JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail"));
+        scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
         scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
         scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
         scheduler.start();

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class FirebasePushNotificationProvider implements PushNotificationProvider {
-    private final FirebaseMessaging firebaseMessaging;
     public void push(PushNotification pushNotification)  {
         Notification notification = Notification.builder()
                                 .setTitle(pushNotification.getTitle())

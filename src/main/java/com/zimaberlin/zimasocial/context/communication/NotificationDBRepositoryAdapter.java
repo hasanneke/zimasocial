@@ -118,6 +118,15 @@ public class NotificationDBRepositoryAdapter {
                         .replyId(notificationEntity.getTargetId())
                         .build();
             }
+            case NEW_MESSAGE -> {
+                return ChatMessageSentNotification.builder()
+                        .id(notificationEntity.getId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .build();
+            }
             case POST_DELETED, VERY_IMPORTANT, POST_SHARED, DANGER, WELCOME, NEWS, IMPORTANT -> {
             }
         }

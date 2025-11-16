@@ -114,6 +114,13 @@ public class NotificationEventListener {
 
     @EventListener
     public void handleChatMessageSentEvent(ChatMessageSentEvent chatMessageSentEvent) {
-
+        ChatMessageSentNotification chatMessageSentNotification = ChatMessageSentNotification
+                .builder()
+                .actorId(new RecipientId(chatMessageSentEvent.sender().getId().getValue()))
+                .recipientId(new RecipientId(chatMessageSentEvent.receiver().getId().getValue()))
+                .createdAt(OffsetDateTime.now())
+                .message(chatMessageSentEvent.message().message())
+                .build();
+        notificationService.sendChatMessageSentNotification(chatMessageSentNotification);
     }
 }
