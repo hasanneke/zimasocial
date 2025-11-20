@@ -38,6 +38,9 @@ public class Recipient {
     public void addToken(DeviceToken deviceToken) {
         this.deviceTokens.add(deviceToken);
     }
+    public void removeToken(DeviceToken deviceToken) {
+        this.deviceTokens.remove(deviceToken);
+    }
 
     @Override
     public boolean equals(Object o) {
