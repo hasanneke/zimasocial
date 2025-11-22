@@ -14,8 +14,8 @@ import java.util.UUID;
 
 @Component
 public interface ChatRoomJpaDao extends JpaRepository<ChatRoomJpaEntity, UUID> {
-    @Query("SELECT chatRoom FROM ChatRoomJpaEntity chatRoom WHERE (chatRoom.participant1 = :participant1 OR chatRoom.participant2 = :participant2) AND chatRoom.lastMessage IS NOT NULL")
-    Page<ChatRoomJpaEntity> findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNull(UserEntity participant1, UserEntity participant2, PageRequest pageRequest);
+    @Query("SELECT chatRoom FROM ChatRoomJpaEntity chatRoom WHERE (chatRoom.participant1 = :participant1 OR chatRoom.participant2 = :participant2) AND chatRoom.lastMessage IS NOT NULL ORDER BY chatRoom.lastMessage.createdAt DESC")
+    Page<ChatRoomJpaEntity> findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(UserEntity participant1, UserEntity participant2, PageRequest pageRequest);
     @Query("""
             SELECT chatRoom FROM ChatRoomJpaEntity chatRoom WHERE
             (chatRoom.participant1Id = :participant1Id AND chatRoom.participant2Id = :participant2Id)

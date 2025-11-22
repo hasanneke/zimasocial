@@ -27,7 +27,7 @@ public class NotificationManager {
             Optional<Notification> checkPreviousNotification = notificationRepository.getPreviousNotification(notification);
             if (checkPreviousNotification.isPresent()) {
                 Notification previousNotification = checkPreviousNotification.get();
-                if (notificationPolicy.canResend(previousNotification)) {
+                if (!notificationPolicy.canResend(previousNotification)) {
                     logger.warn("{} not inserted. Throttled.", notification.getClass().getSimpleName());
                     return;
                 }
