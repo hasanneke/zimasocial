@@ -1,7 +1,8 @@
-package com.zimaberlin.zimasocial.context.communication;
+package com.zimaberlin.zimasocial.context.communication.infastructure;
 
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
-import com.zimaberlin.zimasocial.context.communication.notifications.*;
+import com.zimaberlin.zimasocial.context.communication.domain.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 import com.zimaberlin.zimasocial.entity.NotificationType;
 import com.zimaberlin.zimasocial.entity.TargetCollection;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class NotificationDBRepository implements NotificationRepository{
+public class NotificationDBRepository implements NotificationRepository {
     private final NotificationJpaRepository notificationJpaRepository;
     private final UserJpaRepository userJpaRepository;
 
@@ -63,5 +64,38 @@ public class NotificationDBRepository implements NotificationRepository{
     @Override
     public List<Notification> findAllByIsPushedFalse() {
         return notificationJpaRepository.findAllByIsPushedFalse().stream().map(NotificationDBRepositoryAdapter::convertToNotification).toList();
+    }
+
+    @Override
+    public Optional<Notification> getPreviousNotification(Notification notification) {
+        switch (notification){
+            case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.USER_FOLLOW_REQUEST_ACCEPTED).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case AuthorFollowRequestSentNotification authorFollowRequestSentNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.USER_SENT_FOLLOW_REQUEST).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case AuthorFollowedNotification authorFollowedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.USER_FOLLOWED_YOU).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case ChatMessageSentNotification chatMessageSentNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.NEW_MESSAGE).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case CommentLikedNotification commentLikedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_LIKED, commentLikedNotification.getCommentId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case CommentRepliedNotification commentRepliedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_REPLIED, commentRepliedNotification.getReplyId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case PostCommentedNotification postCommentedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_COMMENTED, postCommentedNotification.getPostId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case PostLikedNotification postLikedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_LIKED, postLikedNotification.getPostId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case SimpleNotification simpleNotification -> {
+                return Optional.empty();
+            }
+        }
     }
 }

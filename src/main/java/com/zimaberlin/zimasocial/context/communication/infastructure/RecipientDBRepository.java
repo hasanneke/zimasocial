@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.communication.infastructure;
 
 import com.zimaberlin.zimasocial.context.communication.RecipientNotFoundException;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
-import com.zimaberlin.zimasocial.context.communication.repository.RecipientRepository;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.Recipient;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.repository.RecipientRepository;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.repository.UserJpaRepository;
 import com.zimaberlin.zimasocial.utility.CurrentUser;

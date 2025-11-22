@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.communication.notifications;
+package com.zimaberlin.zimasocial.context.communication.domain.entity;
 
 import lombok.experimental.SuperBuilder;
 

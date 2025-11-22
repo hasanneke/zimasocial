@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.communication.domain;
+package com.zimaberlin.zimasocial.context.communication.domain.value;
 
 import lombok.Getter;
 

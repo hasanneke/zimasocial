@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
-import com.zimaberlin.zimasocial.context.communication.domain.DeviceToken;
+import com.zimaberlin.zimasocial.context.communication.domain.value.DeviceToken;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;

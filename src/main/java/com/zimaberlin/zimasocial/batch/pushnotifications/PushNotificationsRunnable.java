@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.batch.pushnotifications;
 
-import com.zimaberlin.zimasocial.context.communication.PushNotificationService;
+import com.zimaberlin.zimasocial.context.communication.application.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

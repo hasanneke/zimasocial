@@ -1,10 +1,11 @@
-package com.zimaberlin.zimasocial.context.communication;
+package com.zimaberlin.zimasocial.context.communication.application;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.zimaberlin.zimasocial.context.communication.domain.DeviceToken;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
-import com.zimaberlin.zimasocial.context.communication.notifications.*;
-import com.zimaberlin.zimasocial.context.communication.repository.RecipientRepository;
+import com.zimaberlin.zimasocial.context.communication.domain.repository.NotificationRepository;
+import com.zimaberlin.zimasocial.context.communication.domain.service.RecipientValidator;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
+import com.zimaberlin.zimasocial.context.communication.domain.repository.RecipientRepository;
+import com.zimaberlin.zimasocial.context.communication.domain.value.DeviceToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ public class PushNotificationService {
     }
 
     public void push(Notification notification, List<DeviceToken> deviceTokens) {
+        // TODO: eğer bildirim için: Alıcı, Gönderici ve Tip aynı olan bir bildirim daha önce varsa, üzerinden iki saat geçmiş olmalı - DB seviyesinde yapılmalı.
         Assert.notNull(notification, "Notification cannot be null");
         Recipient recipient = recipientRepository.findByRecipientId(notification.getRecipientId()).orElse(null);
         if (recipient == null) return;
@@ -67,6 +69,8 @@ public class PushNotificationService {
             };
             try {
                 pushNotificationProvider.push(pushNotification);
+                notification.push();
+                notificationRepository.save(notification);
             } catch (FirebaseMessagingException e) {
                 switch (e.getMessagingErrorCode()) {
                     case INVALID_ARGUMENT -> {

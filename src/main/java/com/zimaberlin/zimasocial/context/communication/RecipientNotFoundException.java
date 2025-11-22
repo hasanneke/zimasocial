@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.communication;
 
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 
 public class RecipientNotFoundException extends DataNotFoundException {

@@ -1,7 +1,7 @@
-package com.zimaberlin.zimasocial.context.communication.repository;
+package com.zimaberlin.zimasocial.context.communication.domain.repository;
 
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.Recipient;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 
 import java.util.Optional;
 

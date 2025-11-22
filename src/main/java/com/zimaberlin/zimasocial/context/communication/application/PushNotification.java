@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.communication;
+package com.zimaberlin.zimasocial.context.communication.application;
 
 import lombok.Getter;
 

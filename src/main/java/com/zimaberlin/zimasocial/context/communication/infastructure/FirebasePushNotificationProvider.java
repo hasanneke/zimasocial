@@ -1,8 +1,8 @@
 package com.zimaberlin.zimasocial.context.communication.infastructure;
 
 import com.google.firebase.messaging.*;
-import com.zimaberlin.zimasocial.context.communication.PushNotification;
-import com.zimaberlin.zimasocial.context.communication.PushNotificationProvider;
+import com.zimaberlin.zimasocial.context.communication.application.PushNotification;
+import com.zimaberlin.zimasocial.context.communication.application.PushNotificationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

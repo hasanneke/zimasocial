@@ -7,7 +7,7 @@ import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededExc
 import com.zimaberlin.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
 import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
 import com.zimaberlin.zimasocial.context.account.value.DisableReason;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.Recipient;
 import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;

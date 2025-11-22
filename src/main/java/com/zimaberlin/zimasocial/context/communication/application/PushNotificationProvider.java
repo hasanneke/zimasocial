@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.communication;
+package com.zimaberlin.zimasocial.context.communication.application;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 

@@ -1,7 +1,7 @@
-package com.zimaberlin.zimasocial.context.communication;
+package com.zimaberlin.zimasocial.context.communication.infastructure;
 
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
-import com.zimaberlin.zimasocial.context.communication.notifications.*;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {
@@ -56,6 +56,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case COMMENT_LIKED -> {
@@ -67,6 +68,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case USER_FOLLOWED_YOU -> {
@@ -76,6 +78,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case USER_FOLLOW_REQUEST_ACCEPTED -> {
@@ -85,6 +88,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case USER_SENT_FOLLOW_REQUEST -> {
@@ -94,6 +98,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case POST_COMMENTED -> {
@@ -105,6 +110,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case COMMENT_REPLIED -> {
@@ -116,6 +122,7 @@ public class NotificationDBRepositoryAdapter {
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
                         .replyId(notificationEntity.getTargetId())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case NEW_MESSAGE -> {
@@ -125,6 +132,7 @@ public class NotificationDBRepositoryAdapter {
                         .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
                         .build();
             }
             case POST_DELETED, VERY_IMPORTANT, POST_SHARED, DANGER, WELCOME, NEWS, IMPORTANT -> {

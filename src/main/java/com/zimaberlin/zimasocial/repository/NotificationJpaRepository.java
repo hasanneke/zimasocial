@@ -17,6 +17,9 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
     Page<NotificationEntity> findByReceiverUserIdOrderByCreatedAtDesc(Long receiverId, Pageable page);
     Optional<NotificationEntity> findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
     Optional<NotificationEntity> findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
+
     Optional<NotificationEntity> findByActorIdAndTargetIdAndTypeAndTargetCollection(Long actorId, Long targetId, NotificationType type, TargetCollection collection);
+    Optional<NotificationEntity> findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(Long actorId, Long receiverId, NotificationType type);
+    Optional<NotificationEntity> findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(Long actorId, Long receiverId, NotificationType type, Long targetId);
     List<NotificationEntity> findAllByIsPushedFalse();
 }

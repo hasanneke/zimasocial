@@ -1,5 +1,7 @@
-package com.zimaberlin.zimasocial.context.communication.domain;
+package com.zimaberlin.zimasocial.context.communication.domain.entity;
 
+import com.zimaberlin.zimasocial.context.communication.domain.value.DeviceToken;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 import lombok.Getter;
 
 import java.util.HashSet;

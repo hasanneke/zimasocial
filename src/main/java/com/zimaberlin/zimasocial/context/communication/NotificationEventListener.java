@@ -1,7 +1,8 @@
 package com.zimaberlin.zimasocial.context.communication;
 
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
-import com.zimaberlin.zimasocial.context.communication.notifications.*;
+import com.zimaberlin.zimasocial.context.communication.application.NotificationManager;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
 import com.zimaberlin.zimasocial.context.social.author.AuthorFollowRequestSentEvent;
 import com.zimaberlin.zimasocial.context.social.author.AuthorFollowedEvent;
 import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorFollowRequestAcceptedEvent;
@@ -20,7 +21,7 @@ import java.time.OffsetDateTime;
 @Component
 @RequiredArgsConstructor
 public class NotificationEventListener {
-    private final NotificationService notificationService;
+    private final NotificationManager notificationManager;
     @EventListener
     public void handlePostLikedEvent(PostLikedEvent postLikedEvent) {
         if(postLikedEvent.postOwnerId().equals(postLikedEvent.actorId())){
@@ -32,7 +33,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(postLikedEvent.postOwnerId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendPostLikedNotification(postLikedNotification);
+        notificationManager.throttled().sendNotification(postLikedNotification);
     }
 
     @EventListener
@@ -46,7 +47,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(postCommentedEvent.commentOwnerId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendPostCommentedNotification(postCommentedNotification);
+        notificationManager.sendNotification(postCommentedNotification);
     }
 
 
@@ -62,11 +63,11 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(commentLikedEvent.commentOwnerId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendCommentLikedNotification(commentLikedNotification);
+        notificationManager.throttled().sendNotification(commentLikedNotification);
     }
 
     @EventListener
-    public void   handleCommentRepliedEvent(CommentRepliedEvent commentRepliedEvent) {
+    public void handleCommentRepliedEvent(CommentRepliedEvent commentRepliedEvent) {
         if(commentRepliedEvent.parentCommentOwnerId().equals(commentRepliedEvent.replyerId())){
             return;
         }
@@ -76,7 +77,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendCommentRepliedNotification(commentRepliedNotification);
+        notificationManager.sendNotification(commentRepliedNotification);
     }
 
     @EventListener
@@ -87,7 +88,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(authorFollowedEvent.followed().getId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendAuthorFollowedYouNotification(authorFollowedNotification);
+        notificationManager.throttled().sendNotification(authorFollowedNotification);
     }
 
     @EventListener
@@ -98,7 +99,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(authorFollowRequestAcceptedEvent.followerAuthorId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendAuthorFollowedRequestAcceptedNotification(authorFollowedNotification);
+        notificationManager.sendNotification(authorFollowedNotification);
     }
 
     @EventListener
@@ -109,7 +110,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(authorFollowRequestSentEvent.followedId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationService.sendAuthorSentFollowRequestNotification(authorFollowedNotification);
+        notificationManager.throttled().sendNotification(authorFollowedNotification);
     }
 
     @EventListener
@@ -121,6 +122,6 @@ public class NotificationEventListener {
                 .createdAt(OffsetDateTime.now())
                 .message(chatMessageSentEvent.message().message())
                 .build();
-        notificationService.sendChatMessageSentNotification(chatMessageSentNotification);
+        notificationManager.sendNotification(chatMessageSentNotification);
     }
 }

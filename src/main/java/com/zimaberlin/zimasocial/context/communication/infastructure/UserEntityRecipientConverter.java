@@ -1,8 +1,8 @@
 package com.zimaberlin.zimasocial.context.communication.infastructure;
 
-import com.zimaberlin.zimasocial.context.communication.domain.DeviceToken;
-import com.zimaberlin.zimasocial.context.communication.domain.Recipient;
-import com.zimaberlin.zimasocial.context.communication.domain.RecipientId;
+import com.zimaberlin.zimasocial.context.communication.domain.value.DeviceToken;
+import com.zimaberlin.zimasocial.context.communication.domain.entity.Recipient;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 
 import java.util.stream.Collectors;
