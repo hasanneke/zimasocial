@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class PushNotificationService {
     private final RecipientRepository recipientRepository;
     private final PushNotificationProvider pushNotificationProvider;
     private final RecipientValidator recipientValidator;
-
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     @Transactional
     public void startPushing() {
         List<Notification> notificationList = notificationRepository.findAllByIsPushedFalse();
@@ -65,7 +66,6 @@ public class PushNotificationService {
                 case ChatMessageSentNotification chatMessageSentNotification ->
                         new PushNotification("@%s bir mesaj gönderdi: %s".formatted(actor.getSlug(), chatMessageSentNotification.getMessage()), deviceToken.getToken());
                 case SimpleNotification simpleNotification -> new PushNotification(simpleNotification.getMessage(), deviceToken.getToken());
-                default -> throw new RuntimeException();
             };
             try {
                 pushNotificationProvider.push(pushNotification);
@@ -82,6 +82,8 @@ public class PushNotificationService {
                         recipientRepository.save(recipient);
                     }
                 }
+            } catch (Exception e){
+                logger.warning("Push Notification couldn't be sent %s".formatted(e.getMessage()));
             }
         }
     }
