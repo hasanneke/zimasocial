@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class FirebasePushNotificationProvider implements PushNotificationProvider {
-    public void push(PushNotification pushNotification)  {
+    public void push(PushNotification pushNotification)  throws FirebaseMessagingException{
         Notification notification = Notification.builder()
                                 .setTitle(pushNotification.getTitle())
                                 .setBody(pushNotification.getMessage())
@@ -19,10 +19,6 @@ public class FirebasePushNotificationProvider implements PushNotificationProvide
                 .setToken(pushNotification.getDeviceToken())
                 .setNotification(notification)
                 .build();
-        try {
-            FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
-        }
+        FirebaseMessaging.getInstance().send(message);
     }
 }
