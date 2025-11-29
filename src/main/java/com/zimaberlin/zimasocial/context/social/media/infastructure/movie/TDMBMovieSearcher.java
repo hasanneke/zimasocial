@@ -84,7 +84,7 @@ public class TDMBMovieSearcher implements MovieSearcher {
         assert type != null;
         if (type.equals(MovieMediaType.movie)) {
             URI uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(String.format("%s/movie/%s", baseUrl, id))
-                    .queryParam("language", language)
+                    .queryParam("language", "tr-TR")
                     .encode(StandardCharsets.UTF_8)
                     .build()
                     .toUri();
