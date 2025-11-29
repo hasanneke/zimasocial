@@ -53,12 +53,6 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
-    public List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
-        List<PostEntity> postEntityPage = postJpaRepository.findAllByCreatedAtBetween(start, end);
-        return postEntityPage.stream().map(PostEntity::convertToPostDomain).toList();
-    }
-
-    @Override
     public Page<Post> findAll(Pageable page, String slug, PostCategory category) {
         System.out.println("Start findAll at %s".formatted(LocalDateTime.now()));
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();

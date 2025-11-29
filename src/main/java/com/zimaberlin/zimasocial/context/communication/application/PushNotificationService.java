@@ -41,7 +41,6 @@ public class PushNotificationService {
     }
 
     public void push(Notification notification, List<DeviceToken> deviceTokens) {
-        // TODO: eğer bildirim için: Alıcı, Gönderici ve Tip aynı olan bir bildirim daha önce varsa, üzerinden iki saat geçmiş olmalı - DB seviyesinde yapılmalı.
         Assert.notNull(notification, "Notification cannot be null");
         Recipient recipient = recipientRepository.findByRecipientId(notification.getRecipientId()).orElse(null);
         if (recipient == null) return;

@@ -5,13 +5,11 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
     Optional<Post> findById(Long postId);
-    List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     Page<Post> findAll(Pageable page, String slug, PostCategory type);
     void makeInvisiblePostsOfAuthor(AuthorId authorId);
     void makePostsVisibleOfAuthor(AuthorId authorId);

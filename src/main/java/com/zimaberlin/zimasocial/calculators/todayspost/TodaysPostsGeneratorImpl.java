@@ -1,21 +1,18 @@
 package com.zimaberlin.zimasocial.calculators.todayspost;
 
 import com.zimaberlin.zimasocial.calculators.PostScoreCalculator;
-
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,7 +39,8 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
 
     @Override
     public List<TodaysPost> selectTodaysPosts() {
-        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDate.now().minusDays(1).atStartOfDay(), LocalDate.now().atStartOfDay());
+        ZoneId zone = ZoneId.of("Europe/Istanbul");
+        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDate.now().minusDays(1).atStartOfDay(zone).toOffsetDateTime(), LocalDate.now().atStartOfDay(zone).toOffsetDateTime());
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.movie))
