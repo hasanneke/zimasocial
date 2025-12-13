@@ -5,8 +5,8 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
-import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.media.*;
@@ -21,7 +21,7 @@ import com.zimaberlin.zimasocial.repository.UserRelationJpaRepository;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import com.zimaberlin.zimasocial.utility.CurrentUser;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,32 +29,25 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class PostDBRepository implements PostRepository {
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userRepository;
     private final TodaysPostRepository todaysPostRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
-    @Autowired
-    public PostDBRepository(PostJpaRepository postJpaRepository, UserJpaRepository userRepository, TodaysPostRepository todaysPostRepository, UserRelationJpaRepository userRelationJpaRepository) {
-        this.postJpaRepository = postJpaRepository;
-        this.userRepository = userRepository;
-        this.todaysPostRepository = todaysPostRepository;
-        this.userRelationJpaRepository = userRelationJpaRepository;
-    }
     @Override
     public Optional<Post> findById(Long postId) {
         PostEntity post = postJpaRepository.findByIdAndIsVisibleTrue(postId).orElseThrow(PostNotFoundException::new);
-        return Optional.ofNullable(post.convertToPostDomain());
+        return Optional.ofNullable(post.rehydrate());
     }
 
     @Override
     public Page<Post> findAll(Pageable page, String slug, PostCategory category) {
-        System.out.println("Start findAll at %s".formatted(LocalDateTime.now()));
         UserEntity currentUser = CurrentUser.getCurrentUserProfile();
         Specification<PostEntity> specification = Specification.where(null);
         if(slug != null){
@@ -75,24 +68,23 @@ public class PostDBRepository implements PostRepository {
         List<UserRelationEntity> blockRelations = userRelationJpaRepository.findAllBlockRelations(currentUser.getId());
         List<UserRelationEntity> followRelations = userRelationJpaRepository.findByActorIdAndRelation(currentUser.getId(), Relation.followed);
         List<Long> followedAuthors = followRelations.stream().map(UserRelationEntity::getReceiverId).toList();
-        
+
         specification = specification.and(PostSpecification.notBlocked(currentUser.getId(), blockRelations));
         specification = specification.and(PostSpecification.isVisible());
         specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
         Page<PostEntity> postEntityPage = postJpaRepository.findAll(specification, page);
-        System.out.println("End findAll at %s".formatted(LocalDateTime.now()));
-        return postEntityPage.map(PostEntity::convertToPostDomain);
+        return postEntityPage.map(PostEntity::rehydrate);
     }
 
     @Override
     public Page<Post> findFollowingsPosts(Pageable page, AuthorId authorId) {
-        return postJpaRepository.findFollowingsPosts(page, authorId.getValue()).map(PostEntity::convertToPostDomain);
+        return postJpaRepository.findFollowingsPosts(page, authorId.getValue()).map(PostEntity::rehydrate);
     }
 
     @Override
     public List<Post> findTodaysPosts() {
         List<TodaysPost> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
-        return todaysPosts.stream().map((e)-> e.getPost().convertToPostDomain()).toList();
+        return todaysPosts.stream().map((e)-> e.getPost().rehydrate()).toList();
     }
 
     @Override
@@ -109,14 +101,19 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public List<Post> findAllByAuthorId(AuthorId authorId) {
-        return postJpaRepository.findAllByUserId(authorId.getValue()).stream().map(PostEntity::convertToPostDomain).toList();
+        return postJpaRepository.findAllByUserId(authorId.getValue()).stream().map(PostEntity::rehydrate).toList();
     }
 
     @Override
     public List<Post> findAllInvisiblePostsByAuthorId(AuthorId authorId) {
         return postJpaRepository.
                 findAllInvisiblePostsByUserId(authorId.getValue()).
-                stream().map(PostEntity::convertToPostDomain).toList();
+                stream().map(PostEntity::rehydrate).toList();
+    }
+
+    @Override
+    public List<Post> findAllByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end) {
+        return postJpaRepository.findAllByCreatedAtBetween(start, end).stream().map(PostEntity::rehydrate).toList();
     }
 
     @Override
@@ -162,7 +159,7 @@ public class PostDBRepository implements PostRepository {
             }
         }
         PostEntity savedPost = postJpaRepository.save(postEntity);
-        return savedPost.convertToPostDomain();
+        return savedPost.rehydrate();
     }
 
     @Override

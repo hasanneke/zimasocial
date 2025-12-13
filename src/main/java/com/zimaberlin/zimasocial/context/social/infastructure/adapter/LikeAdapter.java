@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.social.infastructure.adapter;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
-import com.zimaberlin.zimasocial.context.social.post.PostLike;
+import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
 import com.zimaberlin.zimasocial.entity.LikeEntity;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.value;
 
 public class MovieMediaId {
     private final String id;

@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.communication.infastructure;
 
-import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
+import com.zimaberlin.zimasocial.context.communication.domain.value.RecipientId;
 import com.zimaberlin.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {

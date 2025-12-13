@@ -19,8 +19,8 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
     @Query(value = """
              SELECT P.* FROM post P
              INNER JOIN users U ON P.user_id = U.id AND P.is_deleted = false
-             INNER JOIN user_relation UR on UR.receiver_id = U.id AND UR.initiated_id = :authorId AND UR.relation = 'followed' AND UR.is_deleted = false
-             WHERE P.IS_VISIBLE = TRUE AND P.IS_DELETED = FALSE
+             INNER JOIN user_relation UR on UR.receiver_id = U.id AND UR.initiated_id = :authorId AND UR.relation = 'followed'
+             WHERE P.IS_VISIBLE = TRUE
             """, nativeQuery = true)
     Page<PostEntity> findFollowingsPosts(Pageable pageable, Long authorId);
 
@@ -33,4 +33,5 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
     List<PostEntity> findAllInvisiblePostsByUserId(Long userId);
     List<PostEntity> findAllByUserId(Long userId);
     Optional<PostEntity> findByIdAndIsVisibleTrue(Long id);
+    List<PostEntity> findByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
 }

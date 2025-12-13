@@ -1,4 +1,7 @@
 spring:
+  org:
+    hibernate:
+      SQL: DEBUG
   quartz:
     job-store-type: "jdbc"
     properties:
@@ -29,7 +32,7 @@ spring:
     password: example
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: validate
     properties:
@@ -62,13 +65,11 @@ server:
 jwt:
   secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com:
-      zimasocial:
-        app: TRACE
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.type.descriptor.jdbc: TRACE
 
 aws:
   access:
@@ -88,11 +89,20 @@ mediaprovider:
   spotify:
     clientId: 95ab647256b140eb9aa7cb7fdd7d126e
     clientSecret: 6678fd1040a64d929afa806168fe27dc
+  jmx:
+    enabled: true
 management:
   endpoints:
+    jmx:
+      exposure:
+        include: "*"
     web:
       exposure:
         include: "*"
     endpoint:
       health:
         show-detail: always
+webLink: "https://zimasocial-15e04.web.app"
+links:
+  website: "https://zimasocial-15e04.web.app"
+  uri: "zima://app"

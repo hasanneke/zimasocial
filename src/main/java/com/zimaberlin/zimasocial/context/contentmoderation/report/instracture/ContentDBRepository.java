@@ -6,9 +6,8 @@ import com.zimaberlin.zimasocial.context.contentmoderation.report.content.PostCo
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
-import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
-import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

@@ -18,6 +18,7 @@ public class FirebasePushNotificationProvider implements PushNotificationProvide
                 .setNotification(notification)
                 .setToken(pushNotification.getDeviceToken())
                 .setNotification(notification)
+                .putData("url", pushNotification.getLinkToSource())
                 .build();
         FirebaseMessaging.getInstance().send(message);
     }

@@ -7,6 +7,7 @@ import com.zimaberlin.zimasocial.context.communication.domain.entity.*;
 import com.zimaberlin.zimasocial.context.communication.domain.repository.RecipientRepository;
 import com.zimaberlin.zimasocial.context.communication.domain.value.DeviceToken;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -24,6 +25,8 @@ public class PushNotificationService {
     private final PushNotificationProvider pushNotificationProvider;
     private final RecipientValidator recipientValidator;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+    @Value("${webLink}")
+    private String webLink;
     @Transactional
     public void startPushing() {
         List<Notification> notificationList = notificationRepository.findAllByIsPushedFalse();
@@ -48,28 +51,44 @@ public class PushNotificationService {
             Recipient actor = recipientRepository.findByRecipientId(notification.getActorId()).orElse(null);
             if (actor == null) return;
             PushNotification pushNotification = switch (notification) {
-                case AuthorFollowedNotification authorFollowedNotification ->
-                        new PushNotification("@%s seni takip etmeye başladı".formatted(actor.getSlug()), deviceToken.getToken());
-                case AuthorFollowRequestSentNotification authorFollowRequestSentNotification ->
-                        new PushNotification("@%s takip isteği gönderdi".formatted(actor.getSlug()), deviceToken.getToken());
-                case CommentLikedNotification commentLikedNotification ->
-                        new PushNotification("@%s yorumunu beğendi".formatted(actor.getSlug()), deviceToken.getToken());
-                case CommentRepliedNotification commentRepliedNotification ->
-                        new PushNotification("@%s yorumuna yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken());
-                case PostCommentedNotification postCommentedNotification ->
-                        new PushNotification("@%s paylaşımına yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken());
-                case PostLikedNotification postLikedNotification ->
-                        new PushNotification("@%s paylaşımını beğendi".formatted(actor.getSlug()), deviceToken.getToken());
-                case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification ->
-                        new PushNotification("@%s takip isteğini kabul etti".formatted(actor.getSlug()), deviceToken.getToken());
-                case ChatMessageSentNotification chatMessageSentNotification ->
-                        new PushNotification("@%s bir mesaj gönderdi: %s".formatted(actor.getSlug(), chatMessageSentNotification.getMessage()), deviceToken.getToken());
+                case AuthorFollowedNotification authorFollowedNotification -> {
+                    String linkToSource =  webLink + "/users/" + actor.getSlug();
+                    yield new PushNotification("@%s seni takip etmeye başladı".formatted(actor.getSlug()), deviceToken.getToken());
+                }
+                case AuthorFollowRequestSentNotification authorFollowRequestSentNotification -> {
+                    String linkToSource =  webLink + "/users/" + actor.getSlug();
+                    yield new PushNotification("@%s takip isteği gönderdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case CommentLikedNotification commentLikedNotification -> {
+                    String linkToSource =  webLink + "/posts/" + commentLikedNotification.getPostId();
+                    yield new PushNotification("@%s yorumunu beğendi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case CommentRepliedNotification commentRepliedNotification -> {
+                    String linkToSource =  webLink + "/posts/" + commentRepliedNotification.getPostId();
+                    yield new PushNotification("@%s yorumuna yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case PostCommentedNotification postCommentedNotification -> {
+                    String linkToSource =  webLink + "/posts/" + postCommentedNotification.getPostId();
+                    yield new PushNotification("@%s paylaşımına yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case PostLikedNotification postLikedNotification -> {
+                    String linkToSource =  webLink + "/posts/" + postLikedNotification.getPostId();
+                    yield new PushNotification("@%s paylaşımını beğendi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification -> {
+                    String linkToSource =  webLink + "/users/" + actor.getSlug();
+                    yield new PushNotification("@%s takip isteğini kabul etti".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                }
+                case ChatMessageSentNotification chatMessageSentNotification -> {
+                    String linkToApp = webLink + "/chats/" + actor.getSlug();
+                    yield new PushNotification("@%s bir mesaj gönderdi: %s".formatted(actor.getSlug(), chatMessageSentNotification.getMessage()), deviceToken.getToken(), linkToApp);
+                }
                 case SimpleNotification simpleNotification -> new PushNotification(simpleNotification.getMessage(), deviceToken.getToken());
             };
             try {
-                pushNotificationProvider.push(pushNotification);
                 notification.push();
                 notificationRepository.save(notification);
+                pushNotificationProvider.push(pushNotification);
             } catch (FirebaseMessagingException e) {
                 switch (e.getMessagingErrorCode()) {
                     case INVALID_ARGUMENT -> {

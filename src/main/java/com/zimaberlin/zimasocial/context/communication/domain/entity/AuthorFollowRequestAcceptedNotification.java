@@ -6,4 +6,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 public final class AuthorFollowRequestAcceptedNotification extends Notification{
+    private String slug;
 }

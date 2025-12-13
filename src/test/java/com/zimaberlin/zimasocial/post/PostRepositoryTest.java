@@ -5,8 +5,9 @@ import com.zimaberlin.zimasocial.context.social.infastructure.repository.PostDBR
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
-import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.entity.PostFactory;
+import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.entity.media.BookMediaJpa;
@@ -52,7 +53,7 @@ public class PostRepositoryTest {
     void testSaveAnyPost() {
         AuthorId authorId = new AuthorId(0L);
         Long postId = 0L;
-        Post post = new Post(postId, "", PostType.any, authorId);
+        Post post = PostFactory.newAnyPost(postId, "", authorId);
         UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);
@@ -92,7 +93,7 @@ public class PostRepositoryTest {
                 .releaseDate(LocalDate.now())
                 .build();
 
-        Post post = new Post(postId, "", authorId, movieMedia);
+        Post post = PostFactory.newMoviePost(postId, "", authorId, movieMedia);
         UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);
@@ -147,7 +148,7 @@ public class PostRepositoryTest {
                 .publisher("zimabooks")
                 .build();
 
-        Post post = new Post(postId, "", authorId, bookMedia);
+        Post post = PostFactory.newBookPost(postId, "", authorId, bookMedia);
         UserEntity user = new UserEntity(authorId.getValue());
         PostEntity returnedEntity = new PostEntity();
         returnedEntity.setId(0L);

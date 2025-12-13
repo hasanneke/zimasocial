@@ -9,8 +9,8 @@ import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorFollowReque
 import com.zimaberlin.zimasocial.context.social.chat.event.ChatMessageSentEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
-import com.zimaberlin.zimasocial.context.social.post.PostCommentedEvent;
-import com.zimaberlin.zimasocial.context.social.post.PostLikedEvent;
+import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
+import com.zimaberlin.zimasocial.context.social.post.event.PostLikedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -110,7 +110,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(authorFollowRequestSentEvent.followedId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
-        notificationManager.throttled().sendNotification(authorFollowedNotification);
+        notificationManager.sendNotification(authorFollowedNotification);
     }
 
     @EventListener
@@ -121,6 +121,7 @@ public class NotificationEventListener {
                 .recipientId(new RecipientId(chatMessageSentEvent.receiver().getId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .message(chatMessageSentEvent.message().message())
+                .chatRoomId(chatMessageSentEvent.message().chatRoomId())
                 .build();
         notificationManager.sendNotification(chatMessageSentNotification);
     }

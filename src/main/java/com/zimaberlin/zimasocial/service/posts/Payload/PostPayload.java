@@ -23,3 +23,6 @@ public class PostPayload {
     @Schema(description = "Selected TV media type (eg: movie, tv)")
     private MovieMediaType movieMediaType;
 }
+
+
+

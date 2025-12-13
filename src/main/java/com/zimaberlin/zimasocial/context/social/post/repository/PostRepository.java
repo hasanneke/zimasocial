@@ -1,10 +1,12 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +22,5 @@ public interface PostRepository {
     Long nextSequence();
     List<Post> findAllByAuthorId(AuthorId authorId);
     List<Post> findAllInvisiblePostsByAuthorId(AuthorId authorId);
+    List<Post> findAllByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
 }

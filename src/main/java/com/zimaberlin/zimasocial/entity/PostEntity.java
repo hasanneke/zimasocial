@@ -5,7 +5,7 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
-import com.zimaberlin.zimasocial.context.social.post.Post;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.entity.media.MediaJpa;
 import com.zimaberlin.zimasocial.entity.media.MovieMediaJpa;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
@@ -60,6 +60,9 @@ public class PostEntity {
     @Column(name = "user_id",insertable = false, updatable = false)
     private Long userId;
 
+    @Column(name = "score")
+    private Integer score;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
@@ -106,12 +109,13 @@ public class PostEntity {
         this.commentCount = post.getCommentCount();
         this.userId = post.getAuthorId().getValue();
         this.isVisible = post.getIsVisible();
+        this.score = post.getScore();
     }
 
-    public Post convertToPostDomain() {
+    public Post rehydrate() {
         switch (this.getType()){
             case PostType.any -> {
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()));
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), this.getScore());
             }
             case PostType.movie -> {
                 MovieMedia movieDomain = null;
@@ -132,22 +136,23 @@ public class PostEntity {
                             .movieGenres(movie.getMovieGenres())
                             .movieProvider(movie.getMovieProvider())
                             .build();
-                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain);
+                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain, this.getScore());
                 }
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain);
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain, this.getScore());
             }
             case PostType.book ->  {
                 BookMedia bookMedia = null;
                 if(this.getMedia() != null && this.getMedia().getBook() != null){
                     bookMedia = this.getMedia().getBook().toBookMedia(this.getMedia().getId());
                 }
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), bookMedia);
+                assert bookMedia != null;
+                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), bookMedia, this.getScore());
             }
             case PostType.music -> {
                 MusicMedia musicMedia;
                 if(this.getMedia() != null && this.getMedia().getSong() != null){
                     musicMedia = this.getMedia().getSong().toMusicMedia(this.getMedia().getId());
-                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), musicMedia);
+                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), musicMedia, this.getScore());
                 }
             }
             default -> {}

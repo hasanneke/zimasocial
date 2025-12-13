@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.value;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.like.Like;

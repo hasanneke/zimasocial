@@ -1,10 +1,10 @@
 package com.zimaberlin.zimasocial.entity.userRelation;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -14,7 +14,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Table(name = "user_relation")
-@SQLRestriction(value = "IS_DELETED IS FALSE")
 public class UserRelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +33,6 @@ public class UserRelationEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "IS_DELETED", nullable = false)
-    @Builder.Default
-    private Boolean isDeleted = false;
-
-    public void markAsDeleted() {
-        this.isDeleted = true;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,12 +40,11 @@ public class UserRelationEntity {
         UserRelationEntity that = (UserRelationEntity) o;
         return Objects.equals(actorId, that.actorId)
                 && Objects.equals(receiverId, that.receiverId)
-                && Objects.equals(relation, that.getRelation())
-                && Objects.equals(getIsDeleted(), that.getIsDeleted());
+                && Objects.equals(relation, that.getRelation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(actorId, receiverId, relation, getIsDeleted());
+        return Objects.hash(actorId, receiverId, relation);
     }
 }

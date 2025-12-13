@@ -4,18 +4,17 @@ import lombok.Getter;
 
 @Getter
 public class PushNotification {
+    private final String message;
+    private final String deviceToken;
     private String title;
-    private String message;
-    private String deviceToken;
-    private String topic;
-
-    public PushNotification(String title, String message, String deviceToken) {
-        this.title = title;
+    private String linkToSource;
+    public PushNotification(String message, String deviceToken) {
         this.message = message;
         this.deviceToken = deviceToken;
     }
-    public PushNotification( String message, String deviceToken) {
+    public PushNotification( String message, String deviceToken, String linkToSource) {
         this.message = message;
         this.deviceToken = deviceToken;
+        this.linkToSource = linkToSource;
     }
 }

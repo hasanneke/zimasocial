@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TodaysPostJob implements Job {
     @Autowired
     private TodaysPostRunnable todaysPostRunnable;
+
     @Override
     public void execute(JobExecutionContext context) {
         todaysPostRunnable.run();

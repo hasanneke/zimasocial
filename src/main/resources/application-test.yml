@@ -98,3 +98,4 @@ management:
     endpoint:
       health:
         show-detail: always
+webLink: "https://zimasocial-15e04.web.app"

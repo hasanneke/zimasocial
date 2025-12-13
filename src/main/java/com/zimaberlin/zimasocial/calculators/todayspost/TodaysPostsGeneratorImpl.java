@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
-    private static Logger logger = LoggerFactory.getLogger(TodaysPostsGeneratorImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TodaysPostsGeneratorImpl.class);
     private final PostJpaRepository postJpaRepository;
     private final PostScoreCalculator postScoreCalculator;
     private final TodaysPostRepository todaysPostRepository;
@@ -39,8 +39,9 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
 
     @Override
     public List<TodaysPost> selectTodaysPosts() {
-        ZoneId zone = ZoneId.of("Europe/Istanbul");
-        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(LocalDate.now().minusDays(1).atStartOfDay(zone).toOffsetDateTime(), LocalDate.now().atStartOfDay(zone).toOffsetDateTime());
+        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(
+                LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime(),
+                LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime());
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.movie))

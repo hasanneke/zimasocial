@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.config;
 import com.zimaberlin.zimasocial.batch.pushnotifications.PushNotificationsJob;
 import com.zimaberlin.zimasocial.batch.spotifytokenrequester.SpotifyTokenRequesterJob;
 import com.zimaberlin.zimasocial.batch.todaysposts.TodaysPostJob;
+import com.zimaberlin.zimasocial.context.social.post.infastructure.PostScorePunisherJob;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -22,13 +23,19 @@ public class QuartzConfigDev {
                                @Qualifier("pushNotificationsJobDetail") JobDetail pushNotificationsJobDetail,
                                @Qualifier("spotifyTokenRefresherJobDetail") JobDetail spotifyTokenRefresherJobDetail,
                                @Qualifier("spotifyTokenRefresherTrigger") Trigger spotifyTokenRefresherTrigger,
+                               @Qualifier("postScorePunisherJobDetail") JobDetail postScorePunisherJobDetail,
+                               @Qualifier("postScorePunisherTrigger") Trigger postScorePunisherTrigger,
                                SchedulerFactoryBean factory)
             throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
-        scheduler.deleteJob(JobKey.jobKey("Qrtz_Todays_Posts_Job_Detail"));
-        scheduler.deleteJob(JobKey.jobKey("Qrtz_Push_Notifications_JobDetail"));
-        scheduler.deleteJob(JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail"));
-//        scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
+        // Delete jobs
+        scheduler.deleteJob(todaysPostJobDetail.getKey());
+        scheduler.deleteJob(pushNotificationsJobDetail.getKey());
+        scheduler.deleteJob(spotifyTokenRefresherJobDetail.getKey());
+        scheduler.deleteJob(postScorePunisherJobDetail.getKey());
+        // Reschedule jobs
+        scheduler.scheduleJob(postScorePunisherJobDetail, postScorePunisherTrigger);
+        scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
         scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
         scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
         scheduler.start();
@@ -84,6 +91,24 @@ public class QuartzConfigDev {
                 .withIdentity("Qrtz_Spoti_Token_Refresher_Trigger")
                 .withDescription("Quartz refreshes spotify access token")
                 .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
+                .build();
+    }
+
+    @Bean(name = "postScorePunisherJobDetail")
+    public JobDetail postScorePunisherJobDetail() {
+        return JobBuilder.newJob().ofType(PostScorePunisherJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Post_Punisher_Job")
+                .withDescription("Batch to reduce post scores")
+                .build();
+    }
+    @Bean(name = "postScorePunisherTrigger")
+    public Trigger postScorePunisherTrigger(@Qualifier("postScorePunisherJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Post_Score_Punisher_Trigger")
+                .withDescription("Batch reduces score of posts every hour wit given parameters")
+                .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(1))
                 .build();
     }
 }

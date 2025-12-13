@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.event;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 

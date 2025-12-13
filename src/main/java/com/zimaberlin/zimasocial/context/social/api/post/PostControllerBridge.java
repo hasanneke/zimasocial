@@ -5,10 +5,10 @@ import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zimaberlin.zimasocial.context.social.post.CreatePost;
-import com.zimaberlin.zimasocial.context.social.post.Post;
-import com.zimaberlin.zimasocial.context.social.post.PostRepository;
-import com.zimaberlin.zimasocial.context.social.post.PostService;
+import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
+import com.zimaberlin.zimasocial.context.social.post.application.PostService;
 import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
@@ -85,13 +85,12 @@ public class PostControllerBridge {
            PostCategory category,
            String slug
     ) throws NoSuchMethodException {
-        System.out.println("Start getPosts at %s".formatted(LocalDateTime.now()));
         Page<Post> postPage;
         if(category == PostCategory.followings){
             AuthorId authorId = authorRepository.getAuthenticatedAuthor().getId();
             postPage = postRepository.findFollowingsPosts(PageRequest.of(page, size), authorId);
         }else{
-            postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()), slug, category);
+            postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("score","createdAt").descending()), slug, category);
         }
         PagedModel<PostView> pagedModel = PagedModel.of(
                 postViewAdapter.populated(postPage.getContent()),
@@ -105,7 +104,6 @@ public class PostControllerBridge {
                 Integer.class,
                 PostCategory.class,
                 String.class);
-
         if(page + 1 < postPage.getTotalPages()){
             Link link = linkTo(method, page + 1, size, category, slug).withRel(LinkRelation.of("next"));
             pagedModel.add(link);

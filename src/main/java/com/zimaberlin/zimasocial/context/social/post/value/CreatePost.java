@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.value;
 
 import com.zimaberlin.zimasocial.entity.PostType;
 import lombok.Builder;

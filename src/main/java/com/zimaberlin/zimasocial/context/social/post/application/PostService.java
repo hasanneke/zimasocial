@@ -1,4 +1,4 @@
-package com.zimaberlin.zimasocial.context.social.post;
+package com.zimaberlin.zimasocial.context.social.post.application;
 
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
@@ -16,6 +16,12 @@ import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
+import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.entity.PostFactory;
+import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
+import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
+import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
+import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -40,7 +46,7 @@ public class PostService {
     @Transactional
     public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Post post = new Post(postRepository.nextSequence(), createPost.content(), createPost.type(), author.getId());
+        Post post = PostFactory.newAnyPost(postRepository.nextSequence(), createPost.content(), author.getId());
         return postRepository.save(post);
     }
 
@@ -48,7 +54,7 @@ public class PostService {
     public Post createBookPost(String content, String externalBookId) {
         Author author = authorRepository.getAuthenticatedAuthor();
         BookMedia book = bookSearcher.getBook(externalBookId).orElseThrow(BookNotFoundException::new);
-        Post post = new Post(postRepository.nextSequence(),
+        Post post = PostFactory.newBookPost(postRepository.nextSequence(),
                             content,
                             author.getId(),
                             book);
@@ -59,10 +65,10 @@ public class PostService {
     public Post createMoviePost(String content, Integer movieId, MovieMediaType type, String language) {
         Author author = authorRepository.getAuthenticatedAuthor();
         MovieMedia movie = movieSearcher.getMovie(movieId, type, language);
-        Post post = new Post(postRepository.nextSequence(),
+        Post post = PostFactory.newMoviePost(postRepository.nextSequence(),
                 content,
                 author.getId(),
-                movie);
+                movie) ;
         return postRepository.save(post);
     }
 
@@ -70,7 +76,7 @@ public class PostService {
     public Post createMusicPost(String content, String id) {
         Author author = authorRepository.getAuthenticatedAuthor();
         MusicMedia music = musicSearcher.get(id).orElseThrow(()->new DataNotFoundException("Music not found"));
-        Post post = new Post(postRepository.nextSequence(),
+        Post post = PostFactory.newMusicPost(postRepository.nextSequence(),
                 content,
                 author.getId(),
                 music);
@@ -98,7 +104,7 @@ public class PostService {
         if(like.isEmpty()){
             throw new ConflictException("Post is not liked");
         }
-        post.unliked();
+        post.unliked(author.getId());
         postRepository.save(post);
         likeRepository.delete(like.get());
     }
@@ -124,7 +130,7 @@ public class PostService {
     public void removeComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         Post post = postRepository.findById(comment.getPostId()).orElseThrow(PostNotFoundException::new);
-        post.removeComment(commentId);
+        post.removeComment(comment.getAuthorId());
         postRepository.save(post);
         commentRepository.delete(comment);
     }
