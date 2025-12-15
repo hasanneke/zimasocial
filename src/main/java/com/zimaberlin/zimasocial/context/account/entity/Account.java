@@ -30,10 +30,11 @@ public class Account {
     private LocalDate deleteDate;
     private Boolean isDeleted;
     private Boolean isPrivate;
+    private Boolean termsOfUseAccepted;
     private DeleteReason deleteReason;
     private DisableReason disableReason;
     private final Set<UserRole> roles;
-    public Account(AccountId accountId, String email, String slug, String authProvider, Set<UserRole> roles, Boolean isDisabled, LocalDate disableDate, LocalDate deleteDate, Boolean isDeleted, Boolean isPrivate, DeleteReason deleteReason, DisableReason disableReason) {
+    public Account(AccountId accountId, String email, String slug, String authProvider, Set<UserRole> roles, Boolean isDisabled, LocalDate disableDate, LocalDate deleteDate, Boolean isDeleted, Boolean isPrivate, Boolean termsOfUseAccepted, DeleteReason deleteReason, DisableReason disableReason) {
         Assert.notNull(email, "User must have email address");
         Assert.notNull(authProvider, "User must have auth provider info");
         Assert.notNull(accountId, "Account id cannot be null");
@@ -41,6 +42,7 @@ public class Account {
         Assert.notNull(isDisabled, "Is disabled cannot be null");
         Assert.notNull(isPrivate, "Is private cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
+        Assert.notNull(termsOfUseAccepted, "Terms of use accepted cannot be null");
         this.slug = slug;
         if(isDisabled) {
             if(disableDate == null){
@@ -67,6 +69,7 @@ public class Account {
         this.deleteReason = deleteReason;
         this.disableReason = disableReason;
         this.authProvider = authProvider;
+        this.termsOfUseAccepted = termsOfUseAccepted;
         this.email = email;
         this.roles = roles;
     }
@@ -82,6 +85,7 @@ public class Account {
         this.isDisabled = false;
         this.isDeleted = false;
         this.isPrivate = false;
+        this.termsOfUseAccepted = false;
         this.authProvider = authProvider;
         this.email = email;
         this.roles = roles;
@@ -122,5 +126,9 @@ public class Account {
         this.disableReason = null;
         this.disableDate = null;
         StaticEventPublisher.publishEvent(new AccountActivatedEvent(accountId));
+    }
+
+    public void acceptTermsOfUse() {
+        this.termsOfUseAccepted = true;
     }
 }

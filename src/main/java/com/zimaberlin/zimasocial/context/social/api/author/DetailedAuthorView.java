@@ -22,6 +22,7 @@ public class DetailedAuthorView extends AuthorView {
         setFollowed(authorView.isFollowed());
         setIsPrivate(authorView.getIsPrivate());
         setIsBlocked(authorView.getIsBlocked());
+        setTermsOfUseAccepted(authorView.getTermsOfUseAccepted());
         addLinks();
     }
 }

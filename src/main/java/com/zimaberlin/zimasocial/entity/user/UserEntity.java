@@ -89,6 +89,9 @@ public class UserEntity implements Serializable {
     @Column(name = "last_slug_changed_at")
     private LocalDate lastSlugChangedAt;
 
+    @Column(name = "TERMS_OF_USE_ACCEPTED")
+    private Boolean termsOfUseAccepted = false;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -202,6 +205,7 @@ public class UserEntity implements Serializable {
         this.deleteReason = account.getDeleteReason();
         this.disableReason = account.getDisableReason();
         this.slug = account.getSlug();
+        this.termsOfUseAccepted = account.getTermsOfUseAccepted();
     }
 
     public void margeAuthor(Author author){

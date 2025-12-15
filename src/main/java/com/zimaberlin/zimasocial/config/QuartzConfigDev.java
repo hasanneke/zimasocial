@@ -28,16 +28,18 @@ public class QuartzConfigDev {
                                SchedulerFactoryBean factory)
             throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
-        // Delete jobs
-        scheduler.deleteJob(todaysPostJobDetail.getKey());
-        scheduler.deleteJob(pushNotificationsJobDetail.getKey());
-        scheduler.deleteJob(spotifyTokenRefresherJobDetail.getKey());
-        scheduler.deleteJob(postScorePunisherJobDetail.getKey());
-        // Reschedule jobs
-        scheduler.scheduleJob(postScorePunisherJobDetail, postScorePunisherTrigger);
-        scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
-        scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
-        scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
+        if(!scheduler.checkExists(todaysPostJobDetail.getKey())){
+            scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
+        }
+        if(!scheduler.checkExists(pushNotificationsJobDetail.getKey())){
+            scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
+        }
+        if(!scheduler.checkExists(spotifyTokenRefresherJobDetail.getKey())){
+            scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
+        }
+        if(!scheduler.checkExists(postScorePunisherJobDetail.getKey())){
+            scheduler.scheduleJob(postScorePunisherJobDetail, postScorePunisherTrigger);
+        }
         scheduler.start();
         return scheduler;
     }

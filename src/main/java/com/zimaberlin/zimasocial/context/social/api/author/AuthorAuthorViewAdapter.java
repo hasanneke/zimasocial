@@ -1,28 +1,26 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
+import com.zimaberlin.zimasocial.context.account.entity.Account;
+import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.authorrelation.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class AuthorAuthorViewAdapter {
     private final AuthorRelationCollection authorRelationRepository;
+    private final AccountRepository accountRepository;
     private final FollowRequestCollection followRequestCollection;
     private final AuthorRepository authorRepository;
 
-    @Autowired
-    public AuthorAuthorViewAdapter(AuthorRelationCollection authorRelationRepository, AuthorRepository authorRepository, FollowRequestCollection followRequestCollection) {
-        this.authorRelationRepository = authorRelationRepository;
-        this.authorRepository = authorRepository;
-        this.followRequestCollection = followRequestCollection;
-    }
-
     public AuthorView authorViewFromAuthor(Author author) {
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        Account account = accountRepository.getAuthenticatedAccount();
         Optional<FollowRelation> followRelation =
                 authorRelationRepository
                         .findFollowRelationBetween(authenticatedUser.getId(), author.getId());
@@ -50,6 +48,7 @@ public class AuthorAuthorViewAdapter {
         authorView.setFollowRequestReceived(followRequestReceived.isPresent());
         authorView.setIsPrivate(author.getIsPrivate());
         authorView.setIsBlocked(blockRelation.isPresent());
+        authorView.setTermsOfUseAccepted(account.getTermsOfUseAccepted());
         authorView.addLinks();
         return authorView;
     }

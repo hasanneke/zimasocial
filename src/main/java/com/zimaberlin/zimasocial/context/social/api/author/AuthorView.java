@@ -22,6 +22,7 @@ public class AuthorView extends RepresentationModel<AuthorView> {
     private boolean isFollowRequestReceived;
     private Boolean isPrivate;
     private Boolean isBlocked;
+    private Boolean termsOfUseAccepted;
 
     public AuthorView addLinks() {
         // Add self link to user details
