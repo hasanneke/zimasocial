@@ -1,0 +1,2 @@
+ALTER TABLE public.post
+ADD COLUMN last_punished_at TIMESTAMP WITH TIME ZONE;

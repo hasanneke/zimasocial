@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.api.post;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zimaberlin.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
@@ -35,7 +36,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload, String language) {
+    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload, String language) throws JsonProcessingException {
         return ResponseEntity.ok(postControllerBridge.createPost(payload, language));
     }
 

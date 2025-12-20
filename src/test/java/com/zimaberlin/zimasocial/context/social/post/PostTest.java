@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.time.OffsetDateTime;
+
 @ExtendWith(MockitoExtension.class)
 class PostTest {
     @Mock
@@ -96,6 +98,34 @@ class PostTest {
         post.removeComment(commenter);
         Assertions.assertEquals(100, post.getScore());
         Assertions.assertEquals(-1, post.getCommentCount());
+    }
+
+    @Test
+    void testPunishScore_WhenPostCreatedOneHourAgo_ReduceScore() {
+        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(1)).score(100).build();
+        post.punishScore();
+        Assertions.assertEquals(96, post.getScore());
+    }
+
+    @Test
+    void testPunishScore_WhenPostCreatedTwoHoursAgo_ReduceScore() {
+        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(2)).score(100).build();
+        post.punishScore();
+        Assertions.assertEquals(93, post.getScore());
+    }
+
+    @Test
+    void testPunishScore_WhenPostCreated24Ago_ReduceScore() {
+        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(24)).score(100).build();
+        post.punishScore();
+        Assertions.assertTrue(post.getScore() < 50);
+    }
+
+    @Test
+    void testPunishScore_WhenPostCreatedPassedThreeDays_DontReduceScore() {
+        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(73)).lastPunishedAt(OffsetDateTime.now().minusHours(73)).score(50).build();
+        post.punishScore();
+        Assertions.assertEquals(50, post.getScore());
     }
 
     private static Post dummyAnyPost(AuthorId ownerAuthorId) {

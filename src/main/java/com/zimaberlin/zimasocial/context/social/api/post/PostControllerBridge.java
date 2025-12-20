@@ -1,15 +1,15 @@
 package com.zimaberlin.zimasocial.context.social.api.post;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
+import com.zimaberlin.zimasocial.context.social.post.application.PostService;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
-import com.zimaberlin.zimasocial.context.social.post.application.PostService;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
 import com.zimaberlin.zimasocial.service.posts.Payload.PostPayload;
 import com.zimaberlin.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zimaberlin.zimasocial.views.comment.CommentView;
@@ -24,7 +24,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -48,36 +47,16 @@ public class PostControllerBridge {
         this.authorRepository = authorRepository;
     }
 
-    public PostView createPost(PostPayload payload, String language) {
-        switch (payload.getType()){
-            case PostType.movie -> {
-                Post post = postService.createMoviePost(
-                        payload.getContent(),
-                        Integer.valueOf(payload.getMediaId()),
-                        payload.getMovieMediaType(),
-                        language
-                );
-                return postViewAdapter.populated(post);
-            }
-            case PostType.book ->  {
-                Post post = postService.createBookPost(payload.getContent(), payload.getMediaId());
-                return postViewAdapter.populated(post);
-            }
-            case PostType.music -> {
-                Post post = postService.createMusicPost(payload.getContent(), payload.getMediaId());
-                return postViewAdapter.populated(post);
-            }
-            default -> {
-                payload.setType(PostType.any);
-                Post post = postService.createPost(
-                        CreatePost.builder()
-                                .type(payload.getType())
-                                .content(payload.getContent())
-                                .build()
-                );
-                return postViewAdapter.populated(post);
-            }
-        }
+    public PostView createPost(PostPayload payload, String language) throws JsonProcessingException {
+        Post post = postService.createPost(
+                CreatePost.builder()
+                        .type(payload.getType())
+                        .mediaId(payload.getMediaId())
+                        .movieMediaType(payload.getMovieMediaType())
+                        .content(payload.getContent())
+                        .build()
+        );
+        return postViewAdapter.populated(post);
     }
     public PagedModel<PostView> getPosts(
            Integer page,
@@ -113,7 +92,6 @@ public class PostControllerBridge {
             Link link = linkTo(method, page - 1, size, category, slug).withRel(LinkRelation.of("previous"));
             pagedModel.add(link);
         }
-        System.out.println("End getPosts at %s".formatted(LocalDateTime.now()));
         return pagedModel;
     }
 

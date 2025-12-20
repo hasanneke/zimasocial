@@ -9,40 +9,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 @Configuration
 @Profile({"dev"})
 public class QuartzConfigDev {
-    @Bean
-    public Scheduler scheduler(@Qualifier("todaysPostTrigger") Trigger todaysPostTrigger,
-                               @Qualifier("todaysPostJobDetail") JobDetail todaysPostJobDetail,
-                               @Qualifier("pushNotificationsTrigger") Trigger pushNotificationsTrigger,
-                               @Qualifier("pushNotificationsJobDetail") JobDetail pushNotificationsJobDetail,
-                               @Qualifier("spotifyTokenRefresherJobDetail") JobDetail spotifyTokenRefresherJobDetail,
-                               @Qualifier("spotifyTokenRefresherTrigger") Trigger spotifyTokenRefresherTrigger,
-                               @Qualifier("postScorePunisherJobDetail") JobDetail postScorePunisherJobDetail,
-                               @Qualifier("postScorePunisherTrigger") Trigger postScorePunisherTrigger,
-                               SchedulerFactoryBean factory)
-            throws SchedulerException {
-        Scheduler scheduler = factory.getScheduler();
-        if(!scheduler.checkExists(todaysPostJobDetail.getKey())){
-            scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
-        }
-        if(!scheduler.checkExists(pushNotificationsJobDetail.getKey())){
-            scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
-        }
-        if(!scheduler.checkExists(spotifyTokenRefresherJobDetail.getKey())){
-            scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
-        }
-        if(!scheduler.checkExists(postScorePunisherJobDetail.getKey())){
-            scheduler.scheduleJob(postScorePunisherJobDetail, postScorePunisherTrigger);
-        }
-        scheduler.start();
-        return scheduler;
-    }
     @Bean(name = "todaysPostJobDetail")
     public JobDetail todaysPostJobDetail() {
         return JobBuilder.newJob().ofType(TodaysPostJob.class)

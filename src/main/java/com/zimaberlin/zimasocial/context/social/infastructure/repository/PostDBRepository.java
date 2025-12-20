@@ -2,14 +2,10 @@ package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
 import com.zimaberlin.zimasocial.entity.PostType;
-import com.zimaberlin.zimasocial.entity.media.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
@@ -123,41 +119,6 @@ public class PostDBRepository implements PostRepository {
         postEntity.merge(post);
         UserEntity user = userRepository.findById(post.getAuthorId().getValue()).orElseThrow(UserNotFoundException::new);
         postEntity.setUser(user);
-        switch (post.getType()){
-            case PostType.book -> {
-                BookMedia book = post.getBook();
-                MediaJpa mediaJpa = MediaJpa.builder()
-                        .id(book.getId())
-                        .type(MediaType.BOOK)
-                        .book(new BookMediaJpa(book))
-                        .post(postEntity)
-                        .build();
-                mediaJpa.setPostId(post.getPostId());
-                postEntity.setMedia(mediaJpa);
-            }
-            case PostType.movie -> {
-                MovieMedia movie = post.getMovie();
-                MediaJpa mediaJpa = MediaJpa.builder()
-                        .id(movie.getId())
-                        .type(MediaType.MOVIE)
-                        .movie(new MovieMediaJpa(movie))
-                        .post(postEntity)
-                        .build();
-                mediaJpa.setPostId(post.getPostId());
-                postEntity.setMedia(mediaJpa);
-            }
-            case PostType.music -> {
-                MusicMedia music = post.getMusic();
-                MediaJpa mediaJpa = MediaJpa.builder()
-                        .id(music.getId())
-                        .type(MediaType.MUSIC)
-                        .song(new MusicMediaJpa(music))
-                        .post(postEntity)
-                        .build();
-                mediaJpa.setPostId(post.getPostId());
-                postEntity.setMedia(mediaJpa);
-            }
-        }
         PostEntity savedPost = postJpaRepository.save(postEntity);
         return savedPost.rehydrate();
     }

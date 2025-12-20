@@ -2,9 +2,6 @@ package com.zimaberlin.zimasocial.views.post;
 
 import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.context.social.api.post.PostController;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.entity.PostType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +11,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,9 +30,7 @@ public class PostView extends RepresentationModel<PostView> {
     private OffsetDateTime updatedAt;
     private Boolean isReported;
     private Boolean isVisible;
-    private MovieMedia movie;
-    private BookMedia book;
-    private MusicMedia music;
+    private UUID mediaId;
     private String musicId;
     private String bookId;
     public PostView addLinks() {

@@ -2,9 +2,6 @@ package com.zimaberlin.zimasocial.context.social.post.entity;
 
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.context.social.post.event.PostLikedEvent;
 import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
 import com.zimaberlin.zimasocial.entity.PostType;
@@ -16,7 +13,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -31,130 +30,38 @@ public class Post {
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private AuthorId authorId;
-    private MovieMedia movie;
-    private BookMedia book;
-    private MusicMedia music;
-    private String musicId;
-    private String bookId;
+    private UUID mediaId;
     private Boolean isVisible;
     private Integer score;
+    private OffsetDateTime lastPunishedAt;
 
-    // ANY TYPE
-    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, Integer score) {
+    public Post(Long postId, PostType postType, UUID mediaId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, Integer score, OffsetDateTime lastPunishedTime) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
         Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
         this.postId = postId;
         this.content = content;
-        this.type = PostType.any;
+        this.type = postType;
+        this.mediaId = mediaId;
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.authorId = authorId;
-        this.isVisible = true;
-        this.score = score;
-    }
-    // Movie Type
-    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, MovieMedia movie, Integer score) {
-        Assert.notNull(postId, "Post Id cannot be null");
-        Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
-        Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.movie;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.authorId = authorId;
-        this.movie = movie;
-        this.isVisible = true;
-        this.score = score;
-    }
-    // book type
-    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, BookMedia book, Integer score) {
-        Assert.notNull(postId, "Post Id cannot be null");
-        Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
-        Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.book;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.authorId = authorId;
-        this.book = book;
-        this.bookId = book.getResourceId();
         this.score = score;
         this.isVisible = true;
+        this.lastPunishedAt = lastPunishedTime;
     }
-    // Music
-    public Post(Long postId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, MusicMedia music, Integer score) {
-        Assert.notNull(postId, "Post Id cannot be null");
-        Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
-        Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.music;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.authorId = authorId;
-        this.music = music;
-        this.musicId = music.getResourceId();
-        this.score = score;
-        this.isVisible = true;
-    }
-    protected Post(Long postId, String content, PostType type, AuthorId authorId) {
+
+    protected Post(Long postId, String content, PostType type, AuthorId authorId, UUID mediaId) {
         this.postId = postId;
         this.content = content;
         this.type = type;
+        this.mediaId = mediaId;
         this.likeCount = 0;
         this.commentCount = 0;
         this.createdAt = OffsetDateTime.now();
         this.authorId = authorId;
-        this.isVisible = true;
-        this.score = 100;
-    }
-    protected Post(Long postId, String content, AuthorId authorId, BookMedia book) {
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.book;
-        this.likeCount = 0;
-        this.commentCount = 0;
-        this.createdAt = OffsetDateTime.now();
-        this.authorId = authorId;
-        this.book = book;
-        this.bookId = book.getResourceId();
-        this.isVisible = true;
-        this.score = 100;
-    }
-    protected Post(Long postId, String content, AuthorId authorId, MovieMedia movie) {
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.movie;
-        this.likeCount = 0;
-        this.commentCount = 0;
-        this.createdAt = OffsetDateTime.now();
-        this.authorId = authorId;
-        this.movie = movie;
-        this.isVisible = true;
-        this.score = 100;
-    }
-
-    protected Post(Long postId, String content, AuthorId authorId, MusicMedia music) {
-        this.postId = postId;
-        this.content = content;
-        this.type = PostType.music;
-        this.likeCount = 0;
-        this.commentCount = 0;
-        this.createdAt = OffsetDateTime.now();
-        this.authorId = authorId;
-        this.music = music;
-        this.musicId = music.getResourceId();
         this.isVisible = true;
         this.score = 100;
     }
@@ -185,18 +92,27 @@ public class Post {
         if(!authorId.equals(unlikerAuthorId)){
             score -= 2;
         }
-        updatedAt = OffsetDateTime.now();
     }
 
-    public void punishScore(Integer reducedAmount) {
-        score -= reducedAmount;
+    public void punishScore() {
+        if(!isPunishable()) return;
+        long hoursPassedSinceLastPunishment = ChronoUnit.HOURS.between(lastPunishedAt, OffsetDateTime.now());
+        for (long i = 0; i < hoursPassedSinceLastPunishment; i++) {
+            punish();
+        }
+        this.lastPunishedAt = OffsetDateTime.now();
     }
-    public void setMovie(MovieMedia movie) {
-        this.movie = movie;
+
+    private void punish() {
+        score -= (int) (score * 0.04);
     }
-    public void setBook(BookMedia book){
-        this.book = book;
+
+    private boolean isPunishable() {
+        long passedHoursFromCreation = ChronoUnit.HOURS.between(createdAt, OffsetDateTime.now());
+        return !(passedHoursFromCreation > 72 && getScore() < 100);
     }
+
+
     public void makeInvisible() {
         this.isVisible = false;
     }

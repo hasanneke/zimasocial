@@ -9,40 +9,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 @Configuration
 @Profile({"test"})
 public class QuartzConfig {
-    @Bean
-    public Scheduler scheduler(@Qualifier("todaysPostTrigger") Trigger todaysPostTrigger,
-                               @Qualifier("todaysPostJobDetail") JobDetail todaysPostJobDetail,
-                               @Qualifier("pushNotificationsTrigger") Trigger pushNotificationsTrigger,
-                               @Qualifier("pushNotificationsJobDetail") JobDetail pushNotificationsJobDetail,
-                               @Qualifier("spotifyTokenRefresherJobDetail") JobDetail spotifyTokenRefresherJobDetail,
-                               @Qualifier("spotifyTokenRefresherTrigger") Trigger spotifyTokenRefresherTrigger,
-                               @Qualifier("postScorePunisherJobDetail") JobDetail postScorePunisherJobDetail,
-                               @Qualifier("postScorePunisherTrigger") Trigger postScorePunisherTrigger,
-                               SchedulerFactoryBean factory)
-            throws SchedulerException {
-        Scheduler scheduler = factory.getScheduler();
-        if(!scheduler.checkExists(todaysPostJobDetail.getKey())){
-            scheduler.scheduleJob(todaysPostJobDetail, todaysPostTrigger);
-        }
-        if(!scheduler.checkExists(pushNotificationsJobDetail.getKey())){
-            scheduler.scheduleJob(pushNotificationsJobDetail, pushNotificationsTrigger);
-        }
-        if(!scheduler.checkExists(spotifyTokenRefresherJobDetail.getKey())){
-            scheduler.scheduleJob(spotifyTokenRefresherJobDetail, spotifyTokenRefresherTrigger);
-        }
-        if(!scheduler.checkExists(postScorePunisherJobDetail.getKey())){
-            scheduler.scheduleJob(postScorePunisherJobDetail, postScorePunisherTrigger);
-        }
-        scheduler.start();
-        return scheduler;
-    }
     @Bean(name = "todaysPostJobDetail")
     public JobDetail todaysPostJobDetail() {
         return JobBuilder.newJob().ofType(TodaysPostJob.class)
@@ -75,7 +47,7 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Push_Notifications_Trigger")
                 .withDescription("Quartz Triggers push notifications for mobile clients")
-                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2))
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2).withMisfireHandlingInstructionFireNow())
                 .build();
     }
     @Bean(name = "spotifyTokenRefresherJobDetail")
@@ -92,7 +64,7 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Spoti_Token_Refresher_Trigger")
                 .withDescription("Quartz refreshes spotify access token")
-                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
+                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30).withMisfireHandlingInstructionFireNow())
                 .build();
     }
 
@@ -102,6 +74,7 @@ public class QuartzConfig {
                 .storeDurably()
                 .withIdentity("Qrtz_Post_Punisher_Job")
                 .withDescription("Batch to reduce post scores")
+                .requestRecovery()
                 .build();
     }
     @Bean(name = "postScorePunisherTrigger")
@@ -110,7 +83,7 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Post_Score_Punisher_Trigger")
                 .withDescription("Batch reduces score of posts every hour wit given parameters")
-                .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(1))
+                .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(1).withMisfireHandlingInstructionFireNow())
                 .build();
     }
 }

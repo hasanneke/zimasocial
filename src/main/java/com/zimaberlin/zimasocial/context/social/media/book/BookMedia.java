@@ -26,6 +26,7 @@ public class BookMedia {
     private Integer pageCount;
     private String language;
     private BookProvider provider;
+
     public BookMedia(UUID id, SearchBookMediaItem searchBookMediaItem) {
         this.id = id;
         this.resourceId = searchBookMediaItem.getId();

@@ -2,7 +2,6 @@ package com.zimaberlin.zimasocial.context.social.post.application;
 
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
-import com.zimaberlin.zimasocial.context.social.post.service.PostScoreReducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,15 +13,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PostScorePunisherServiceTest {
     @Mock
     private PostRepository postRepository;
-    @Mock
-    private PostScoreReducer postScoreReducer;
     @InjectMocks
     private PostScorePunisherService postScorePunisherService;
 
@@ -38,8 +34,7 @@ class PostScorePunisherServiceTest {
         when(postRepository.findAllByCreatedAtBetween(start, end)).thenReturn(posts);
         postScorePunisherService.punishPosts();
         for (Post post : posts) {
-            verify(postScoreReducer).calculateReduceAmount(post);
-            verify(post).punishScore(anyInt());
+            verify(post).punishScore();
             verify(postRepository).save(post);
         }
     }

@@ -1,6 +1,5 @@
 package com.zimaberlin.zimasocial.config;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
@@ -34,6 +33,7 @@ public class SecurityConfig {
             "/actuator/**",
             "/metrics",
             "/api/v1/files/images/**",
+            "/hello"
     };
 
     @Autowired

@@ -1,5 +1,6 @@
 package com.zimaberlin.zimasocial.batch.spotifytokenrequester;
 
+import com.zimaberlin.zimasocial.context.social.media.infastructure.music.SpotifyMusicSearcher;
 import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +20,16 @@ import java.util.List;
 @Service
 public class SpotifyTokenRequesterRunnable implements Runnable {
     private final RestTemplate restTemplate;
-    private final SearchMusicClient searchMusicClient;
+    private final SpotifyMusicSearcher spotifyMusicSearcher;
     @Value("${mediaprovider.spotify.clientId}")
     private String clientId;
     @Value("${mediaprovider.spotify.clientSecret}")
     private String clientSecret;
 
     @Autowired
-    public SpotifyTokenRequesterRunnable(RestTemplateBuilder restTemplateBuilder, SearchMusicClient searchMusicClient) {
+    public SpotifyTokenRequesterRunnable(RestTemplateBuilder restTemplateBuilder, SpotifyMusicSearcher spotifyMusicSearcher) {
         this.restTemplate = restTemplateBuilder.build();
-        this.searchMusicClient = searchMusicClient;
+        this.spotifyMusicSearcher = spotifyMusicSearcher;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class SpotifyTokenRequesterRunnable implements Runnable {
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             TokenResponse tokenResponse = response.getBody();
             System.out.println("Spotify token refreshed successfully ✅");
-            searchMusicClient.updateAccessToken(tokenResponse.accessToken());
+            spotifyMusicSearcher.updateAccessToken(tokenResponse.accessToken());
         } else {
             System.err.println("❌ Failed to refresh Spotify token: " + response.getStatusCode());
         }

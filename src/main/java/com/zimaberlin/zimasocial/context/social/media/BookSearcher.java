@@ -1,12 +1,12 @@
 package com.zimaberlin.zimasocial.context.social.media;
 
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zimaberlin.zimasocial.context.social.media.book.SearchBookMediaItem;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 public interface BookSearcher {
     List<SearchBookMediaItem> search(String query);
-    Optional<BookMedia> getBook(String id);
+    UUID getBook(String id) throws JsonProcessingException;
 }

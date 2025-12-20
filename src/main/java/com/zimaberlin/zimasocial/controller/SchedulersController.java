@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.controller;
 
 import com.zimaberlin.zimasocial.calculators.todayspost.TodaysPostGenerator;
+import com.zimaberlin.zimasocial.context.social.post.application.PostScorePunisherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SchedulersController {
     final private TodaysPostGenerator todaysPostGenerator;
+    private final PostScorePunisherService postScorePunisherService;
     @GetMapping(path = "/todays-posts")
     public ResponseEntity<Void> triggerTodaysPosts() {
         todaysPostGenerator.createTodaysPost();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(path = "/post-score-punisher")
+    public ResponseEntity<Void> triggerPostScorePunisher(){
+        postScorePunisherService.punishPosts();
+        return ResponseEntity.noContent().build();
     }
 }

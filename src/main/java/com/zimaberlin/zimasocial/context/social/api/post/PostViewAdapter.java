@@ -50,11 +50,7 @@ public class PostViewAdapter {
         postView.setCommentCount( post.getCommentCount() );
         postView.setCreatedAt( post.getCreatedAt() );
         postView.setUpdatedAt( post.getUpdatedAt() );
-        postView.setMovie( post.getMovie() );
-        postView.setBook( post.getBook() );
-        postView.setMusic( post.getMusic() );
-        postView.setMusicId( post.getMusicId() );
-        postView.setBookId( post.getBookId() );
+        postView.setMediaId( post.getMediaId() );
         postView.addLinks();
 
 

@@ -1,27 +1,21 @@
 package com.zimaberlin.zimasocial.context.social.post.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
+import com.zimaberlin.zimasocial.context.social.infastructure.service.googleBooks.MediaService;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
-import com.zimaberlin.zimasocial.context.social.media.BookSearcher;
-import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
-import com.zimaberlin.zimasocial.context.social.media.MusicSearcher;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.book.BookNotFoundException;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
-import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.entity.PostFactory;
-import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
+import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
-import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
+import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -32,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,46 +35,16 @@ public class PostService {
     private final AuthorRepository authorRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final MovieSearcher movieSearcher;
-    private final BookSearcher bookSearcher;
-    private final MusicSearcher musicSearcher;
-    @Transactional
-    public Post createPost(CreatePost createPost) {
-        Author author = authorRepository.getAuthenticatedAuthor();
-        Post post = PostFactory.newAnyPost(postRepository.nextSequence(), createPost.content(), author.getId());
-        return postRepository.save(post);
-    }
+    private final MediaService mediaService;
 
     @Transactional
-    public Post createBookPost(String content, String externalBookId) {
+    public Post createPost(CreatePost createPost) throws JsonProcessingException {
         Author author = authorRepository.getAuthenticatedAuthor();
-        BookMedia book = bookSearcher.getBook(externalBookId).orElseThrow(BookNotFoundException::new);
-        Post post = PostFactory.newBookPost(postRepository.nextSequence(),
-                            content,
-                            author.getId(),
-                            book);
-        return postRepository.save(post);
-    }
-
-    @Transactional
-    public Post createMoviePost(String content, Integer movieId, MovieMediaType type, String language) {
-        Author author = authorRepository.getAuthenticatedAuthor();
-        MovieMedia movie = movieSearcher.getMovie(movieId, type, language);
-        Post post = PostFactory.newMoviePost(postRepository.nextSequence(),
-                content,
-                author.getId(),
-                movie) ;
-        return postRepository.save(post);
-    }
-
-    @Transactional
-    public Post createMusicPost(String content, String id) {
-        Author author = authorRepository.getAuthenticatedAuthor();
-        MusicMedia music = musicSearcher.get(id).orElseThrow(()->new DataNotFoundException("Music not found"));
-        Post post = PostFactory.newMusicPost(postRepository.nextSequence(),
-                content,
-                author.getId(),
-                music);
+        UUID domainMediaId = null;
+        if(createPost.mediaId() != null){
+            domainMediaId = mediaService.get(createPost.mediaId(), createPost.type(), createPost.movieMediaType());
+        }
+        Post post = PostFactory.newPost(postRepository.nextSequence(), createPost.type(), createPost.content(), author.getId(), domainMediaId);
         return postRepository.save(post);
     }
 

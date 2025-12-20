@@ -2,12 +2,7 @@ package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.media.book.BookMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.music.MusicMedia;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
-import com.zimaberlin.zimasocial.entity.media.MediaJpa;
-import com.zimaberlin.zimasocial.entity.media.MovieMediaJpa;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
@@ -17,11 +12,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -63,6 +60,9 @@ public class PostEntity {
     @Column(name = "score")
     private Integer score;
 
+    @Column(name = "last_punished_at")
+    private OffsetDateTime lastPunishedAt;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<CommentEntity> comments = new HashSet<>();
@@ -76,14 +76,14 @@ public class PostEntity {
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
     @Column(name = "IS_DELETED", nullable = false)
     private Boolean isDeleted = false;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "media_id")
-    private MediaJpa media;
+    @Column(name = "media_item_id")
+    private UUID mediaId;
 
     @Override
     public boolean equals(Object o) {
@@ -110,54 +110,13 @@ public class PostEntity {
         this.userId = post.getAuthorId().getValue();
         this.isVisible = post.getIsVisible();
         this.score = post.getScore();
+        this.lastPunishedAt = post.getLastPunishedAt();
+        this.updatedAt = post.getUpdatedAt();
+        this.mediaId = post.getMediaId();
     }
 
     public Post rehydrate() {
-        switch (this.getType()){
-            case PostType.any -> {
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), this.getScore());
-            }
-            case PostType.movie -> {
-                MovieMedia movieDomain = null;
-                if(this.getMedia() != null && this.getMedia().getMovie() != null){
-                    final MovieMediaJpa movie = this.getMedia().getMovie();
-                    movieDomain = MovieMedia
-                            .builder()
-                            .id(this.getMedia().getId())
-                            .description(movie.getDescription())
-                            .originalLanguage(movie.getOriginalLanguage())
-                            .posterUrl(movie.getPosterUrl())
-                            .summary(movie.getSummary())
-                            .releaseDate(movie.getReleaseDate())
-                            .voteAverage(movie.getVoteAverage())
-                            .voteCount(movie.getVoteCount())
-                            .imdbScore(movie.getImdbScore())
-                            .name(movie.getName())
-                            .movieGenres(movie.getMovieGenres())
-                            .movieProvider(movie.getMovieProvider())
-                            .build();
-                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain, this.getScore());
-                }
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), movieDomain, this.getScore());
-            }
-            case PostType.book ->  {
-                BookMedia bookMedia = null;
-                if(this.getMedia() != null && this.getMedia().getBook() != null){
-                    bookMedia = this.getMedia().getBook().toBookMedia(this.getMedia().getId());
-                }
-                assert bookMedia != null;
-                return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), bookMedia, this.getScore());
-            }
-            case PostType.music -> {
-                MusicMedia musicMedia;
-                if(this.getMedia() != null && this.getMedia().getSong() != null){
-                    musicMedia = this.getMedia().getSong().toMusicMedia(this.getMedia().getId());
-                    return new Post(this.getId(), this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), musicMedia, this.getScore());
-                }
-            }
-            default -> {}
-        }
-        return null;
+        return new Post(this.getId(), this.getType(), this.getMediaId(),  this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), this.getScore(), this.getLastPunishedAt());
     }
 }
 
