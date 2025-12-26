@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class SpotifyMusicSearcher implements MusicSearcher {
     }
 
     @Override
-    public UUID get(String id) throws JsonProcessingException {
+    public MediaItem get(String id) throws JsonProcessingException {
         String url = "https://api.spotify.com/v1/tracks/%s".formatted(id);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer %s".formatted(accessToken));
@@ -51,9 +50,8 @@ public class SpotifyMusicSearcher implements MusicSearcher {
         mediaItem.setProvider("spotify");
         mediaItem.setResourceUrl(url);
         mediaItem.setResourceId(id);
-        mediaItem.setContent(objectMapper.writeValueAsString(response));
-        MediaItem savedItem = mediaItemJpaRepository.save(mediaItem);
-        return savedItem.getId();
+        mediaItem.setContent(objectMapper.writeValueAsString(response.getBody()));
+        return mediaItem;
     }
     public void updateAccessToken(String accessToken) {
         this.accessToken = accessToken;

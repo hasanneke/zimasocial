@@ -47,7 +47,7 @@ public class QuartzConfigDev {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Push_Notifications_Trigger")
                 .withDescription("Quartz Triggers push notifications for mobile clients")
-                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2))
+                .withSchedule(cronSchedule("0/2 * * * * ?").withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
     @Bean(name = "spotifyTokenRefresherJobDetail")
@@ -64,7 +64,8 @@ public class QuartzConfigDev {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Spoti_Token_Refresher_Trigger")
                 .withDescription("Quartz refreshes spotify access token")
-                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
+                .startNow()
+                .withSchedule(cronSchedule("0 0/30 * * * ?").withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
 
@@ -74,6 +75,7 @@ public class QuartzConfigDev {
                 .storeDurably()
                 .withIdentity("Qrtz_Post_Punisher_Job")
                 .withDescription("Batch to reduce post scores")
+                .requestRecovery()
                 .build();
     }
     @Bean(name = "postScorePunisherTrigger")
@@ -82,7 +84,7 @@ public class QuartzConfigDev {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Post_Score_Punisher_Trigger")
                 .withDescription("Batch reduces score of posts every hour wit given parameters")
-                .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(1))
+                .withSchedule(cronSchedule("0 0 * * * ?").withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
 }

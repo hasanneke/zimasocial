@@ -4,12 +4,9 @@ import com.zimaberlin.zimasocial.context.social.author.Author;
 import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.author.AuthorService;
 import com.zimaberlin.zimasocial.context.social.author.SlugAlreadyTakenException;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.apache.coyote.BadRequestException;
-import org.checkerframework.checker.units.qual.N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
@@ -21,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1/authors")
@@ -80,6 +76,7 @@ public class AuthorController {
         authorService.updateName(name);
         return ResponseEntity.ok().build();
     }
+
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
         Optional<Author> author = authorRepository.findBySlugAndIsDisabledFalse(slug);
@@ -90,13 +87,13 @@ public class AuthorController {
     }
 
     @GetMapping(path = "/{slug}/follow")
-    public ResponseEntity<Void> followUser(@PathVariable(name = "slug") String slug) throws BadRequestException {
+    public ResponseEntity<Void> followUser(@PathVariable(name = "slug") String slug) {
         authorService.follow(slug);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(path = "/{slug}/unfollow")
-    public ResponseEntity<Void> unfollowUser(@PathVariable(name = "slug") String slug) throws BadRequestException {
+    public ResponseEntity<Void> unfollowUser(@PathVariable(name = "slug") String slug) {
         authorService.unfollow(slug);
         return ResponseEntity.noContent().build();
     }
@@ -106,6 +103,7 @@ public class AuthorController {
         authorService.block(slug);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{slug}/unblock")
     public ResponseEntity<Void> unblockUser(@PathVariable(name = "slug") String slug) {
         authorService.unblock(slug);
@@ -133,21 +131,21 @@ public class AuthorController {
             @PathVariable(name = "slug") String slug,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        return new  HttpEntity<>(authorControllerBridge.getFollowings(slug, page, size));
+        return new HttpEntity<>(authorControllerBridge.getFollowings(slug, page, size));
     }
 
     @GetMapping(path = "/blocks")
     public HttpEntity<PagedModel<AuthorView>> getBlocks(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        return new  HttpEntity<>(authorControllerBridge.getBlocks(page, size));
+        return new HttpEntity<>(authorControllerBridge.getBlocks(page, size));
     }
 
     @GetMapping("/search")
     public HttpEntity<PagedModel<AuthorView>> search(@Valid @NotBlank @RequestParam(name = "query") String query,
                                                      @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                      @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
-        return new  HttpEntity<>(authorControllerBridge.searchAuthors(query, page, size));
+        return new HttpEntity<>(authorControllerBridge.searchAuthors(query, page, size));
     }
     @GetMapping("/{slug}/follow-requests")
     public ResponseEntity<List<FollowRequestDTO>> getAllFollowRequests() {

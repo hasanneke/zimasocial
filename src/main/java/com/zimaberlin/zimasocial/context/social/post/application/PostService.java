@@ -16,6 +16,7 @@ import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
 import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
+import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -42,9 +43,9 @@ public class PostService {
         Author author = authorRepository.getAuthenticatedAuthor();
         UUID domainMediaId = null;
         if(createPost.mediaId() != null){
-            domainMediaId = mediaService.get(createPost.mediaId(), createPost.type(), createPost.movieMediaType());
+            domainMediaId = mediaService.getId(createPost.mediaId(), createPost.type(), createPost.movieMediaType());
         }
-        Post post = PostFactory.newPost(postRepository.nextSequence(), createPost.type(), createPost.content(), author.getId(), domainMediaId);
+        Post post = PostFactory.newPost(postRepository.nextSequence(),createPost.mediaId() == null ? PostType.any : createPost.type(), createPost.content(), author.getId(), domainMediaId);
         return postRepository.save(post);
     }
 

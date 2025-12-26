@@ -2,7 +2,9 @@ package com.zimaberlin.zimasocial.context.social.infastructure.jpaentities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
@@ -29,6 +31,7 @@ public class MediaItem {
     @Column(name = "provider")
     private String provider;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "content", columnDefinition = "jsonb")
     private String content;
 }

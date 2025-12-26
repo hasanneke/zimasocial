@@ -21,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 @Service
 public class TDMBMovieSearcher implements MovieSearcher {
@@ -43,7 +42,7 @@ public class TDMBMovieSearcher implements MovieSearcher {
     }
 
     @Override
-    public UUID getMovie(Integer movieId, MovieMediaType type, String language) throws JsonProcessingException {
+    public MediaItem getMovie(Integer movieId, MovieMediaType type, String language) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
         HttpEntity entity = new HttpEntity<>(headers);
@@ -66,7 +65,7 @@ public class TDMBMovieSearcher implements MovieSearcher {
             );
             mediaItem.setResourceUrl(String.format("%s/movie/%s", baseUrl, movieId));
             mediaItem.setResourceId(movieId.toString());
-            mediaItem.setContent(objectMapper.writeValueAsString(result));
+            mediaItem.setContent(objectMapper.writeValueAsString(result.getBody()));
         }else {
             UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(String.format("%s/tv/%s", baseUrl, mediaItem)).queryParam("language", language);
             ResponseEntity<TDMBMultiMediaTVMovieSearchResponse.TvShow> result = restTemplate.exchange(
@@ -77,9 +76,8 @@ public class TDMBMovieSearcher implements MovieSearcher {
             );
             mediaItem.setResourceUrl(String.format("%s/tv/%s", baseUrl, movieId));
             mediaItem.setResourceId(movieId.toString());
-            mediaItem.setContent(objectMapper.writeValueAsString(result));
+            mediaItem.setContent(objectMapper.writeValueAsString(result.getBody()));
         }
-        MediaItem savedItem = mediaItemJpaRepository.save(mediaItem);
-        return savedItem.getId();
+        return mediaItem;
     }
 }

@@ -1,9 +1,8 @@
 package com.zimaberlin.zimasocial.context.social.media;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.UUID;
+import com.zimaberlin.zimasocial.context.social.infastructure.jpaentities.MediaItem;
 
 public interface MusicSearcher {
-    UUID get(String id) throws JsonProcessingException;
+    MediaItem get(String id) throws JsonProcessingException;
 }

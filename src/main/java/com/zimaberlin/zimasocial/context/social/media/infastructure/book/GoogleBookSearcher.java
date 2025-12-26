@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class GoogleBookSearcher implements BookSearcher {
@@ -36,7 +35,7 @@ public class GoogleBookSearcher implements BookSearcher {
 
     @Override
     @Transactional
-    public UUID getBook(String id) throws JsonProcessingException {
+    public MediaItem getBook(String id) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String url = String.format("%s/books/v1/volumes/%s", baseUrl, id);
         GoogleBookSearchResult.Book book = restTemplate
@@ -47,7 +46,6 @@ public class GoogleBookSearcher implements BookSearcher {
         mediaItem.setResourceUrl(url);
         mediaItem.setResourceId(id);
         mediaItem.setContent(objectMapper.writeValueAsString(book));
-        MediaItem savedItem = mediaItemJpaRepository.save(mediaItem);
-        return savedItem.getId();
+        return mediaItem;
     }
 }
