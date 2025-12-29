@@ -11,12 +11,12 @@ import com.zimaberlin.zimasocial.context.social.infastructure.service.googleBook
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
-import com.zimaberlin.zimasocial.context.social.post.entity.PostFactory;
 import com.zimaberlin.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
+import com.zimaberlin.zimasocial.context.social.post.value.MediaId;
+import com.zimaberlin.zimasocial.context.social.post.value.PostContent;
 import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
-import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +38,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final MediaService mediaService;
+    private final Clock clock;
 
     @Transactional
     public Post createPost(CreatePost createPost) throws JsonProcessingException {
@@ -45,7 +47,7 @@ public class PostService {
         if(createPost.mediaId() != null){
             domainMediaId = mediaService.getId(createPost.mediaId(), createPost.type(), createPost.movieMediaType());
         }
-        Post post = PostFactory.newPost(postRepository.nextSequence(),createPost.mediaId() == null ? PostType.any : createPost.type(), createPost.content(), author.getId(), domainMediaId);
+        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type(), new MediaId(domainMediaId)), clock);
         return postRepository.save(post);
     }
 

@@ -3,9 +3,9 @@ package com.zimaberlin.zimasocial.context.social.media.infastructure.music;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zimaberlin.zimasocial.context.social.infastructure.jpaentities.MediaItem;
-import com.zimaberlin.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zimaberlin.zimasocial.context.social.media.MusicSearcher;
 import com.zimaberlin.zimasocial.service.musicService.impl.SpotifyResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -19,17 +19,16 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SpotifyMusicSearcher implements MusicSearcher {
     private final RestTemplate restTemplate;
-    private final MediaItemJpaRepository mediaItemJpaRepository;
+    @Getter
     private String accessToken;
     private final ObjectMapper objectMapper;
     String baseUrl;
 
     @Autowired
-    public SpotifyMusicSearcher(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper, MediaItemJpaRepository mediaItemJpaRepository) {
+    public SpotifyMusicSearcher(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder.build();
         this.baseUrl = "https://api.spotify.com/v1/search";
         this.objectMapper = objectMapper;
-        this.mediaItemJpaRepository = mediaItemJpaRepository;
     }
 
     @Override

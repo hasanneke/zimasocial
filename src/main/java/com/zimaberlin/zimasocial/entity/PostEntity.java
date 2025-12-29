@@ -3,6 +3,7 @@ package com.zimaberlin.zimasocial.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
+import com.zimaberlin.zimasocial.context.social.post.value.MediaId;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.zimaberlin.zimasocial.context.social.post.value.PostContent;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -103,8 +105,9 @@ public class PostEntity {
 
     public void merge(Post post) {
         this.id = post.getPostId();
-        this.content = post.getContent();
-        this.type = post.getType();
+        this.content = post.getContent().content();
+        this.type = post.getContent().type();
+        this.mediaId = post.getContent().mediaId().value();
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
         this.userId = post.getAuthorId().getValue();
@@ -112,11 +115,21 @@ public class PostEntity {
         this.score = post.getScore();
         this.lastPunishedAt = post.getLastPunishedAt();
         this.updatedAt = post.getUpdatedAt();
-        this.mediaId = post.getMediaId();
+
     }
 
     public Post rehydrate() {
-        return new Post(this.getId(), this.getType(), this.getMediaId(),  this.getContent(), this.getLikeCount(), this.getCommentCount(), this.getCreatedAt(), this.getUpdatedAt(), new AuthorId(this.getUser().getId()), this.getScore(), this.getLastPunishedAt());
+        return Post.reconstitute(
+                id,
+                new AuthorId(userId),
+                new PostContent(content, type, new MediaId(mediaId)),
+                likeCount,
+                commentCount,
+                score,
+                isVisible,
+                createdAt,
+                updatedAt,
+                lastPunishedAt);
     }
 }
 

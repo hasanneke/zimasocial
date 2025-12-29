@@ -44,13 +44,13 @@ public class PostViewAdapter {
         postView.setIsReported(postReported);
         postView.setUser(authorViewAdapter.authorViewFromAuthor(author));
         postView.setId( post.getPostId() );
-        postView.setContent( post.getContent() );
-        postView.setType( post.getType() );
+        postView.setContent( post.getContent().content() );
+        postView.setType( post.getContent().type() );
         postView.setLikeCount( post.getLikeCount() );
         postView.setCommentCount( post.getCommentCount() );
         postView.setCreatedAt( post.getCreatedAt() );
         postView.setUpdatedAt( post.getUpdatedAt() );
-        postView.setMediaId( post.getMediaId() );
+        postView.setMediaId( post.getContent().mediaId().value() );
         postView.addLinks();
 
 

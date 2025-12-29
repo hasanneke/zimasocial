@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zimaberlin.zimasocial.context.social.infastructure.service.googleBooks.MediaService;
-import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMedia;
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,18 +18,14 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class MediaController {
-    private final MediaCollection mediaCollection;
     private final MediaService mediaService;
     private final ObjectMapper objectMapper;
-
-    @GetMapping(path = "/movies/{movieId}")
-    public ResponseEntity<MovieMedia> getMovie(@PathVariable(name = "movieId") UUID movieId){
-        MovieMedia movieMedia = mediaCollection.findMovieById(movieId).orElseThrow(MovieNotFoundException::new);
-        return ResponseEntity.ok(movieMedia);
-    }
 
     @GetMapping("/{mediaId}")
     public ResponseEntity<JsonNode> getMedia(@PathVariable(name = "mediaId") UUID mediaId) throws JsonProcessingException {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(objectMapper.readTree(mediaService.get(mediaId)));
     }
+
+
+
 }

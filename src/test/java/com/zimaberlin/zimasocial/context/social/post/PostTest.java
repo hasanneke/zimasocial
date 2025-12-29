@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.post;
 
+import com.zimaberlin.zimasocial.TestUtil;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
-import com.zimaberlin.zimasocial.context.social.post.entity.PostFactory;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -102,34 +102,34 @@ class PostTest {
 
     @Test
     void testPunishScore_WhenPostCreatedOneHourAgo_ReduceScore() {
-        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(1)).score(100).build();
+        Post post = TestUtil.mockPostForScoring(OffsetDateTime.now().minusHours(1), OffsetDateTime.now().minusHours(1), 100);
         post.punishScore();
         Assertions.assertEquals(96, post.getScore());
     }
 
     @Test
     void testPunishScore_WhenPostCreatedTwoHoursAgo_ReduceScore() {
-        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(2)).score(100).build();
+        Post post = TestUtil.mockPostForScoring(OffsetDateTime.now().minusHours(1), OffsetDateTime.now().minusHours(2), 100);
         post.punishScore();
         Assertions.assertEquals(93, post.getScore());
     }
 
     @Test
     void testPunishScore_WhenPostCreated24Ago_ReduceScore() {
-        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(1)).lastPunishedAt(OffsetDateTime.now().minusHours(24)).score(100).build();
+        Post post = TestUtil.mockPostForScoring(OffsetDateTime.now().minusHours(1),OffsetDateTime.now().minusHours(24), 100);
         post.punishScore();
         Assertions.assertTrue(post.getScore() < 50);
     }
 
     @Test
     void testPunishScore_WhenPostCreatedPassedThreeDays_DontReduceScore() {
-        Post post = Post.builder().createdAt(OffsetDateTime.now().minusHours(73)).lastPunishedAt(OffsetDateTime.now().minusHours(73)).score(50).build();
+        Post post = TestUtil.mockPostForScoring(OffsetDateTime.now().minusHours(73), OffsetDateTime.now().minusHours(73), 50);
         post.punishScore();
         Assertions.assertEquals(50, post.getScore());
     }
 
     private static Post dummyAnyPost(AuthorId ownerAuthorId) {
-        return PostFactory.newAnyPost(0L, "", ownerAuthorId);
+        return TestUtil.mockAnyPost();
     }
 
     private static Comment dummyComment(AuthorId authorId) {

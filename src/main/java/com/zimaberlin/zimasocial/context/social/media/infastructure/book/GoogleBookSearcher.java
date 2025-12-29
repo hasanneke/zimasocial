@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zimaberlin.zimasocial.context.social.infastructure.jpaentities.MediaItem;
 import com.zimaberlin.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zimaberlin.zimasocial.context.social.media.BookSearcher;
-import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
 import com.zimaberlin.zimasocial.context.social.media.book.SearchBookMediaItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,7 +21,7 @@ public class GoogleBookSearcher implements BookSearcher {
     private MediaItemJpaRepository mediaItemJpaRepository;
 
     @Autowired
-    public GoogleBookSearcher(RestTemplateBuilder restTemplateBuilder, MediaCollection mediaRepository, MediaItemJpaRepository mediaItemJpaRepository, ObjectMapper objectMapper) {
+    public GoogleBookSearcher(RestTemplateBuilder restTemplateBuilder, MediaItemJpaRepository mediaItemJpaRepository, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder.build();
         this.baseUrl = "https://www.googleapis.com";
         this.mediaItemJpaRepository = mediaItemJpaRepository;

@@ -65,11 +65,15 @@ server:
 jwt:
   secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
 
-#logging:
-#  level:
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.orm.jdbc.bind: TRACE
-#    org.hibernate.type.descriptor.jdbc: TRACE
+logging:
+  level:
+    reactor:
+      netty:
+        http:
+          client: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.type.descriptor.jdbc: TRACE
 
 aws:
   access:
@@ -85,7 +89,7 @@ aws:
 mediaprovider:
   movie:
     baseurl: https://api.themoviedb.org/3
-    apikey: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MzliYTVlMDYwNWVhZGQ2ZjFhOWY5NGU4NWNlYTU4NCIsIm5iZiI6MTczMDczNzgxNC4yOTQ1NjQsInN1YiI6IjY3MjhmNjM5NTkxODEzN2NmYzM5YzI0YSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JL7yTW0W-j_xvqXm84mHIkmd-pat0dkCeGp-QV1Onwc
+    apikey: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MzliYTVlMDYwNWVhZGQ2ZjFhOWY5NGU4NWNlYTU4NCIsIm5iZiI6MTczMDczNzcyMS42NzcsInN1YiI6IjY3MjhmNjM5NTkxODEzN2NmYzM5YzI0YSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.vTL18UNsB8eomYR6EW0cWmXhxfeGhal_Jjac8KXhJnQ
   spotify:
     clientId: 95ab647256b140eb9aa7cb7fdd7d126e
     clientSecret: 6678fd1040a64d929afa806168fe27dc

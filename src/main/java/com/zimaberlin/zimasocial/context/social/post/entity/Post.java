@@ -3,67 +3,83 @@ package com.zimaberlin.zimasocial.context.social.post.entity;
 import com.zimaberlin.zimasocial.context.social.author.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.post.event.PostLikedEvent;
+import com.zimaberlin.zimasocial.context.social.post.value.PostContent;
 import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
-import com.zimaberlin.zimasocial.entity.PostType;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Post {
     private Long postId;
-    private String content;
-    private PostType type;
     private int likeCount;
     private int commentCount;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private AuthorId authorId;
-    private UUID mediaId;
+    private PostContent content;
     private Boolean isVisible;
     private Integer score;
     private OffsetDateTime lastPunishedAt;
-
-    public Post(Long postId, PostType postType, UUID mediaId, String content, int likeCount, int commentCount, OffsetDateTime createdAt, OffsetDateTime updatedAt, AuthorId authorId, Integer score, OffsetDateTime lastPunishedTime) {
-        Assert.notNull(postId, "Post Id cannot be null");
-        Assert.isTrue(likeCount >= 0, "Like count cannot be negative");
-        Assert.isTrue(commentCount >= 0, "Comment count cannot be negative");
-        this.postId = postId;
-        this.content = content;
-        this.type = postType;
-        this.mediaId = mediaId;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.authorId = authorId;
-        this.score = score;
-        this.isVisible = true;
-        this.lastPunishedAt = lastPunishedTime;
+    private Post(Long postId) {
+        this.postId = Objects.requireNonNull(postId, "Post id cannot be null");
     }
 
-    protected Post(Long postId, String content, PostType type, AuthorId authorId, UUID mediaId) {
-        this.postId = postId;
-        this.content = content;
-        this.type = type;
-        this.mediaId = mediaId;
-        this.likeCount = 0;
-        this.commentCount = 0;
-        this.createdAt = OffsetDateTime.now();
-        this.authorId = authorId;
-        this.isVisible = true;
-        this.score = 100;
+    public static Post create(
+            Long postId,
+            AuthorId authorId,
+            PostContent content,
+            Clock clock
+    ) {
+        Assert.notNull(authorId, "Author is required");
+
+        OffsetDateTime now = OffsetDateTime.now(clock);
+
+        Post post = new Post(postId);
+        post.authorId = authorId;
+        post.content = content;
+
+        post.likeCount = 0;
+        post.commentCount = 0;
+        post.score = 100;
+        post.isVisible = true;
+
+        post.createdAt = now;
+        post.updatedAt = null;
+        post.lastPunishedAt = null;
+
+        return post;
+    }
+
+    public static Post reconstitute(
+            Long postId,
+            AuthorId authorId,
+            PostContent content,
+            int likeCount,
+            int commentCount,
+            int score,
+            boolean visible,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt,
+            OffsetDateTime lastPunishedAt
+    ) {
+        Post post = new Post(postId);
+        post.authorId = authorId;
+        post.content = content;
+        post.likeCount = likeCount;
+        post.commentCount = commentCount;
+        post.score = score;
+        post.isVisible = visible;
+        post.createdAt = createdAt;
+        post.updatedAt = updatedAt;
+        post.lastPunishedAt = lastPunishedAt;
+
+        return post;
     }
 
     public PostLike like(AuthorId likerAuthorId) {

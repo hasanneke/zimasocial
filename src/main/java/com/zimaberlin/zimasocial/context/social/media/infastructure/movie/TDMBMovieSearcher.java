@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zimaberlin.zimasocial.context.social.infastructure.jpaentities.MediaItem;
 import com.zimaberlin.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
-import com.zimaberlin.zimasocial.context.social.media.MediaCollection;
 import com.zimaberlin.zimasocial.context.social.media.MovieSearcher;
 import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
 import com.zimaberlin.zimasocial.service.movieService.Impl.TDMBMultiMediaTVMovieSearchResponse;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,19 +25,16 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class TDMBMovieSearcher implements MovieSearcher {
     private final RestTemplate restTemplate;
-    private final MediaCollection mediaCollection;
-    private MediaItemJpaRepository mediaItemJpaRepository;
     private ObjectMapper objectMapper;
+    @Getter
     private final String apiKey;
     private final String baseUrl;
 
     @Autowired
-    public TDMBMovieSearcher(MediaItemJpaRepository mediaItemJpaRepository, ObjectMapper objectMapper, RestTemplateBuilder restTemplateBuilder, MediaCollection mediaCollection, @Value("${mediaprovider.movie.apikey}") String apiKey, @Value("${mediaprovider.movie.baseurl}")String baseUrl) {
+    public TDMBMovieSearcher(MediaItemJpaRepository mediaItemJpaRepository, ObjectMapper objectMapper, RestTemplateBuilder restTemplateBuilder, @Value("${mediaprovider.movie.apikey}") String apiKey, @Value("${mediaprovider.movie.baseurl}") String baseUrl) {
         this.restTemplate = restTemplateBuilder.build();
-        this.mediaCollection = mediaCollection;
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;
-        this.mediaItemJpaRepository = mediaItemJpaRepository;
         this.objectMapper = objectMapper;
     }
 
