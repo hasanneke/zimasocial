@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.post.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

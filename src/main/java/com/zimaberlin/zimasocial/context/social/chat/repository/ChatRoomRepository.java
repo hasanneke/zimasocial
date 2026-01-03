@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.chat.repository;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
 import org.springframework.data.domain.Page;

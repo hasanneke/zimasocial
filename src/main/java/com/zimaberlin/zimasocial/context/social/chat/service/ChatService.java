@@ -1,10 +1,14 @@
 package com.zimaberlin.zimasocial.context.social.chat.service;
 
 import com.zimaberlin.zimasocial.context.communication.controller.request.ChatMessageRequest;
-import com.zimaberlin.zimasocial.context.social.author.*;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.exception.AuthorNotFollowedException;
+import com.zimaberlin.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
-import com.zimaberlin.zimasocial.context.social.authorrelation.BlockRelation;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.FollowRelation;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;

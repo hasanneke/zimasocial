@@ -1,6 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.authorrelation;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 
 import java.util.List;
 import java.util.Optional;

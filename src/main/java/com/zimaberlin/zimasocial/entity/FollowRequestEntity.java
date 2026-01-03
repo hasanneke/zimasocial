@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.entity;
 
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

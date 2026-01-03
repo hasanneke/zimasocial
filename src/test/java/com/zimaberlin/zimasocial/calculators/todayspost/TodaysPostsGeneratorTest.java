@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.calculators.todayspost;
 
 import com.zimaberlin.zimasocial.calculators.PostScoreCalculator;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.user.UserFactory;
@@ -45,43 +45,43 @@ public class TodaysPostsGeneratorTest {
         post.setLikeCount(0);
         post.setCommentCount(0);
         post.setUser(author);
-        post.setType(PostType.music);
+        post.setType(MediaType.music);
         PostEntity post1 = new PostEntity();
         post1.setId(1L);
         post1.setLikeCount(2);
         post1.setCommentCount(2);
         post1.setUser(author);
-        post1.setType(PostType.music);
+        post1.setType(MediaType.music);
         PostEntity post2 = new PostEntity();
         post2.setId(2L);
         post2.setLikeCount(0);
         post2.setCommentCount(0);
         post2.setUser(author1);
-        post2.setType(PostType.movie);
+        post2.setType(MediaType.movie);
         PostEntity post3 = new PostEntity();
         post3.setId(3L);
         post3.setLikeCount(2);
         post3.setCommentCount(2);
         post3.setUser(author1);
-        post3.setType(PostType.movie);
+        post3.setType(MediaType.movie);
         PostEntity post4 = new PostEntity();
         post4.setId(4L);
         post4.setLikeCount(1);
         post4.setCommentCount(1);
         post4.setUser(author2);
-        post4.setType(PostType.book);
+        post4.setType(MediaType.book);
         PostEntity post5 = new PostEntity();
         post5.setId(5L);
         post5.setLikeCount(2);
         post5.setCommentCount(2);
         post5.setUser(author2);
-        post5.setType(PostType.book);
+        post5.setType(MediaType.book);
         PostEntity post6 = new PostEntity();
         post6.setId(6L);
         post6.setLikeCount(4);
         post6.setCommentCount(4);
         post6.setUser(author2);
-        post6.setType(PostType.music);
+        post6.setType(MediaType.music);
         testPosts.addAll(List.of(post, post1, post2, post3, post4, post5, post6));
     }
     @Test
@@ -90,11 +90,11 @@ public class TodaysPostsGeneratorTest {
         List<TodaysPost> todaysPosts = todaysPostGenerator.selectTodaysPosts();
 
         assertEquals(3, todaysPosts.size());
-        assertEquals(6, todaysPosts.stream().filter(e->e.getPost().getType().equals(PostType.music))
+        assertEquals(6, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.music))
                 .findFirst().get().getPost().getId());
-        assertEquals(3, todaysPosts.stream().filter(e->e.getPost().getType().equals(PostType.movie))
+        assertEquals(3, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.movie))
                 .findFirst().get().getPost().getId());
-        assertEquals(5, todaysPosts.stream().filter(e->e.getPost().getType().equals(PostType.book))
+        assertEquals(5, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.book))
                 .findFirst().get().getPost().getId());
     }
 

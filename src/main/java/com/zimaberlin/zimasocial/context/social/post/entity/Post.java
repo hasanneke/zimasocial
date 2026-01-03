@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.post.entity;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.post.event.PostLikedEvent;
 import com.zimaberlin.zimasocial.context.social.post.value.PostContent;

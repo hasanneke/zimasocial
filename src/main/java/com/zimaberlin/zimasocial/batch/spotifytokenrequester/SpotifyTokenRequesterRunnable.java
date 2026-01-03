@@ -1,7 +1,6 @@
 package com.zimaberlin.zimasocial.batch.spotifytokenrequester;
 
-import com.zimaberlin.zimasocial.context.social.media.infastructure.music.SpotifyMusicSearcher;
-import com.zimaberlin.zimasocial.service.musicService.domain.SearchMusicClient;
+import com.zimaberlin.zimasocial.context.social.media.infastructure.SpotifyMusicSearcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

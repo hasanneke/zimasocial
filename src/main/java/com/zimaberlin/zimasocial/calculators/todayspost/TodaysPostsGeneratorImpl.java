@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.calculators.todayspost;
 
 import com.zimaberlin.zimasocial.calculators.PostScoreCalculator;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.repository.PostJpaRepository;
 import com.zimaberlin.zimasocial.repository.TodaysPostRepository;
@@ -42,11 +42,11 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
         List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(
                 LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime(),
                 LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime());
-        List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.music))
+        List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
-        List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.movie))
+        List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
-        List<PostEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(PostType.book))
+        List<PostEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.book))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
 
         PostEntity todaysMusic = musics.stream().findFirst().orElse(null);

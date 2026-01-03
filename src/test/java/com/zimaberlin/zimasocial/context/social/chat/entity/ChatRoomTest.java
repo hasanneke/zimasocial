@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.chat.entity;
 
 import com.zimaberlin.zimasocial.context.social.chat.ChatTestUtility;
-import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
 import com.zimaberlin.zimasocial.context.social.chat.exception.AuthorIsNotInRoom;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;

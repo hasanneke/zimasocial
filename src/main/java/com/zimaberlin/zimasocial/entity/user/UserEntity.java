@@ -2,20 +2,20 @@ package com.zimaberlin.zimasocial.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zimaberlin.zimasocial.context.account.entity.Account;
-import com.zimaberlin.zimasocial.context.account.exception.BioLengthExceededException;
-import com.zimaberlin.zimasocial.context.account.exception.NameLengthExceededException;
+import com.zimaberlin.zimasocial.context.account.exception.CharachterLengthExceededException;
 import com.zimaberlin.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
 import com.zimaberlin.zimasocial.context.account.value.DeleteReason;
 import com.zimaberlin.zimasocial.context.account.value.DisableReason;
 import com.zimaberlin.zimasocial.context.communication.domain.entity.Recipient;
 import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.entity.*;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,6 +31,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Builder
+@AllArgsConstructor
 @Table(name = "users")
 @Entity
 @Getter
@@ -47,6 +49,7 @@ public class UserEntity implements Serializable {
         this.authProvider = authProvider;
         this.roles = roles;
         this.slug = slug;
+        this.isDeleted = false;
     }
     @Id
     private Long id;
@@ -175,19 +178,19 @@ public class UserEntity implements Serializable {
     }
     public void updateBio(String bio){
         if(bio.length() > 128) {
-            throw new BioLengthExceededException();
+            throw new CharachterLengthExceededException(128);
         }
         this.bio = bio;
     }
     public void updateName(String name) {
         if(name.length() > 32){
-            throw new NameLengthExceededException();
+            throw new CharachterLengthExceededException(32);
         }
         this.name = name;
     }
     public void updateSlug(String slug){
         if(name.length() > 32){
-            throw new NameLengthExceededException();
+            throw new CharachterLengthExceededException(32);
         }
         this.slug = slug;
     }

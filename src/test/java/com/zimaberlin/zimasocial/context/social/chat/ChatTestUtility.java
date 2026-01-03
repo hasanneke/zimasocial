@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.chat;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessageId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;

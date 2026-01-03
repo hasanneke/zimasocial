@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.chat.infastructure.datasource.repository;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
 import com.zimaberlin.zimasocial.context.social.chat.infastructure.datasource.dao.ChatRoomJpaDao;

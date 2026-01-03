@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.post;
 
 import com.zimaberlin.zimasocial.TestUtil;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
@@ -129,7 +129,7 @@ class PostTest {
     }
 
     private static Post dummyAnyPost(AuthorId ownerAuthorId) {
-        return TestUtil.mockAnyPost();
+        return TestUtil.mockAnyPost(ownerAuthorId);
     }
 
     private static Comment dummyComment(AuthorId authorId) {

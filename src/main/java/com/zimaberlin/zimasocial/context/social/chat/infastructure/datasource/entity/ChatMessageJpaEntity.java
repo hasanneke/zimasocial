@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.chat.infastructure.datasource.entity;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatMessageId;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoomId;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

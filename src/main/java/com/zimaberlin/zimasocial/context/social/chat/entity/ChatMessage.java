@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.chat.entity;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import org.springframework.util.Assert;
 
 import java.time.OffsetDateTime;

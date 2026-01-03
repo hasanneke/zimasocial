@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.context.contentmoderation.report.instracture;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.entity.report.ReportEntity;
 import com.zimaberlin.zimasocial.entity.report.ReportId;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;

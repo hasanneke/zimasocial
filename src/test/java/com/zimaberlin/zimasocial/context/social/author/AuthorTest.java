@@ -2,6 +2,8 @@ package com.zimaberlin.zimasocial.context.social.author;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zimaberlin.zimasocial.context.account.exception.CircularFollowException;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

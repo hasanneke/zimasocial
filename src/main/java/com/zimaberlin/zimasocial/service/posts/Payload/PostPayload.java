@@ -1,9 +1,11 @@
 package com.zimaberlin.zimasocial.service.posts.Payload;
 
-import com.zimaberlin.zimasocial.context.social.media.movie.MovieMediaType;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Schema(description = "Post creation request")
 @Getter
@@ -12,16 +14,13 @@ import lombok.*;
 @NoArgsConstructor
 public class PostPayload {
     @Schema(description = "Post Type")
-    private PostType type = PostType.any;
+    private MediaType type = MediaType.any;
 
     @Schema(description = "Post Content")
     private String content;
 
     @Schema(description = "Selected media id")
     private String mediaId;
-
-    @Schema(description = "Selected TV media type (eg: movie, tv)")
-    private MovieMediaType movieMediaType;
 }
 
 

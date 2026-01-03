@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.value.MediaId;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
@@ -40,7 +40,7 @@ public class PostEntity {
     private String url;
 
     @Enumerated(EnumType.STRING)
-    private PostType type;
+    private MediaType type;
 
     @Column(name = "like_count")
     private int likeCount = 0;
@@ -107,7 +107,7 @@ public class PostEntity {
         this.id = post.getPostId();
         this.content = post.getContent().content();
         this.type = post.getContent().type();
-        this.mediaId = post.getContent().mediaId().value();
+        this.mediaId = post.getContent().mediaId() != null ? post.getContent().mediaId().value() : null;
         this.likeCount = post.getLikeCount();
         this.commentCount = post.getCommentCount();
         this.userId = post.getAuthorId().getValue();
@@ -115,14 +115,13 @@ public class PostEntity {
         this.score = post.getScore();
         this.lastPunishedAt = post.getLastPunishedAt();
         this.updatedAt = post.getUpdatedAt();
-
     }
 
     public Post rehydrate() {
         return Post.reconstitute(
                 id,
                 new AuthorId(userId),
-                new PostContent(content, type, new MediaId(mediaId)),
+                new PostContent(content, type, mediaId != null ? new MediaId(mediaId) : null),
                 likeCount,
                 commentCount,
                 score,

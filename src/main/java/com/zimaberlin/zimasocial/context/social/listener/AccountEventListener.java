@@ -3,7 +3,7 @@ package com.zimaberlin.zimasocial.context.social.listener;
 import com.zimaberlin.zimasocial.context.account.event.AccountActivatedEvent;
 import com.zimaberlin.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zimaberlin.zimasocial.context.account.event.AccountDisabledEvent;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.context.social.post.application.PostService;

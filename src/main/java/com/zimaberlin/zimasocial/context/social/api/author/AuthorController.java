@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.author.AuthorService;
-import com.zimaberlin.zimasocial.context.social.author.SlugAlreadyTakenException;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.application.AuthorService;
+import com.zimaberlin.zimasocial.context.social.author.exception.SlugAlreadyTakenException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

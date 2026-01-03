@@ -2,8 +2,8 @@ package com.zimaberlin.zimasocial.context.social.api.post;
 
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zimaberlin.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
@@ -50,7 +50,7 @@ public class PostViewAdapter {
         postView.setCommentCount( post.getCommentCount() );
         postView.setCreatedAt( post.getCreatedAt() );
         postView.setUpdatedAt( post.getUpdatedAt() );
-        postView.setMediaId( post.getContent().mediaId().value() );
+        postView.setMediaId( post.getContent().mediaId() != null ? post.getContent().mediaId().value() : null );
         postView.addLinks();
 
 

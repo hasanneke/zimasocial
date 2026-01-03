@@ -1,0 +1,2 @@
+ALTER TABLE public.media_item
+ADD COLUMN type VARCHAR(16) NOT NULL;

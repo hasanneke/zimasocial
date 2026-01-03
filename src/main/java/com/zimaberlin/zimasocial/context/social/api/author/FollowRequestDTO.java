@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

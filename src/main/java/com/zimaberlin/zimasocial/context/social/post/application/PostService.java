@@ -1,13 +1,12 @@
 package com.zimaberlin.zimasocial.context.social.post.application;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentLike;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
-import com.zimaberlin.zimasocial.context.social.infastructure.service.googleBooks.MediaService;
+import com.zimaberlin.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zimaberlin.zimasocial.context.social.like.Like;
 import com.zimaberlin.zimasocial.context.social.like.LikeRepository;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
@@ -17,6 +16,7 @@ import com.zimaberlin.zimasocial.context.social.post.value.CreatePost;
 import com.zimaberlin.zimasocial.context.social.post.value.MediaId;
 import com.zimaberlin.zimasocial.context.social.post.value.PostContent;
 import com.zimaberlin.zimasocial.context.social.post.value.PostLike;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import com.zimaberlin.zimasocial.exception.ConflictException;
 import com.zimaberlin.zimasocial.exception.DataNotFoundException;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -37,17 +37,17 @@ public class PostService {
     private final AuthorRepository authorRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final MediaService mediaService;
+    private final MediaItemJpaRepository mediaItemJpaRepository;
     private final Clock clock;
 
     @Transactional
-    public Post createPost(CreatePost createPost) throws JsonProcessingException {
+    public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        UUID domainMediaId = null;
+        MediaId mediaId = null;
         if(createPost.mediaId() != null){
-            domainMediaId = mediaService.getId(createPost.mediaId(), createPost.type(), createPost.movieMediaType());
+            mediaId = new MediaId(mediaItemJpaRepository.findIdById(UUID.fromString(createPost.mediaId())).orElseThrow(()-> new DataNotFoundException("media_not_found")));
         }
-        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type(), new MediaId(domainMediaId)), clock);
+        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId), clock);
         return postRepository.save(post);
     }
 

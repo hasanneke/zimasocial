@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.testutility;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;

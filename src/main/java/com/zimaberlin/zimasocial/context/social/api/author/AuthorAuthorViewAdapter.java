@@ -2,12 +2,19 @@ package com.zimaberlin.zimasocial.context.social.api.author;
 
 import com.zimaberlin.zimasocial.context.account.entity.Account;
 import com.zimaberlin.zimasocial.context.account.repository.AccountRepository;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.authorrelation.*;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
+import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestCollection;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.FollowRelation;
+import com.zimaberlin.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
+import com.zimaberlin.zimasocial.context.social.playlist.application.PlayListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -17,6 +24,7 @@ public class AuthorAuthorViewAdapter {
     private final AccountRepository accountRepository;
     private final FollowRequestCollection followRequestCollection;
     private final AuthorRepository authorRepository;
+    private final PlayListService playListService;
 
     public AuthorView authorViewFromAuthor(Author author) {
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
@@ -33,7 +41,9 @@ public class AuthorAuthorViewAdapter {
                 followRequestCollection.findByFollowedIdAndFollowerId(authenticatedUser.getId(), author.getId());
         Optional<FollowRequest> followRequestSent =
                 followRequestCollection.findByFollowedIdAndFollowerId(author.getId(), authenticatedUser.getId());
+        List<PlaylistDTO> playlists = playListService.getAllList(author.getSlug());
         AuthorView authorView = new AuthorView();
+        authorView.setPlaylists(playlists);
         authorView.setId(author.getId().getValue());
         authorView.setSlug(author.getSlug());
         authorView.setName(author.getName());

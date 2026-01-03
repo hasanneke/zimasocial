@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.comment;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;

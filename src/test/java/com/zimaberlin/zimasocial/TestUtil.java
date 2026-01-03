@@ -1,10 +1,10 @@
 package com.zimaberlin.zimasocial;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.value.PostContent;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -22,10 +22,13 @@ public class TestUtil {
 
     public static Post mockPostForScoring(OffsetDateTime createdAt, OffsetDateTime lastPunishedAt, Integer score) {
         Clock clock = Clock.system(ZoneId.systemDefault());
-        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", PostType.any, null), 0, 0, score, false, createdAt, null, lastPunishedAt);
+        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, score, false, createdAt, null, lastPunishedAt);
     }
 
     public static Post mockAnyPost() {
-        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", PostType.any, null), 0, 0, 100, false, null, null, null);
+        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
+    }
+    public static Post mockAnyPost(AuthorId authorId) {
+        return Post.reconstitute(new Random().nextLong(), authorId, new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
     }
 }

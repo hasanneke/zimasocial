@@ -19,7 +19,11 @@ public class FirebaseConfig {
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
-        return FirebaseApp.initializeApp(options);
+        if(FirebaseApp.getApps().isEmpty()){
+            return FirebaseApp.initializeApp(options);
+        }else{
+            return FirebaseApp.getInstance();
+        }
     }
     @Bean
     FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {

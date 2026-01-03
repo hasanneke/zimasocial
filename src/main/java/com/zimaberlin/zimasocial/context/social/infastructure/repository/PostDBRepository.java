@@ -1,11 +1,11 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.context.social.api.post.PostCategory;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.post.entity.Post;
 import com.zimaberlin.zimasocial.context.social.post.repository.PostRepository;
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import com.zimaberlin.zimasocial.entity.todayspost.TodaysPost;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.Relation;
@@ -51,14 +51,15 @@ public class PostDBRepository implements PostRepository {
             specification = specification.and(PostSpecification.authorId(user.getId()));
         }
         // Study Specification Pattern
-        PostType type = switch (category) {
-                case any -> PostType.any;
-                case music -> PostType.music;
-                case movie -> PostType.movie;
-                case book -> PostType.book;
+        MediaType type = switch (category) {
+                case any -> MediaType.any;
+                case music -> MediaType.music;
+                case movie -> MediaType.movie;
+                case book -> MediaType.book;
+                case tv ->  MediaType.tv;
                 case followings -> null;
         };
-        if(type != PostType.any){
+        if(type != MediaType.any){
             specification = specification.and(PostSpecification.type(type));
         }
         List<UserRelationEntity> blockRelations = userRelationJpaRepository.findAllBlockRelations(currentUser.getId());

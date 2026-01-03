@@ -8,13 +8,12 @@ import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportReposito
 import com.zimaberlin.zimasocial.context.contentmoderation.report.ReportService;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.service.report.dto.ReportRequest;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

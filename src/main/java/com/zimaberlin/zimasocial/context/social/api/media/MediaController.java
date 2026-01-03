@@ -2,8 +2,8 @@ package com.zimaberlin.zimasocial.context.social.api.media;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zimaberlin.zimasocial.context.social.infastructure.service.googleBooks.MediaService;
+import com.zimaberlin.zimasocial.context.social.media.MediaService;
+import com.zimaberlin.zimasocial.context.social.post.value.MediaId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +19,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MediaController {
     private final MediaService mediaService;
-    private final ObjectMapper objectMapper;
 
     @GetMapping("/{mediaId}")
-    public ResponseEntity<JsonNode> getMedia(@PathVariable(name = "mediaId") UUID mediaId) throws JsonProcessingException {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(objectMapper.readTree(mediaService.get(mediaId)));
+    public ResponseEntity<JsonNode> getMedia(@PathVariable UUID mediaId) throws JsonProcessingException {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getMedia(new MediaId(mediaId)));
     }
 
-
-
+    @GetMapping("/external-media/{externalMediaId}/{provider}")
+    public ResponseEntity<UUID> getMediaFromExternal(@PathVariable String externalMediaId,
+                                                     @PathVariable String provider) throws JsonProcessingException {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getId(externalMediaId, provider));
+    }
 }

@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.api.media;
 
-import com.zimaberlin.zimasocial.context.social.infastructure.ProxyService;
+import com.zimaberlin.zimasocial.context.social.media.MediaProxyService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/proxy")
 @RequiredArgsConstructor
 public class MediaProxy {
-    private final ProxyService proxyService;
+    private final MediaProxyService proxyService;
 
     @RequestMapping
     public ResponseEntity<byte[]> proxy(

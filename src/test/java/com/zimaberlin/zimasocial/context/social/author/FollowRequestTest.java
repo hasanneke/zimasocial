@@ -1,10 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.author;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zimaberlin.zimasocial.context.account.entity.AccountId;
-import com.zimaberlin.zimasocial.context.account.event.AccountDisabledEvent;
-import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorFollowRequestAcceptedEvent;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestAlreadyProcessed;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;

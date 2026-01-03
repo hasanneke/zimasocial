@@ -1,9 +1,9 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import org.springframework.stereotype.Component;
 
 @Component

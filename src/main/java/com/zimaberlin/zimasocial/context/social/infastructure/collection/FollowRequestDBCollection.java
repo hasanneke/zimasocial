@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.collection;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestCollection;
 import com.zimaberlin.zimasocial.entity.FollowRequestEntity;
 import lombok.RequiredArgsConstructor;

@@ -1,0 +1,5 @@
+ALTER TABLE playlist
+DROP COLUMN updated_at;
+
+ALTER TABLE playlist
+ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE;

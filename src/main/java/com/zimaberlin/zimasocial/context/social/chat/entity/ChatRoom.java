@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.social.chat.entity;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
 import com.zimaberlin.zimasocial.context.social.chat.event.ChatMessageSentEvent;
 import com.zimaberlin.zimasocial.context.social.chat.exception.AuthorIsNotInRoom;
 import com.zimaberlin.zimasocial.shared.StaticEventPublisher;

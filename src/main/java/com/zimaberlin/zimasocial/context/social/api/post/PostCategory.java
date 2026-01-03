@@ -4,6 +4,7 @@ public enum PostCategory {
     any,
     music,
     movie,
+    tv,
     book,
     followings
 }

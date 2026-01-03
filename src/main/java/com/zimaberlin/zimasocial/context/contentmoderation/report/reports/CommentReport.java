@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.contentmoderation.report.reports;
 
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import org.springframework.util.Assert;
 

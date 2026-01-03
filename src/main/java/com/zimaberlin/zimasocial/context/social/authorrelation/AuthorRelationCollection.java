@@ -1,7 +1,11 @@
 package com.zimaberlin.zimasocial.context.social.authorrelation;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.AuthorRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.BlockRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.FollowRelation;
+import com.zimaberlin.zimasocial.context.social.authorrelation.values.MutedRelation;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;

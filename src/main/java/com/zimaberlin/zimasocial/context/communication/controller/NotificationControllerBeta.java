@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.context.communication.controller;
 
 import com.zimaberlin.zimasocial.context.communication.application.NotificationManager;
 import com.zimaberlin.zimasocial.context.communication.infastructure.DeviceTokenPayload;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zimaberlin.zimasocial.views.notification.NotificationView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

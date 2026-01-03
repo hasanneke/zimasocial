@@ -2,7 +2,7 @@ package com.zimaberlin.zimasocial.views.post;
 
 import com.zimaberlin.zimasocial.context.social.api.author.AuthorView;
 import com.zimaberlin.zimasocial.context.social.api.post.PostController;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class PostView extends RepresentationModel<PostView> {
     private Long id;
     private String content;
     private String url;
-    private PostType type;
+    private MediaType type;
     private int likeCount = 0;
     private int commentCount = 0;
     private boolean isLiked = false;

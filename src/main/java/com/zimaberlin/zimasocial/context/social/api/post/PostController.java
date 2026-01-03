@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/v2/posts")
-@Tag(name = "Posts Controller Beta", description = "APIs for managing posts")
+@RequestMapping(path = "/api/v1/posts")
+@Tag(name = "Posts Controller", description = "APIs for managing posts")
 public class PostController {
     private final PostService postService;
     private final PostControllerBridge postControllerBridge;
@@ -36,8 +36,8 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload, String language) throws JsonProcessingException {
-        return ResponseEntity.ok(postControllerBridge.createPost(payload, language));
+    public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) throws JsonProcessingException {
+        return ResponseEntity.ok(postControllerBridge.createPost(payload));
     }
 
     @GetMapping

@@ -1,11 +1,11 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorNotFoundException;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
-import com.zimaberlin.zimasocial.context.social.author.AuthorService;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.application.AuthorService;
 import com.zimaberlin.zimasocial.context.social.authorrelation.AuthorRelationCollection;
-import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequest;
+import com.zimaberlin.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zimaberlin.zimasocial.context.social.authorrelation.FollowRequestCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,8 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.api.post;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import com.zimaberlin.zimasocial.context.social.comment.Comment;
 import com.zimaberlin.zimasocial.context.social.comment.CommentRepository;
 import com.zimaberlin.zimasocial.context.social.comment.CommentViewAdapter;
@@ -47,12 +46,11 @@ public class PostControllerBridge {
         this.authorRepository = authorRepository;
     }
 
-    public PostView createPost(PostPayload payload, String language) throws JsonProcessingException {
+    public PostView createPost(PostPayload payload) {
         Post post = postService.createPost(
                 CreatePost.builder()
                         .type(payload.getType())
                         .mediaId(payload.getMediaId())
-                        .movieMediaType(payload.getMovieMediaType())
                         .content(payload.getContent())
                         .build()
         );

@@ -1,7 +1,14 @@
 package com.zimaberlin.zimasocial.context.social.api.author;
-import lombok.*;
+
+import com.zimaberlin.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,6 +30,7 @@ public class AuthorView extends RepresentationModel<AuthorView> {
     private Boolean isPrivate;
     private Boolean isBlocked;
     private Boolean termsOfUseAccepted;
+    private List<PlaylistDTO> playlists;
 
     public AuthorView addLinks() {
         // Add self link to user details

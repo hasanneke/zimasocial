@@ -1,5 +1,5 @@
 package com.zimaberlin.zimasocial.context.social.like;
-import com.zimaberlin.zimasocial.context.social.author.AuthorId;
+import com.zimaberlin.zimasocial.context.social.author.value.AuthorId;
 import lombok.Getter;
 
 @Getter

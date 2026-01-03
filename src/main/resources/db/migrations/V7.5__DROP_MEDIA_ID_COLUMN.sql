@@ -1,0 +1,2 @@
+ALTER TABLE post
+DROP COLUMN media_id;

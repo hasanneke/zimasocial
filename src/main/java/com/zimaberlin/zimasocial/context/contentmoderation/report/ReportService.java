@@ -5,14 +5,11 @@ import com.zimaberlin.zimasocial.context.contentmoderation.report.content.PostCo
 import com.zimaberlin.zimasocial.context.contentmoderation.report.exception.ReportAlreadyMadeException;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zimaberlin.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zimaberlin.zimasocial.context.contentmoderation.user.User;
-import com.zimaberlin.zimasocial.context.contentmoderation.user.UserRepository;
-import com.zimaberlin.zimasocial.context.social.author.Author;
-import com.zimaberlin.zimasocial.context.social.author.AuthorRepository;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
+import com.zimaberlin.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zimaberlin.zimasocial.entity.report.ReportReason;
 import com.zimaberlin.zimasocial.entity.report.ResourceType;
 import com.zimaberlin.zimasocial.service.posts.exception.CommentNotFoundException;
-import com.zimaberlin.zimasocial.service.users.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

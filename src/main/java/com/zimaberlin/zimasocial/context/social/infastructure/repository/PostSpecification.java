@@ -1,7 +1,7 @@
 package com.zimaberlin.zimasocial.context.social.infastructure.repository;
 
 import com.zimaberlin.zimasocial.entity.PostEntity;
-import com.zimaberlin.zimasocial.entity.PostType;
+import com.zimaberlin.zimasocial.entity.MediaType;
 import com.zimaberlin.zimasocial.entity.user.UserEntity;
 import com.zimaberlin.zimasocial.entity.userRelation.UserRelationEntity;
 import jakarta.persistence.criteria.Path;
@@ -15,7 +15,7 @@ public class PostSpecification {
                .equal(root.get("userId"), authorId);
    }
 
-    public static Specification<PostEntity> type(PostType type){
+    public static Specification<PostEntity> type(MediaType type){
         return (root, query, builder)-> builder
                 .equal(root.get("type"), type);
     }

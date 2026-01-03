@@ -1,6 +1,6 @@
 package com.zimaberlin.zimasocial.context.communication.controller.views;
 
-import com.zimaberlin.zimasocial.context.social.author.Author;
+import com.zimaberlin.zimasocial.context.social.author.entity.Author;
 import com.zimaberlin.zimasocial.context.social.chat.entity.ChatRoom;
 import lombok.Getter;
 
