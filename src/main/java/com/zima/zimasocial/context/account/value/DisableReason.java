@@ -1,0 +1,14 @@
+package com.zima.zimasocial.context.account.value;
+
+public enum DisableReason {
+    TAKE_BREAK,
+    TOO_MANY_ADS,
+    WANT_TO_REMOVE_SOMETHING,
+    PRIVACY_CONCERNS,
+    CREATED_SECOND_ACCOUNT,
+    TROUBLE_GETTING_STARTED,
+    TOO_BUSY_TOO_DISTRACTING,
+    CONCERNED_ABOUT_MY_DATE,
+    CANT_FIND_PEOPLE_TO_FOLLOW,
+    SOMETHING_ELSE;
+}

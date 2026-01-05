@@ -1,9 +1,0 @@
-package com.zimaberlin.zimasocial.context.account.exception;
-
-import com.zimaberlin.zimasocial.exception.ConflictException;
-
-public class UserIsNotBlockedException extends ConflictException {
-    public UserIsNotBlockedException() {
-        super("User is not blocked");
-    }
-}

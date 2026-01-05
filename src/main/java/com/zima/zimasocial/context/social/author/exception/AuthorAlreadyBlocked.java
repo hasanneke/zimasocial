@@ -1,0 +1,10 @@
+package com.zima.zimasocial.context.social.author.exception;
+
+import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.exception.ConflictException;
+
+public class AuthorAlreadyBlocked extends ConflictException {
+    public AuthorAlreadyBlocked(AuthorId authorId) {
+        super("author_already_blocked", String.format("Author with given id: %d is already blocked", authorId.getValue()));
+    }
+}

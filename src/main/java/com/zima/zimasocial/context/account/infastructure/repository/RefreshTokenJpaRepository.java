@@ -1,0 +1,14 @@
+package com.zima.zimasocial.context.account.infastructure.repository;
+
+import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
+@Repository
+public interface RefreshTokenJpaRepository extends JpaRepository<RefreshTokenEntity, String> {
+    Optional<RefreshTokenEntity> findByTokenAndRevoked(String token, boolean revoked);
+    Optional<RefreshTokenEntity> findFirstByUserIdAndRevokedIsFalseAndExpiresAtGreaterThanOrderByCreatedAtDesc(Long userId, OffsetDateTime expireDate);
+}

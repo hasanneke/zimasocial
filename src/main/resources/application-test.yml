@@ -52,7 +52,7 @@ spring:
             client-secret: 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
             scope: openid,profile,email
   flyway:
-    locations: classpath:db/migrations
+    locations: classpath:db/migration
     enabled: true
     default-schema: public
 server:
@@ -71,7 +71,10 @@ aws:
   s3:
     bucket: zimapublic
     region: eu-central-1
-
+logging:
+  level:
+    root: ERROR
+    com.zima.zimasocial: DEBUG
 mediaprovider:
   movie:
     baseurl: https://api.themoviedb.org/3
@@ -88,3 +91,6 @@ management:
       health:
         show-detail: always
 webLink: "https://zimasocial-15e04.web.app"
+links:
+  website: "https://zimasocial-15e04.web.app"
+  uri: "zima://app"

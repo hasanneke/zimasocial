@@ -8,7 +8,7 @@
 		<version>3.3.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.zimaberlin</groupId>
+	<groupId>com.zima.zimasocial</groupId>
 	<artifactId>zimasocial</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>zimasocial</name>
@@ -170,7 +170,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.zimaberlin.zimasocial.ZimaSocialApplication</mainClass>
+                    <mainClass>com.zima.zimasocial.ZimaSocialApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

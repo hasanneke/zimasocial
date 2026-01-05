@@ -1,4 +1,7 @@
 spring:
+  threads:
+    virtual:
+      enabled: true
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -31,8 +34,10 @@ spring:
     username: zimaadmin
     password: example
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 200000
   jpa:
-#    show-sql: true
+    show-sql: true
     hibernate:
       ddl-auto: validate
     properties:
@@ -56,7 +61,7 @@ spring:
             client-secret: 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
             scope: openid,profile,email
   flyway:
-    locations: classpath:db/migrations
+    locations: classpath:db/migration
     enabled: true
     default-schema: public
 server:
@@ -67,13 +72,8 @@ jwt:
 
 logging:
   level:
-    reactor:
-      netty:
-        http:
-          client: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.hibernate.type.descriptor.jdbc: TRACE
+    root: ERROR
+    com.zima.zimasocial: DEBUG
 
 aws:
   access:
