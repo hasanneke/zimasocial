@@ -182,7 +182,7 @@ public class PostDBRepository implements PostRepository {
                     )
                 """);
         if(feedFilter.getLastCreatedAt() != null && feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
-            baseSqlString.append(" AND (Post.score, Post.created_at, Post.id) < (:last_score, :last_created_at, :last_id)");
+            baseSqlString.append(" AND Post.score <= :last_score AND (Post.created_at, Post.id) < (:last_created_at, :last_id)");
         }
         if(feedFilter.getType() != null){
             baseSqlString.append(" AND Post.type = :type");

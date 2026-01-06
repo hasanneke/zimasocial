@@ -7,6 +7,7 @@ import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
+import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
 import com.zima.zimasocial.service.posts.Payload.PostPayload;
 import com.zima.zimasocial.views.comment.CommentView;
@@ -56,8 +57,14 @@ public class PostController {
             @RequestParam(name = "size", defaultValue = "20") Integer size,
             @RequestParam(name = "lastScore", required = false) Integer lastScore,
             @RequestParam(name = "lastCreatedAt", required = false) LocalDateTime lastCreatedAt,
-            @RequestParam(name = "lastId", required = false) Long lastId) {
-        return ResponseEntity.ok(postService.getFeed(FeedFilter.builder().lastScore(lastScore).lastId(lastId).lastCreatedAt(lastCreatedAt).build()));
+            @RequestParam(name = "lastId", required = false) Long lastId,
+            @RequestParam(name = "type", required = false) MediaType type) {
+        return ResponseEntity.ok(postService.getFeed(FeedFilter.builder()
+                .lastScore(lastScore)
+                .lastId(lastId)
+                .lastCreatedAt(lastCreatedAt)
+                .type(type)
+                .build()));
     }
 
     @GetMapping(path = "/{postId}")
