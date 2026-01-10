@@ -14,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "notification", schema = "public")
@@ -70,6 +71,9 @@ public class NotificationEntity {
 
     @Column(name = "post_id")
     private Long postId;
+
+    @Column(name = "chat_id")
+    private UUID chatId;
 
     @Column(name = "pushed")
     private Boolean isPushed = false;
@@ -183,6 +187,7 @@ public class NotificationEntity {
                 .receiverUserId(chatMessageSentNotification.getRecipientId().getValue())
                 .actorId(chatMessageSentNotification.getActorId().getValue())
                 .isPushed(chatMessageSentNotification.isPushed())
+                .chatId(chatMessageSentNotification.getChatRoomId().value())
                 .build();
     }
     public void merge(Notification notification){

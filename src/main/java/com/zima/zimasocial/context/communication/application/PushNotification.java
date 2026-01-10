@@ -1,20 +1,15 @@
 package com.zima.zimasocial.context.communication.application;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class PushNotification {
     private final String message;
     private final String deviceToken;
     private String title;
+    private String type;
     private String linkToSource;
-    public PushNotification(String message, String deviceToken) {
-        this.message = message;
-        this.deviceToken = deviceToken;
-    }
-    public PushNotification( String message, String deviceToken, String linkToSource) {
-        this.message = message;
-        this.deviceToken = deviceToken;
-        this.linkToSource = linkToSource;
-    }
+    private String resourceId;
 }

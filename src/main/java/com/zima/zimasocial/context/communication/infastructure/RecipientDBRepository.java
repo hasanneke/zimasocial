@@ -5,6 +5,7 @@ import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.communication.domain.repository.RecipientRepository;
 import com.zima.zimasocial.entity.user.UserEntity;
+import com.zima.zimasocial.repository.UserDeviceTokeJpaRepository;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecipientDBRepository implements RecipientRepository {
     private final UserJpaRepository userJpaRepository;
+    private final UserDeviceTokeJpaRepository userDeviceTokeJpaRepository;
     @Override
     public Optional<Recipient> findByRecipientId(RecipientId id) {
         Optional<UserEntity> user = userJpaRepository.findByIdWithDeviceTokensOpt(id.getValue());
@@ -44,7 +46,8 @@ public class RecipientDBRepository implements RecipientRepository {
 
     @Override
     public void save(Recipient recipient) {
-        UserEntity user = userJpaRepository.findById(recipient.getRecipientId().getValue()).orElseThrow(()->new RecipientNotFoundException(recipient.getRecipientId()));
+        UserEntity user = userJpaRepository.findById(recipient.getRecipientId().getValue()).orElseThrow(() -> new RecipientNotFoundException(recipient.getRecipientId()));
+        userDeviceTokeJpaRepository.deleteAll(user.getDeviceTokens());
         user.mergeRecipient(recipient);
         userJpaRepository.save(user);
     }

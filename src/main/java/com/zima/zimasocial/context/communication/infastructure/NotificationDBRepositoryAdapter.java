@@ -2,6 +2,7 @@ package com.zima.zimasocial.context.communication.infastructure;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
+import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
 import com.zima.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {
@@ -133,6 +134,7 @@ public class NotificationDBRepositoryAdapter {
                         .actorId(new RecipientId(notificationEntity.getActorId()))
                         .isPushed(notificationEntity.getIsPushed())
                         .createdAt(notificationEntity.getCreatedAt())
+                        .chatRoomId(new ChatRoomId(notificationEntity.getChatId()))
                         .build();
             }
             case POST_DELETED, VERY_IMPORTANT, POST_SHARED, DANGER, WELCOME, NEWS, IMPORTANT -> {

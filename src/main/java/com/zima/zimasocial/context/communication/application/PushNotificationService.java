@@ -53,37 +53,72 @@ public class PushNotificationService {
             PushNotification pushNotification = switch (notification) {
                 case AuthorFollowedNotification authorFollowedNotification -> {
                     String linkToSource =  webLink + "/users/" + actor.getSlug();
-                    yield new PushNotification("@%s seni takip etmeye başladı".formatted(actor.getSlug()), deviceToken.getToken());
+                    yield PushNotification.builder()
+                            .message("@%s seni takip etmeye başladı".formatted(actor.getSlug()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case AuthorFollowRequestSentNotification authorFollowRequestSentNotification -> {
                     String linkToSource =  webLink + "/users/" + actor.getSlug();
-                    yield new PushNotification("@%s takip isteği gönderdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message("@%s takip isteği gönderdi".formatted(actor.getSlug()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case CommentLikedNotification commentLikedNotification -> {
                     String linkToSource =  webLink + "/posts/" + commentLikedNotification.getPostId();
-                    yield new PushNotification("@%s yorumunu beğendi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message("@%s yorumunu beğendi".formatted(actor.getSlug()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case CommentRepliedNotification commentRepliedNotification -> {
                     String linkToSource =  webLink + "/posts/" + commentRepliedNotification.getPostId();
-                    yield new PushNotification("@%s yorumuna yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message("@%s yorumuna yanıt verdi".formatted(actor.getSlug()))
+                            .deviceToken( deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case PostCommentedNotification postCommentedNotification -> {
                     String linkToSource =  webLink + "/posts/" + postCommentedNotification.getPostId();
-                    yield new PushNotification("@%s paylaşımına yanıt verdi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message(("@%s paylaşımına yanıt verdi".formatted(actor.getSlug())))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case PostLikedNotification postLikedNotification -> {
                     String linkToSource =  webLink + "/posts/" + postLikedNotification.getPostId();
-                    yield new PushNotification("@%s paylaşımını beğendi".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message("@%s paylaşımını beğendi".formatted(actor.getSlug()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification -> {
                     String linkToSource =  webLink + "/users/" + actor.getSlug();
-                    yield new PushNotification("@%s takip isteğini kabul etti".formatted(actor.getSlug()), deviceToken.getToken(), linkToSource);
+                    yield PushNotification.builder()
+                            .message("@%s takip isteğini kabul etti".formatted(actor.getSlug()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToSource)
+                            .build();
                 }
                 case ChatMessageSentNotification chatMessageSentNotification -> {
                     String linkToApp = webLink + "/chats/" + actor.getSlug();
-                    yield new PushNotification("@%s bir mesaj gönderdi: %s".formatted(actor.getSlug(), chatMessageSentNotification.getMessage()), deviceToken.getToken(), linkToApp);
+                    yield PushNotification.builder()
+                            .message("@%s bir mesaj gönderdi: %s".formatted(actor.getSlug(), chatMessageSentNotification.getMessage()))
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToApp)
+                            .type("chat")
+                            .resourceId(chatMessageSentNotification.getChatRoomId().value().toString())
+                            .build();
                 }
-                case SimpleNotification simpleNotification -> new PushNotification(simpleNotification.getMessage(), deviceToken.getToken());
+                case SimpleNotification simpleNotification ->
+                        PushNotification.builder().message(simpleNotification.getMessage()).deviceToken(deviceToken.getToken()).build();
             };
             try {
                 notification.push();

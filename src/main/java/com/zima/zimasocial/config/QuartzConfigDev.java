@@ -1,5 +1,6 @@
 package com.zima.zimasocial.config;
 
+import com.zima.zimasocial.batch.pushnotifications.PushNotificationsJob;
 import com.zima.zimasocial.batch.spotifytokenrequester.SpotifyTokenRequesterJob;
 import com.zima.zimasocial.batch.todaysposts.TodaysPostJob;
 import com.zima.zimasocial.context.social.post.infastructure.PostScorePunisherJob;
@@ -35,23 +36,24 @@ public class QuartzConfigDev {
                         .withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
-//    @Bean(name = "pushNotificationsJobDetail")
-//    public JobDetail pushNotificationsJobDetail() {
-//        return JobBuilder.newJob().ofType(PushNotificationsJob.class)
-//                .storeDurably()
-//                .withIdentity("Qrtz_Push_Notifications_JobDetail")
-//                .withDescription("Invoke TodaysPostsJob")
-//                .build();
-//    }
-//    @Bean(name = "pushNotificationsTrigger")
-//    public Trigger pushNotificationsTrigger(@Qualifier("pushNotificationsJobDetail") JobDetail jobDetail){
-//        return TriggerBuilder.newTrigger()
-//                .forJob(jobDetail)
-//                .withIdentity("Qrtz_Push_Notifications_Trigger")
-//                .withDescription("Quartz Triggers push notifications for mobile clients")
-//                .withSchedule(cronSchedule("0/2 * * * * ?").withMisfireHandlingInstructionFireAndProceed())
-//                .build();
-//    }
+    @Bean(name = "pushNotificationsJobDetail")
+    public JobDetail pushNotificationsJobDetail() {
+        return JobBuilder.newJob().ofType(PushNotificationsJob.class)
+                .storeDurably()
+                .withIdentity("Qrtz_Push_Notifications_JobDetail")
+                .withDescription("Invoke TodaysPostsJob")
+                .build();
+    }
+    @Bean(name = "pushNotificationsTrigger")
+    public Trigger pushNotificationsTrigger(@Qualifier("pushNotificationsJobDetail") JobDetail jobDetail){
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity("Qrtz_Push_Notifications_Trigger")
+                .withDescription("Quartz Triggers push notifications for mobile clients")
+                .withSchedule(cronSchedule("0/2 * * * * ?")
+                        .withMisfireHandlingInstructionFireAndProceed())
+                .build();
+    }
 
     @Bean(name = "spotifyTokenRefresherJobDetail")
     public JobDetail spotifyTokenRefresherJobDetail() {

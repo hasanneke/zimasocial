@@ -29,7 +29,6 @@ public class UserDeviceToken {
     private LocalDateTime createdAt;
 
     public UserDeviceToken(DeviceToken deviceToken) {
-        this.id = deviceToken.getId();
         this.userId = deviceToken.getRecipientId().getValue();
         this.token = deviceToken.getToken();
         this.createdAt = LocalDateTime.now();

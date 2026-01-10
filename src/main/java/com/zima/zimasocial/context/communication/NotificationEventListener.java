@@ -117,6 +117,7 @@ public class NotificationEventListener {
     public void handleChatMessageSentEvent(ChatMessageSentEvent chatMessageSentEvent) {
         ChatMessageSentNotification chatMessageSentNotification = ChatMessageSentNotification
                 .builder()
+                .chatRoomId(chatMessageSentEvent.message().chatRoomId())
                 .actorId(new RecipientId(chatMessageSentEvent.sender().getId().getValue()))
                 .recipientId(new RecipientId(chatMessageSentEvent.receiver().getId().getValue()))
                 .createdAt(OffsetDateTime.now())
