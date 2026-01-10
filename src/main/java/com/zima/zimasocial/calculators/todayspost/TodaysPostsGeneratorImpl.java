@@ -1,8 +1,8 @@
 package com.zima.zimasocial.calculators.todayspost;
 
 import com.zima.zimasocial.calculators.PostScoreCalculator;
-import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
 import com.zima.zimasocial.repository.PostJpaRepository;
 import com.zima.zimasocial.repository.TodaysPostRepository;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,8 +39,9 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
     @Override
     public List<TodaysPost> selectTodaysPosts() {
         List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(
-                LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime(),
-                LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime());
+                LocalDate.now().minusDays(1).atStartOfDay(),
+                LocalDate.now().atStartOfDay()
+        );
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
                 .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))

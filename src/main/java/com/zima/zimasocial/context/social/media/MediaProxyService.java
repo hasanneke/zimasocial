@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -32,7 +31,7 @@ public class MediaProxyService {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired
-    public MediaProxyService(WebClient.Builder builder, SpotifyMusicSearcher spotifyMusicSearcher, TMDBMovieSearcher movieTVSearcher, ServletRequest servletRequest) {
+    public MediaProxyService(SpotifyMusicSearcher spotifyMusicSearcher, TMDBMovieSearcher movieTVSearcher, ServletRequest servletRequest) {
         this.spotifyMusicSearcher = spotifyMusicSearcher;
         this.movieTVSearcher = movieTVSearcher;
         this.restTemplate = new RestTemplate();

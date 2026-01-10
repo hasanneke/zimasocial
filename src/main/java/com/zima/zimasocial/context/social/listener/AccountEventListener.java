@@ -4,9 +4,9 @@ import com.zima.zimasocial.context.account.event.AccountActivatedEvent;
 import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.event.AccountDisabledEvent;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.repository.PostRepository;
-import com.zima.zimasocial.context.social.post.application.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -18,6 +18,7 @@ import java.util.List;
 public class AccountEventListener {
     private final PostRepository postRepository;
     private final PostService postService;
+
     @EventListener
     public void handleAccountDisabledEvent(AccountDisabledEvent accountDisabledEvent) {
         List<Post> allPostsOfAuthor = postRepository.findAllByAuthorId(new AuthorId(accountDisabledEvent.accountId().getValue()));

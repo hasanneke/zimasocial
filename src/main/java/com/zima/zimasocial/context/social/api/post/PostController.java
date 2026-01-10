@@ -7,7 +7,7 @@ import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
 import com.zima.zimasocial.service.posts.Payload.PostPayload;
 import com.zima.zimasocial.views.comment.CommentView;
@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,9 @@ public class PostController {
     private final PostService postService;
     private final PostControllerBridge postControllerBridge;
     private final CommentViewAdapter commentViewAdapter;
+    private static final DateTimeFormatter CLIENT_TS_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+
     @Autowired
     public PostController(PostControllerBridge postControllerBridge, PostService postService, CommentViewAdapter commentViewAdapter) {
         this.postControllerBridge = postControllerBridge;
@@ -56,14 +60,29 @@ public class PostController {
     public ResponseEntity<List<PostView>> getPostsPaginated(
             @RequestParam(name = "size", defaultValue = "20") Integer size,
             @RequestParam(name = "lastScore", required = false) Integer lastScore,
-            @RequestParam(name = "lastCreatedAt", required = false) LocalDateTime lastCreatedAt,
+            @RequestParam(name = "lastCreatedAt", required = false) String lastCreatedAt,
             @RequestParam(name = "lastId", required = false) Long lastId,
-            @RequestParam(name = "type", required = false) MediaType type) {
+            @RequestParam(name = "type", required = false) PostCategory category,
+            @RequestParam(name = "sortType", required = false)PostSortType sortType) {
+        LocalDateTime localDateTime = lastCreatedAt != null ? LocalDateTime.parse(lastCreatedAt, CLIENT_TS_FORMAT) : null;
         return ResponseEntity.ok(postService.getFeed(FeedFilter.builder()
                 .lastScore(lastScore)
                 .lastId(lastId)
-                .lastCreatedAt(lastCreatedAt)
-                .type(type)
+                .category(category)
+                .sortType(sortType)
+                .build()));
+    }
+
+    @GetMapping("/followings-feed")
+    public ResponseEntity<List<PostView>> getFollowingsFeed(
+            @RequestParam(name = "size", defaultValue = "20") Integer size,
+            @RequestParam(name = "lastScore", required = false) Integer lastScore,
+            @RequestParam(name = "lastCreatedAt", required = false) String lastCreatedAt,
+            @RequestParam(name = "lastId", required = false) Long lastId) {
+        LocalDateTime localDateTime = lastCreatedAt != null ? LocalDateTime.parse(lastCreatedAt, CLIENT_TS_FORMAT) : null;
+        return ResponseEntity.ok(postService.getFollowingsFeed(FeedFilter.builder()
+                .lastScore(lastScore)
+                .lastId(lastId)
                 .build()));
     }
 

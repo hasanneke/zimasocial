@@ -9,8 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -24,8 +23,8 @@ class PostScorePunisherServiceTest {
 
     @Test
     void punishPosts() {
-        OffsetDateTime start = LocalDate.now().minusDays(3).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
-        OffsetDateTime end = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+        LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
+        LocalDateTime end = LocalDate.now().atStartOfDay();
         Post post1 = mock(Post.class);
         Post post2 =  mock(Post.class);
         Post post24 = mock(Post.class);
@@ -35,7 +34,7 @@ class PostScorePunisherServiceTest {
         postScorePunisherService.punishPosts();
         for (Post post : posts) {
             verify(post).punishScore();
-            verify(postRepository).save(post);
         }
+        verify(postRepository).saveAll(posts);
     }
 }

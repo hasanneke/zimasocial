@@ -1,9 +1,7 @@
 package com.zima.zimasocial.context.social.post.repository;
 
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.api.post.PostCategory;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -13,8 +11,8 @@ import java.time.LocalDateTime;
 public class FeedFilter {
     Integer size;
     Integer lastScore;
-    LocalDateTime lastCreatedAt;
     Long lastId;
     Long userId;
-    MediaType type;
+    PostCategory category;
+    PostSortType sortType;
 }

@@ -64,7 +64,8 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Spoti_Token_Refresher_Trigger")
                 .withDescription("Quartz refreshes spotify access token")
-                .withSchedule(cronSchedule("0 0/30 * * * ?").withMisfireHandlingInstructionFireAndProceed())
+                .withSchedule(cronSchedule("0 0/30 * * * ?")
+                        .withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
 

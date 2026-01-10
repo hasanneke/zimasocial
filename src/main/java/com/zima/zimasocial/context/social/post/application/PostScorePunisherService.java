@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -20,14 +19,14 @@ public class PostScorePunisherService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     public void punishPosts() {
         logger.info("--- Punishing post started ----");
-        OffsetDateTime start = LocalDate.now().minusDays(3).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
-        OffsetDateTime end = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+        LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
+        LocalDateTime end = LocalDate.now().atStartOfDay();
         List<Post> posts = postRepository.findAllByCreatedAtBetween(start, end);
         logger.info("--- %d posts will be punished ----".formatted(posts.size()));
         for (Post post : posts) {
             post.punishScore();
-            postRepository.save(post);
         }
+        postRepository.saveAll(posts);
         logger.info("--- %d posts are successfully punished ----".formatted(posts.size()));
     }
 }

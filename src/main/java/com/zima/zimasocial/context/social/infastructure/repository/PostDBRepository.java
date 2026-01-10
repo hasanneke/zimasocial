@@ -5,6 +5,7 @@ import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostRepository;
+import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class PostDBRepository implements PostRepository {
         }
         // Study Specification Pattern
         MediaType type = switch (category) {
-                case any -> MediaType.any;
+                case all -> MediaType.any;
                 case music -> MediaType.music;
                 case movie -> MediaType.movie;
                 case book -> MediaType.book;
@@ -113,7 +114,7 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
-    public List<Post> findAllByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end) {
+    public List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
         return postJpaRepository.findAllByCreatedAtBetween(start, end).stream().map(PostEntity::rehydrate).toList();
     }
 
@@ -126,6 +127,15 @@ public class PostDBRepository implements PostRepository {
         postEntity.setUser(user);
         PostEntity savedPost = postJpaRepository.save(postEntity);
         return savedPost.rehydrate();
+    }
+
+    @Override
+    public void saveAll(List<Post> post) {
+        List<PostEntity> postEntityList = postJpaRepository.findAllById(post.stream().map(Post::getPostId).toList());
+        for (int i = 0; i < postEntityList.size(); i++) {
+            postEntityList.get(i).merge(post.get(i));
+        }
+        postJpaRepository.saveAll(postEntityList);
     }
 
     @Override
@@ -163,14 +173,14 @@ public class PostDBRepository implements PostRepository {
                      	Users.bio,
                      	Users.follower_count as followerCount,
                      	Users.following_count as followingCount,
-                     	EXISTS (SELECT 1 FROM user_relation       WHERE initiated_id = :user_id AND receiver_id = Users.id) isFollowed,
-                     	EXISTS (SELECT 1 FROM user_relation   	  WHERE receiver_id = Users.id AND initiated_id = :user_id) isFollowingMe,
+                     	EXISTS (SELECT 1 FROM user_relation       WHERE initiated_id = :user_id AND receiver_id = Users.id AND relation = 'followed') isFollowed,
+                     	EXISTS (SELECT 1 FROM user_relation   	  WHERE initiated_id = Users.id AND receiver_id = :user_id AND relation = 'followed') isFollowingMe,
                      	EXISTS (SELECT 1 FROM follow_request 	  WHERE follower_id = :user_id AND followed_id = Users.id) isFollowRequestSent,
                      	EXISTS (SELECT 1 FROM follow_request      WHERE followed_id = :user_id AND follower_id = Users.id) isFollowRequestReceived,
                      	EXISTS (SELECT 1 FROM likes				  WHERE user_id = :user_id AND post_id = Post.id AND like_type = 'post') isLiked,
                      	EXISTS (SELECT 1 FROM report			  WHERE resource_id = Post.id AND reporter_id = Users.id AND resource_type = 'post') isReported
                     FROM post Post
-                    INNER JOIN users Users ON Users.id = Post.user_id AND Users.is_deleted = false AND Users.is_private = false
+                    INNER JOIN users Users ON Users.id = Post.user_id AND Users.is_deleted = false AND Users.is_private = false AND Users.is_disabled = false
                     WHERE NOT EXISTS (
                         SELECT 1
                         FROM user_relation UserRelation
@@ -181,29 +191,80 @@ public class PostDBRepository implements PostRepository {
                           )
                     )
                 """);
-        if(feedFilter.getLastCreatedAt() != null && feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
-            baseSqlString.append(" AND Post.score <= :last_score AND (Post.created_at, Post.id) < (:last_created_at, :last_id)");
+        if(feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
+            baseSqlString.append(" AND Post.id < :last_id AND Post.score <= :last_score");
         }
-        if(feedFilter.getType() != null){
+        if(feedFilter.getCategory() != null && feedFilter.getCategory().getType().isPresent()){
             baseSqlString.append(" AND Post.type = :type");
         }
-        baseSqlString.append(" ORDER BY Post.score DESC, Post.created_at DESC, Post.id DESC LIMIT :size");
+        if(feedFilter.getSortType() == PostSortType.recent){
+            baseSqlString.append(" ORDER BY Post.id DESC LIMIT :size");
+        }else{
+            baseSqlString.append(" ORDER BY Post.id DESC, Post.score DESC LIMIT :size");
+        }
         Query query = entityManager.createNativeQuery(baseSqlString.toString(), "post_dto_mapping");
 
         query.setParameter("user_id", feedFilter.getUserId());
         query.setParameter("size", feedFilter.getSize() == null ? 20 : feedFilter.getSize());
 
-        if(feedFilter.getLastCreatedAt() != null && feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
+        if(feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
             query.setParameter("last_score", feedFilter.getLastScore());
-            query.setParameter("last_created_at", feedFilter.getLastCreatedAt());
             query.setParameter("last_id", feedFilter.getLastId());
         }
 
-        if(feedFilter.getType() != null){
-            query.setParameter("type", feedFilter.getType().name());
+        if(feedFilter.getCategory() != null && feedFilter.getCategory().getType().isPresent()){
+            query.setParameter("type", feedFilter.getCategory().getType().get().name());
         }
 
         List<PostDTO> postDTOS = query.getResultList();
         return postDTOS;
+    }
+
+    @Override
+    public List<PostDTO> findFollowingsFeed(FeedFilter feedFilter) {
+        StringBuilder baseSQLString = new StringBuilder("""
+                SELECT
+                    	Post.id id,
+                     	Post.content,
+                     	Post.type,
+                     	Post.like_count as likeCount,
+                     	Post.comment_count as commentCount,
+                     	Post.updated_at as updatedAt,
+                     	Post.score,
+                     	Post.media_id as mediaId,
+                     	Post.created_at as createdAt,
+                      	Users.id as userId,
+                     	Users.slug,
+                     	Users.name,
+                     	Users.family_name as familyName,
+                     	Users.avatar_file_name as avatarFileName,
+                     	Users.bio,
+                     	Users.follower_count as followerCount,
+                     	Users.following_count as followingCount,
+                     	EXISTS (SELECT 1 FROM user_relation       WHERE initiated_id = :user_id AND receiver_id = Users.id AND relation = 'followed') isFollowed,
+                     	EXISTS (SELECT 1 FROM user_relation   	  WHERE receiver_id = Users.id AND initiated_id = :user_id AND relation = 'followed') isFollowingMe,
+                     	EXISTS (SELECT 1 FROM follow_request 	  WHERE follower_id = :user_id AND followed_id = Users.id) isFollowRequestSent,
+                     	EXISTS (SELECT 1 FROM follow_request      WHERE followed_id = :user_id AND follower_id = Users.id) isFollowRequestReceived,
+                     	EXISTS (SELECT 1 FROM likes				  WHERE user_id = :user_id AND post_id = Post.id AND like_type = 'post') isLiked,
+                     	EXISTS (SELECT 1 FROM report			  WHERE resource_id = Post.id AND reporter_id = Users.id AND resource_type = 'post') isReported
+                    FROM post Post
+                    INNER JOIN users Users ON Users.id = Post.user_id AND Users.is_deleted = false AND Users.is_private = false AND Users.is_disabled = false
+                    WHERE
+                    EXISTS (SELECT 1 FROM user_relation WHERE initiated_id = :user_id AND receiver_id = Users.id AND relation = 'followed')
+                """);
+
+        if(feedFilter.getSortType() == PostSortType.recent){
+            baseSQLString.append(" ORDER BY Post.id DESC LIMIT :size");
+        }else{
+            baseSQLString.append(" ORDER BY Post.id DESC, Post.score DESC LIMIT :size");
+        }        Query query = entityManager.createNativeQuery(baseSQLString.toString(), "post_dto_mapping");
+
+        query.setParameter("user_id", feedFilter.getUserId());
+        query.setParameter("size", feedFilter.getSize() == null ? 20 : feedFilter.getSize());
+
+        if(feedFilter.getLastScore() != null && feedFilter.getLastId() != null){
+            query.setParameter("last_id", feedFilter.getLastId());
+        }
+        return query.getResultList();
     }
 }

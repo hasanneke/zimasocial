@@ -39,6 +39,7 @@ public class PostView {
         this.updatedAt = postDTO.getUpdatedAt();
         this.isReported = postDTO.getIsReported();
         this.mediaId = postDTO.getMediaId();
+        this.type = MediaType.valueOf(postDTO.getType());
         this.score = postDTO.getScore().intValue();
     }
 }

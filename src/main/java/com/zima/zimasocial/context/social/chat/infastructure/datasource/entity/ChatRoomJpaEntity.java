@@ -45,6 +45,9 @@ public class ChatRoomJpaEntity {
         if(lastMessage == null){
             return new ChatRoom(new ChatRoomId(id), participant1.toDomain(), participant2.toDomain());
         }
-        return new ChatRoom(new ChatRoomId(id), participant1.toDomain(), participant2.toDomain(), lastMessage.toDomain());
+        return new ChatRoom(new ChatRoomId(id),
+                participant1.toDomain(),
+                participant2.toDomain(),
+                lastMessage.toDomain());
     }
 }

@@ -169,4 +169,11 @@ public class PostService {
         List<PostDTO> postDTOS = postRepository.findFeed(filter);
         return postDTOS.stream().map(PostView::new).toList();
     }
+
+    public List<PostView> getFollowingsFeed(FeedFilter filter) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        filter.setUserId(author.getId().getValue());
+        List<PostDTO> postDTOS = postRepository.findFollowingsFeed(filter);
+        return postDTOS.stream().map(PostView::new).toList();
+    }
 }

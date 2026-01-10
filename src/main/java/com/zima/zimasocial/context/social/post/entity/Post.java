@@ -11,7 +11,6 @@ import org.springframework.util.Assert;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -113,7 +112,7 @@ public class Post {
 
     public void punishScore() {
         if(!isPunishable()) return;
-        long hoursPassedSinceLastPunishment = ChronoUnit.HOURS.between(lastPunishedAt, OffsetDateTime.now());
+        long hoursPassedSinceLastPunishment = ChronoUnit.HOURS.between(lastPunishedAt == null ? createdAt : lastPunishedAt, LocalDateTime.now());
         for (long i = 0; i < hoursPassedSinceLastPunishment; i++) {
             punish();
         }
@@ -125,7 +124,7 @@ public class Post {
     }
 
     private boolean isPunishable() {
-        long passedHoursFromCreation = ChronoUnit.HOURS.between(createdAt, OffsetDateTime.now());
+        long passedHoursFromCreation = ChronoUnit.HOURS.between(createdAt, LocalDateTime.now());
         return !(passedHoursFromCreation > 72 && getScore() < 100);
     }
 

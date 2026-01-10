@@ -87,7 +87,8 @@ public class QuartzConfigDev {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Post_Score_Punisher_Trigger")
                 .withDescription("Batch reduces score of posts every hour wit given parameters")
-                .withSchedule(cronSchedule("0 0 * * * ?").withMisfireHandlingInstructionFireAndProceed())
+                .withSchedule(cronSchedule("0 0 * * * ?")
+                        .withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
 }

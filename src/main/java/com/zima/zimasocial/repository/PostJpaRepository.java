@@ -8,14 +8,14 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaSpecificationExecutor<PostEntity> {
     @Query("Select post FROM PostEntity post JOIN UserEntity user ON user.id = post.userId WHERE post.createdAt BETWEEN :start AND :end AND user.isPrivate = false")
-    List<PostEntity> findAllByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
+    List<PostEntity> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     @Query(value = """
              SELECT P.* FROM post P
              INNER JOIN users U ON P.user_id = U.id AND P.is_deleted = false
@@ -33,5 +33,5 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
     List<PostEntity> findAllInvisiblePostsByUserId(Long userId);
     List<PostEntity> findAllByUserId(Long userId);
     Optional<PostEntity> findByIdAndIsVisibleTrue(Long id);
-    List<PostEntity> findByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
+    List<PostEntity> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -19,5 +19,8 @@ public class QuartzStartupTrigger {
         scheduler.triggerJob(
                 JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail")
         );
+        scheduler.triggerJob(
+                JobKey.jobKey("Qrtz_Post_Punisher_Job")
+        );
     }
 }
