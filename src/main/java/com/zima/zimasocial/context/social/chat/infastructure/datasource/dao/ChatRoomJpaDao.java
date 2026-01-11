@@ -1,7 +1,6 @@
 package com.zima.zimasocial.context.social.chat.infastructure.datasource.dao;
 
 import com.zima.zimasocial.context.social.chat.infastructure.datasource.entity.ChatRoomJpaEntity;
-import com.zima.zimasocial.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,12 +15,13 @@ import java.util.UUID;
 public interface ChatRoomJpaDao extends JpaRepository<ChatRoomJpaEntity, UUID> {
     @Query("""
         SELECT chatRoom FROM ChatRoomJpaEntity chatRoom
-        JOIN UserEntity participant1 ON participant1.id = chatRoom.participant1Id
+        JOIN UserEntity participant ON participant.id = chatRoom.participant1Id
         JOIN UserEntity participant2 ON participant2.id = chatRoom.participant2Id
+        WHERE participant.id = :participantId OR participant2.id = :participantId
         AND chatRoom.lastMessage IS NOT NULL
         ORDER BY chatRoom.lastMessage.createdAt DESC
        """)
-    Page<ChatRoomJpaEntity> findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(UserEntity participant1, UserEntity participant2, PageRequest pageRequest);
+    Page<ChatRoomJpaEntity> findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(Long participantId, PageRequest pageRequest);
     @Query("""
             SELECT chatRoom FROM ChatRoomJpaEntity chatRoom WHERE
             (chatRoom.participant1Id = :participant1Id AND chatRoom.participant2Id = :participant2Id)

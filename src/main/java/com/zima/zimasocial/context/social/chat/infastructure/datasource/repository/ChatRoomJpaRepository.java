@@ -48,7 +48,7 @@ public class ChatRoomJpaRepository implements ChatRoomRepository {
     public Page<ChatRoom> findByParticipantIn(AuthorId recipientId, PageRequest pageRequest) {
         UserEntity user = userJpaRepository.findById(recipientId.getValue()).orElseThrow(UserNotFoundException::new);
         return chatRoomJpaDao
-                .findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(user, user, pageRequest).map(ChatRoomJpaEntity::toDomain);
+                .findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(user.getId(), pageRequest).map(ChatRoomJpaEntity::toDomain);
     }
 
     @Override
