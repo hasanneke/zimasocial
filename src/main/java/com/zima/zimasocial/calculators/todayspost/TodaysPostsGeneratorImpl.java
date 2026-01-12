@@ -43,17 +43,20 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
                 LocalDate.now().atStartOfDay()
         );
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
-                .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))
-                .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
+        List<PostEntity> series = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.tv))
+                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
         List<PostEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.book))
-                .sorted(Comparator.comparing(postScoreCalculator::calculateScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
 
         PostEntity todaysMusic = musics.stream().findFirst().orElse(null);
         PostEntity todaysMovie = movies.stream().findFirst().orElse(null);
         PostEntity todaysBook = books.stream().findFirst().orElse(null);
+        PostEntity todaysSeries = series.stream().findFirst().orElse(null);
 
-        List<PostEntity> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook).toList().stream().filter(e->e != null).toList();
+        List<PostEntity> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook, todaysSeries).toList().stream().filter(e->e != null).toList();
 
         List<TodaysPost> todaysPosts = selectedPosts.stream().map(e-> TodaysPost.builder()
                         .post(e)
@@ -78,6 +81,10 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
         }else{
             logger.error("Todays book post not found");
         }
-        return todaysPosts;
+        if(todaysSeries != null){
+            logger.debug(String.format("Todays Series Post id: %d, author: %s", todaysSeries.getId(), todaysSeries.getUser().getSlug()));
+        }else{
+            logger.error("Todays series post not found");
+        }        return todaysPosts;
     }
 }

@@ -91,9 +91,7 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public void delete(Post post) {
-        PostEntity postEntity = postJpaRepository.findById(post.getPostId()).orElseThrow(PostNotFoundException::new);
-        postEntity.markAsDeleted();
-        postJpaRepository.save(postEntity);
+        postJpaRepository.deleteById(post.getPostId());
     }
 
     @Override
