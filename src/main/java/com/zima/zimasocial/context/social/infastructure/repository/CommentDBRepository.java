@@ -77,8 +77,6 @@ public class CommentDBRepository implements CommentRepository {
     }
     @Override
     public void delete(Comment comment) {
-        CommentEntity commentEntity = commentJpaRepository.findById(comment.getCommentId()).orElseThrow(CommentNotFoundException::new);
-        commentEntity.markAsDeleted();
-        commentJpaRepository.save(commentEntity);
+        commentJpaRepository.deleteById(comment.getCommentId());
     }
 }

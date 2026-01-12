@@ -51,26 +51,6 @@ public class CommentEntity {
     @JoinColumn(name = "parent_id")
     private CommentEntity parent;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
-
-    public void incrementLikeCount(){
-        likeCount = likeCount + 1;
-    }
-    public void decrementLikeCount(){
-        likeCount = likeCount - 1;
-    }
-    public void incrementReplyCount(){
-        replyCount = replyCount + 1;
-    }
-    public void decrementReplyCount(){
-        replyCount = replyCount - 1;
-    }
-
-    public void markAsDeleted() {
-        this.isDeleted = true;
-    }
-
     public void mergeDomain(Comment comment){
         this.likeCount = comment.getLikeCount();
         this.replyCount = comment.getReplyCount();
