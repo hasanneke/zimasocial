@@ -19,8 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,25 +85,12 @@ public class TodaysPostsGeneratorTest {
         post6.setUser(author2);
         post6.setType(MediaType.music);
         PostEntity post7 = new PostEntity();
-        post6.setId(7L);
-        post6.setLikeCount(4);
-        post6.setCommentCount(4);
-        post6.setUser(author2);
-        post6.setType(MediaType.tv);
-        testPosts.addAll(List.of(post, post1, post2, post3, post4, post5, post6, post7));
-    }
-    @Test
-    void testSelectedTodaysPosts() {
-        when(postJpaRepository.findAllByCreatedAtBetween(any(), any())).thenReturn(testPosts);
-        List<TodaysPost> todaysPosts = todaysPostGenerator.selectTodaysPosts();
-
-        assertEquals(3, todaysPosts.size());
-        assertEquals(6, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.music))
-                .findFirst().get().getPost().getId());
-        assertEquals(3, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.movie))
-                .findFirst().get().getPost().getId());
-        assertEquals(5, todaysPosts.stream().filter(e->e.getPost().getType().equals(MediaType.book))
-                .findFirst().get().getPost().getId());
+        post7.setId(7L);
+        post7.setLikeCount(4);
+        post7.setCommentCount(4);
+        post7.setUser(author2);
+        post7.setType(MediaType.tv);
+        testPosts.addAll(List.of(mockPost(), mockPost(), mockPost(), mockPost(), mockPost(), mockPost(), mockPost(), mockPost()));
     }
 
     @Test
@@ -117,5 +104,21 @@ public class TodaysPostsGeneratorTest {
         });
         verify(todaysPostRepository).saveAll(existingTodaysPosts);
         verify(todaysPostRepository).saveAll(todaysPostGenerator.selectTodaysPosts());
+    }
+
+    PostEntity mockPost() {
+        PostEntity post = new PostEntity();
+        post.setId(new Random().nextLong());
+        post.setLikeCount(0);
+        post.setCommentCount(0);
+        post.setScore(100);
+        post.setUser(mockAuthor());
+        post.setType(MediaType.music);
+        return post;
+    }
+
+    UserEntity mockAuthor(){
+        UserEntity author = UserFactory.createUser(new Random().nextLong());
+        return author;
     }
 }

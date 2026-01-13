@@ -91,8 +91,7 @@ public class PostDBRepository implements PostRepository {
 
     @Override
     public void delete(Post post) {
-        postJpaRepository.deleteById(post.getPosf
-                tId());
+        postJpaRepository.deleteById(post.getPostId());
     }
 
     @Override
