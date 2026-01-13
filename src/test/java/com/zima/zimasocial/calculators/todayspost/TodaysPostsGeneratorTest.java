@@ -1,8 +1,8 @@
 package com.zima.zimasocial.calculators.todayspost;
 
 import com.zima.zimasocial.calculators.PostScoreCalculator;
-import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.entity.user.UserFactory;
@@ -15,13 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TodaysPostsGeneratorTest {
@@ -82,7 +84,13 @@ public class TodaysPostsGeneratorTest {
         post6.setCommentCount(4);
         post6.setUser(author2);
         post6.setType(MediaType.music);
-        testPosts.addAll(List.of(post, post1, post2, post3, post4, post5, post6));
+        PostEntity post7 = new PostEntity();
+        post6.setId(7L);
+        post6.setLikeCount(4);
+        post6.setCommentCount(4);
+        post6.setUser(author2);
+        post6.setType(MediaType.tv);
+        testPosts.addAll(List.of(post, post1, post2, post3, post4, post5, post6, post7));
     }
     @Test
     void testSelectedTodaysPosts() {
