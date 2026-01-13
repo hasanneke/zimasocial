@@ -3,15 +3,15 @@ package com.zima.zimasocial.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.exception.CharachterLengthExceededException;
-import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
 import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
 import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.contentmoderation.user.User;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.*;
-import com.zima.zimasocial.entity.todayspost.TodaysPost;
+import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.UserDeviceToken;
+import com.zima.zimasocial.entity.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -107,27 +107,11 @@ public class UserEntity implements Serializable {
     @JsonIgnore
     private Set<PostEntity> posts = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private Set<CommentEntity> comments = new HashSet<>();
-
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     private Set<UserRole> roles = new HashSet<>();
-
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private Set<RefreshTokenEntity> refreshTokens = new HashSet<>();
-
-    @OneToMany(mappedBy = "receiverUser")
-    @JsonIgnore
-    private Set<NotificationEntity> notifications = new HashSet<>();
-
-    @OneToMany(mappedBy = "author")
-    @JsonIgnore
-    private Set<TodaysPost> todaysPost =  new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore

@@ -1,11 +1,13 @@
 package com.zima.zimasocial.entity;
 
-import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.context.social.comment.Comment;
+import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,7 +18,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLRestriction(value = "IS_DELETED IS FALSE")
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
