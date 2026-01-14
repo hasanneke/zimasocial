@@ -198,7 +198,7 @@ public class PostDBRepository implements PostRepository {
         if(feedFilter.getSortType() == PostSortType.recent){
             baseSqlString.append(" ORDER BY Post.id DESC LIMIT :size");
         }else{
-            baseSqlString.append(" ORDER BY Post.id DESC, Post.score DESC LIMIT :size");
+            baseSqlString.append(" ORDER BY Post.score DESC, Post.id DESC LIMIT :size");
         }
         Query query = entityManager.createNativeQuery(baseSqlString.toString(), "post_dto_mapping");
 
