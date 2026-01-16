@@ -128,15 +128,6 @@ public class PostDBRepository implements PostRepository {
     }
 
     @Override
-    public void saveAll(List<Post> post) {
-        List<PostEntity> postEntityList = postJpaRepository.findAllById(post.stream().map(Post::getPostId).toList());
-        for (int i = 0; i < postEntityList.size(); i++) {
-            postEntityList.get(i).merge(post.get(i));
-        }
-        postJpaRepository.saveAll(postEntityList);
-    }
-
-    @Override
     public void makeInvisiblePostsOfAuthor(AuthorId authorId) {
         List<PostEntity> postEntityList = postJpaRepository.findAllByUserId(authorId.getValue());
         postEntityList.forEach(e->e.setIsVisible(false));

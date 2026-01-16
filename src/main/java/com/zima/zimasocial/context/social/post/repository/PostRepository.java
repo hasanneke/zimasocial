@@ -21,7 +21,6 @@ public interface PostRepository {
     Page<Post> findFollowingsPosts(Pageable page, AuthorId authorId);
     List<Post> findTodaysPosts();
     Post save(Post post);
-    void saveAll(List<Post> post);
     void delete(Post post);
     Long nextSequence();
     List<Post> findAllByAuthorId(AuthorId authorId);

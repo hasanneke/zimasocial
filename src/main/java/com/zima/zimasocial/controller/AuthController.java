@@ -1,11 +1,10 @@
 package com.zima.zimasocial.controller;
 
 import com.google.auth.oauth2.TokenVerifier;
-import com.zima.zimasocial.utility.TokenResponse;
 import com.zima.zimasocial.service.auth.AuthService;
+import com.zima.zimasocial.utility.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,22 +34,5 @@ public class AuthController {
         TokenResponse tokenResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }
-    @Profile({"dev"})
-    @GetMapping(path = "/quick-login")
-    ResponseEntity<TokenResponse> quickLogin() throws TokenVerifier.VerificationException {
-        TokenResponse tokenResponse = authService.quickLogin();
-        return ResponseEntity.ok(tokenResponse);
-    }
-    @Profile({"dev"})
-    @GetMapping(path = "/quick-login-test")
-    ResponseEntity<TokenResponse> quickLoginTest() throws TokenVerifier.VerificationException {
-        TokenResponse tokenResponse = authService.quickLoginNext();
-        return ResponseEntity.ok(tokenResponse);
-    }
-    @Profile({"dev"})
-    @GetMapping(path = "/quick-login-test2")
-    ResponseEntity<TokenResponse> quickLoginTest2() throws TokenVerifier.VerificationException {
-        TokenResponse tokenResponse = authService.quickLoginPrevious();
-        return ResponseEntity.ok(tokenResponse);
-    }
+
 }

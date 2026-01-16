@@ -25,8 +25,8 @@ public class PostScorePunisherService {
         logger.info("--- %d posts will be punished ----".formatted(posts.size()));
         for (Post post : posts) {
             post.punishScore();
+            postRepository.save(post);
         }
-        postRepository.saveAll(posts);
         logger.info("--- %d posts are successfully punished ----".formatted(posts.size()));
     }
 }

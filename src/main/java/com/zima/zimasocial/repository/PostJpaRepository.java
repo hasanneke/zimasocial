@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaSpecificationExecutor<PostEntity> {
-    @Query("Select post FROM PostEntity post JOIN UserEntity user ON user.id = post.userId WHERE post.createdAt BETWEEN :start AND :end AND user.isPrivate = false")
+    @Query("Select post FROM PostEntity post JOIN UserEntity user ON user.id = post.userId WHERE post.createdAt BETWEEN :start AND :end")
     List<PostEntity> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     @Query(value = """
              SELECT P.* FROM post P

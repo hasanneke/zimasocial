@@ -77,7 +77,7 @@ public class PostEntity {
     private int commentCount = 0;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", updatable = false)
     @JsonIgnore
     private UserEntity user;
 
@@ -126,9 +126,6 @@ public class PostEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-    public void markAsDeleted() {
-        this.isDeleted = true;
     }
 
     public void merge(Post post) {
