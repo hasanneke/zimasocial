@@ -15,7 +15,7 @@ public interface PostRepository {
     Optional<Post> findById(Long postId);
     Page<Post> findAll(Pageable page, String slug, PostCategory type);
     List<PostDTO> findFeed(FeedFilter feedFilter);
-    List<PostDTO> findFollowingsFeed(FeedFilter feedFilter) ;
+    List<PostDTO> findAuthorsPosts(FeedFilter feedFilter);
     void makeInvisiblePostsOfAuthor(AuthorId authorId);
     void makePostsVisibleOfAuthor(AuthorId authorId);
     Page<Post> findFollowingsPosts(Pageable page, AuthorId authorId);

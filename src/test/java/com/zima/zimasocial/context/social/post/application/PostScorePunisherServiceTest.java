@@ -34,7 +34,7 @@ class PostScorePunisherServiceTest {
         postScorePunisherService.punishPosts();
         for (Post post : posts) {
             verify(post).punishScore();
+            verify(postRepository).save(post);
         }
-        verify(postRepository).saveAll(posts);
     }
 }

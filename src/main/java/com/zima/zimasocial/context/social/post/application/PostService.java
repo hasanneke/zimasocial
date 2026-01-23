@@ -1,7 +1,11 @@
 package com.zima.zimasocial.context.social.post.application;
 
+import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
+import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
 import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentLike;
 import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
@@ -42,6 +46,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
+    private final AuthorRelationService authorRelationService;
     private final Clock clock;
 
     @Transactional
@@ -163,17 +168,25 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostView> getFeed(FeedFilter filter) {
+    public List<PostView> getFeed(FeedFilterPlain filterPlain) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        filter.setUserId(author.getId().getValue());
-        List<PostDTO> postDTOS = postRepository.findFeed(filter);
-        return postDTOS.stream().map(PostView::new).toList();
-    }
+        FeedFilter feedFilter = new FeedFilter();
+        if(filterPlain.getSlug() != null){
+            Author ownerAuthor = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
+            if(ownerAuthor.equals(author) || (ownerAuthor.getIsPrivate() && authorRelationService.isAuthorFollowed(author.getId(),  ownerAuthor.getId()))){
+                feedFilter.setOwnerAuthorId(ownerAuthor.getId());
+            }else{
+                throw new AuthorNotFollowedException(ownerAuthor.getSlug());
+            }
+        }
+        feedFilter.setReaderAuthorId(author.getId());
+        feedFilter.setSize(feedFilter.getSize());
+        feedFilter.setLastId(feedFilter.getLastId());
+        feedFilter.setLastScore(filterPlain.getLastScore());
+        feedFilter.setCategory(filterPlain.getCategory());
+        feedFilter.setSortType(filterPlain.getSortType());
 
-    public List<PostView> getFollowingsFeed(FeedFilter filter) {
-        Author author = authorRepository.getAuthenticatedAuthor();
-        filter.setUserId(author.getId().getValue());
-        List<PostDTO> postDTOS = postRepository.findFollowingsFeed(filter);
+        List<PostDTO> postDTOS = postRepository.findFeed(feedFilter);
         return postDTOS.stream().map(PostView::new).toList();
     }
 }
