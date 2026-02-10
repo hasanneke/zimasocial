@@ -16,11 +16,8 @@ public class QuartzStartupTrigger {
 
     @EventListener(ApplicationReadyEvent.class)
     public void triggerOnStartup() throws SchedulerException {
-        scheduler.triggerJob(
-                JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail")
-        );
-        scheduler.triggerJob(
-                JobKey.jobKey("Qrtz_Post_Punisher_Job")
-        );
+        if(!scheduler.checkExists(JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail"))) return;
+        scheduler.triggerJob(JobKey.jobKey("Qrtz_Spotify_Token_Refresh_JobDetail"));
+        scheduler.triggerJob(JobKey.jobKey("Qrtz_Post_Punisher_Job"));
     }
 }
