@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 @Configuration
-@Profile({"test"})
+@Profile({"test","prod"})
 public class QuartzConfig {
     @Bean(name = "todaysPostJobDetail")
     public JobDetail todaysPostJobDetail() {
