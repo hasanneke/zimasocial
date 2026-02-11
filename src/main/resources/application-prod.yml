@@ -1,0 +1,71 @@
+spring:
+  quartz:
+    job-store-type: "jdbc"
+    properties:
+      org:
+        quartz:
+          jobStore:
+            tablePrefix: "QUARTZ.QRTZ_"
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  application:
+    name: zimasocial
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 500KB
+      max-request-size: 500KB
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATASOURCE_URL}
+    password: ${DATASOURCE_PASSWORD}
+    username: ${DATASOURCE_USERNAME}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      format_sql: true
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+          jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+          scope:
+            - email
+            - profile
+            - openid
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,profile,email
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    default-schema: public
+server:
+  port: 8081
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    root: ERROR
+    com.zima.zimasocial: DEBUG
+mediaprovider:
+  movie:
+    baseurl: https://api.themoviedb.org/3
+    apikey: ${TMDB_API_KEY}
+  spotify:
+    clientId: ${SPOTIFY_CLIENT_ID}
+    clientSecret: ${SPOTIFY_CLIENT_SECRET}
+webLink: ${WEB_SITE}
+links:
+  website: ${WEB_SITE}
+  uri: "zima://app"
