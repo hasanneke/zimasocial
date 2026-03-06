@@ -24,7 +24,7 @@ class PostScorePunisherServiceTest {
     @Test
     void punishPosts() {
         LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
-        LocalDateTime end = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
         Post post1 = mock(Post.class);
         Post post2 =  mock(Post.class);
         Post post24 = mock(Post.class);

@@ -57,7 +57,7 @@ jwt:
 logging:
   level:
     root: ERROR
-    com.zima.zimasocial: DEBUG
+    com.zima.zimasocial: ERROR
 mediaprovider:
   movie:
     baseurl: https://api.themoviedb.org/3
