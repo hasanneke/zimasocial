@@ -73,7 +73,6 @@ public class QuartzConfigDev {
                 .withSchedule(cronSchedule("0 0/30 * * * ?").withMisfireHandlingInstructionFireAndProceed())
                 .build();
     }
-
     @Bean(name = "postScorePunisherJobDetail")
     public JobDetail postScorePunisherJobDetail() {
         return JobBuilder.newJob().ofType(PostScorePunisherJob.class)

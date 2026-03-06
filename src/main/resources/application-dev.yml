@@ -13,6 +13,8 @@ spring:
             instanceName: MyScheduler
           threadPool:
             threadCount: 5
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
   devtools:
     restart:
       enabled: true
@@ -35,15 +37,14 @@ spring:
     password: example
     driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 200000
+      connection-timeout: 20000
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
     properties:
-      format_sql: true
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
   security:
     oauth2:
       resourceserver:

@@ -20,7 +20,7 @@ public class PostScorePunisherService {
     public void punishPosts() {
         logger.info("--- Punishing post started ----");
         LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
-        LocalDateTime end = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
         List<Post> posts = postRepository.findAllByCreatedAtBetween(start, end);
         logger.info("--- %d posts will be punished ----".formatted(posts.size()));
         for (Post post : posts) {

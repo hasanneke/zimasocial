@@ -90,7 +90,7 @@ management:
     endpoint:
       health:
         show-detail: always
-webLink: "https://zimasocial-15e04.web.app"
+webLink: "https://zimas.io"
 links:
-  website: "https://zimasocial-15e04.web.app"
+  website: "https://zimasi.io"
   uri: "zima://app"
