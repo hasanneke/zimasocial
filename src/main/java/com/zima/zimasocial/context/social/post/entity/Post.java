@@ -113,6 +113,7 @@ public class Post {
     public void punishScore() {
         if(!isPunishable()) return;
         long hoursPassedSinceLastPunishment = ChronoUnit.HOURS.between(lastPunishedAt == null ? createdAt : lastPunishedAt, LocalDateTime.now());
+        if(hoursPassedSinceLastPunishment == 0) return;
         for (long i = 0; i < hoursPassedSinceLastPunishment; i++) {
             punish();
         }
