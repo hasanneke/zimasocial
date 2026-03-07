@@ -1,8 +1,8 @@
 package com.zima.zimasocial.context.communication;
 
 import com.zima.zimasocial.context.communication.application.NotificationManager;
-import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.communication.domain.entity.*;
+import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEvent;
 import com.zima.zimasocial.context.social.author.value.AuthorFollowedEvent;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
@@ -11,6 +11,7 @@ import com.zima.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zima.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zima.zimasocial.context.social.post.event.PostLikedEvent;
+import com.zima.zimasocial.context.social.post.event.PostSharedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,20 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class NotificationEventListener {
     private final NotificationManager notificationManager;
+
+    @EventListener
+    public void handlePostSharedEvent(PostSharedEvent postSharedEvent) {
+        PostSharedNotification postSharedNotification = PostSharedNotification
+                .builder()
+                .postId(postSharedEvent.postId())
+                .actorId(new RecipientId(postSharedEvent.postOwnerId().getValue()))
+                .type(postSharedEvent.postContent().type())
+                .createdAt(OffsetDateTime.now())
+                .content(postSharedEvent.postContent().content())
+                .build();
+        notificationManager.throttled().sendNotification(postSharedNotification);
+    }
+
     @EventListener
     public void handlePostLikedEvent(PostLikedEvent postLikedEvent) {
         if(postLikedEvent.postOwnerId().equals(postLikedEvent.actorId())){

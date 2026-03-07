@@ -2,6 +2,7 @@ package com.zima.zimasocial.entity;
 
 public enum NotificationType {
     POST_LIKED,
+    POST_SHARED,
     COMMENT_LIKED,
     USER_FOLLOWED_YOU,
     USER_SENT_FOLLOW_REQUEST,
@@ -9,7 +10,6 @@ public enum NotificationType {
     POST_COMMENTED,
     COMMENT_REPLIED,
     POST_DELETED,
-    POST_SHARED,
     WELCOME,
     NEWS,
     IMPORTANT,

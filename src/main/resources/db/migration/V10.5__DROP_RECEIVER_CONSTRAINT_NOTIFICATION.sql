@@ -1,0 +1,1 @@
+ALTER TABLE notification ALTER COLUMN receiver_user_id DROP NOT NULL;

@@ -28,7 +28,7 @@ public class NotificationDBRepository implements NotificationRepository {
 
     @Override
     public void save(Notification notification) {
-        UserEntity recipient = userJpaRepository.findById(notification.getRecipientId().getValue()).orElse(null);
+        UserEntity recipient = notification.getRecipientId() != null ? userJpaRepository.findById(notification.getRecipientId().getValue()).orElse(null) : null;
         UserEntity actor = userJpaRepository.findById(notification.getActorId().getValue()).orElse(null);
         NotificationEntity notificationEntity = notificationJpaRepository.findById(notification.getId() == null ? -1 : notification.getId()).orElse(null);
         if(notificationEntity == null){
@@ -41,6 +41,7 @@ public class NotificationDBRepository implements NotificationRepository {
                 case AuthorFollowRequestSentNotification authorFollowRequestSentNotification -> notificationEntity = NotificationEntity.buildAuthorFollowRequestSentNotification(authorFollowRequestSentNotification);
                 case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification -> notificationEntity = NotificationEntity.buildAuthorFollowRequestAcceptedNotification(authorFollowRequestAcceptedNotification);
                 case ChatMessageSentNotification chatMessageSentNotification -> notificationEntity = NotificationEntity.buildNewMessageNotification(chatMessageSentNotification);
+                case PostSharedNotification postSharedNotification -> notificationEntity = NotificationEntity.buildPostSharedNotification(postSharedNotification);
                 default -> throw new IllegalStateException("Unexpected value: " + notification);
             }
         }else{
@@ -92,6 +93,9 @@ public class NotificationDBRepository implements NotificationRepository {
             }
             case PostLikedNotification postLikedNotification -> {
                 return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_LIKED, postLikedNotification.getPostId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case PostSharedNotification postSharedNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndTypeOrderByCreatedAtDesc(postSharedNotification.getActorId().getValue(), NotificationType.POST_SHARED).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case SimpleNotification simpleNotification -> {
                 return Optional.empty();

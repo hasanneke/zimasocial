@@ -15,6 +15,7 @@ import com.zima.zimasocial.context.social.like.Like;
 import com.zima.zimasocial.context.social.like.LikeRepository;
 import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.event.PostCommentedEvent;
+import com.zima.zimasocial.context.social.post.event.PostSharedEvent;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostRepository;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
@@ -57,7 +58,9 @@ public class PostService {
             mediaId = new MediaId(mediaItemJpaRepository.findIdById(UUID.fromString(createPost.mediaId())).orElseThrow(()-> new DataNotFoundException("media_not_found")));
         }
         Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId), clock);
-        return postRepository.save(post);
+        postRepository.save(post);
+        StaticEventPublisher.publishEvent(new PostSharedEvent(post.getPostId(), post.getAuthorId(), post.getContent()));;
+        return post;
     }
 
     @Transactional
@@ -173,7 +176,7 @@ public class PostService {
         FeedFilter feedFilter = new FeedFilter();
         if(filterPlain.getSlug() != null){
             Author ownerAuthor = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
-            if(ownerAuthor.equals(author) || (ownerAuthor.getIsPrivate() && authorRelationService.isAuthorFollowed(author.getId(),  ownerAuthor.getId()))){
+            if(ownerAuthor.equals(author) || !ownerAuthor.getIsPrivate() || authorRelationService.isAuthorFollowed(author.getId(), ownerAuthor.getId())){
                 feedFilter.setOwnerAuthorId(ownerAuthor.getId());
             }else{
                 throw new AuthorNotFollowedException(ownerAuthor.getSlug());

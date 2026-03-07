@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 @SuperBuilder
 @Getter
 @NotNull
-public abstract sealed class Notification permits AuthorFollowRequestAcceptedNotification, AuthorFollowRequestSentNotification, AuthorFollowedNotification, CommentLikedNotification, CommentRepliedNotification, PostCommentedNotification, PostLikedNotification, SimpleNotification, ChatMessageSentNotification {
+public abstract sealed class Notification permits AuthorFollowRequestAcceptedNotification, AuthorFollowRequestSentNotification, AuthorFollowedNotification, ChatMessageSentNotification, CommentLikedNotification, CommentRepliedNotification, PostCommentedNotification, PostLikedNotification, PostSharedNotification, SimpleNotification {
     Long id;
     RecipientId recipientId;
     RecipientId actorId;
@@ -19,5 +19,8 @@ public abstract sealed class Notification permits AuthorFollowRequestAcceptedNot
     boolean isPushed;
     public void push(){
         this.isPushed = true;
+    }
+    public void setRecipientId(RecipientId recipientId) {
+        this.recipientId = recipientId;
     }
 }

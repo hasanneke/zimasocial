@@ -1,0 +1,1 @@
+ALTER TABLE notification ADD COLUMN post_type VARCHAR(16);

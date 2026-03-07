@@ -4,12 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum MediaType {
-    music("spotify"),
-    movie("tdmb"),
-    tv("tdmb"),
-    book("google"),
-    any("");
+    music("spotify", "Müzik"),
+    movie("tdmb", "Film"),
+    tv("tdmb", "Dizi"),
+    book("google", "Kitap"),
+    any("","");
     String provider;
-    MediaType(String provider){
+    String title;
+    MediaType(String provider, String title){
     this.provider = provider;
+    this.title = title;
 } }

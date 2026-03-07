@@ -72,6 +72,10 @@ public class NotificationEntity {
     @Column(name = "post_id")
     private Long postId;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "post_type")
+    private MediaType postType;
+
     @Column(name = "chat_id")
     private UUID chatId;
 
@@ -81,6 +85,20 @@ public class NotificationEntity {
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default()
     private Boolean isDeleted = false;
+
+    public static NotificationEntity buildPostSharedNotification(PostSharedNotification postSharedNotification) {
+        return NotificationEntity.builder()
+                .id(postSharedNotification.getId())
+                .postId(postSharedNotification.getPostId())
+                .type(NotificationType.POST_SHARED)
+                .postType(postSharedNotification.getType())
+                .content(postSharedNotification.getContent())
+                .targetCollection(TargetCollection.post)
+                .actorId(postSharedNotification.getActorId().getValue())
+                .isPushed(postSharedNotification.isPushed())
+                .build();
+        }
+
     public void markAsDeleted(){
         this.isDeleted = true;
     }

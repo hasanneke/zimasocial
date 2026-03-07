@@ -49,6 +49,20 @@ public class NotificationDBRepositoryAdapter {
 
     public static Notification convertToNotification(NotificationEntity notificationEntity) {
         switch (notificationEntity.getType()){
+            case POST_SHARED -> {
+                return PostSharedNotification
+                        .builder()
+                        .id(notificationEntity.getId())
+                        .postId(notificationEntity.getPostId())
+                        .content(notificationEntity.getContent())
+                        .message(notificationEntity.getContent())
+                        .type(notificationEntity.getPostType())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
+                        .build();
+            }
             case POST_LIKED -> {
                 return PostLikedNotification.builder()
                         .id(notificationEntity.getId())
@@ -137,7 +151,7 @@ public class NotificationDBRepositoryAdapter {
                         .chatRoomId(new ChatRoomId(notificationEntity.getChatId()))
                         .build();
             }
-            case POST_DELETED, VERY_IMPORTANT, POST_SHARED, DANGER, WELCOME, NEWS, IMPORTANT -> {
+            case POST_DELETED, VERY_IMPORTANT, DANGER, WELCOME, NEWS, IMPORTANT -> {
             }
         }
         return SimpleNotification.builder()

@@ -1,11 +1,13 @@
 package com.zima.zimasocial.context.communication.application;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
-import com.zima.zimasocial.context.communication.domain.service.RecipientValidator;
+import com.zima.zimasocial.context.communication.domain.SubscriberSearch;
 import com.zima.zimasocial.context.communication.domain.entity.*;
+import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
 import com.zima.zimasocial.context.communication.domain.repository.RecipientRepository;
+import com.zima.zimasocial.context.communication.domain.service.RecipientValidator;
 import com.zima.zimasocial.context.communication.domain.value.DeviceToken;
+import com.zima.zimasocial.entity.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class PushNotificationService {
     private final RecipientRepository recipientRepository;
     private final PushNotificationProvider pushNotificationProvider;
     private final RecipientValidator recipientValidator;
+    private final SubscriberSearch subscriberSearch;
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     @Value("${webLink}")
     private String webLink;
@@ -31,15 +35,24 @@ public class PushNotificationService {
     public void startPushing() {
         List<Notification> notificationList = notificationRepository.findAllByIsPushedFalse();
         for (Notification notification : notificationList) {
-            Optional<Recipient> recipient = recipientRepository.findByRecipientId(notification.getRecipientId());
-            if (recipient.isPresent()) {
-                boolean eligibleForPush = recipientValidator.canBePushed(recipient.get().getRecipientId());
-                if (eligibleForPush) {
-                    Recipient getRecipient = recipient.get();
-                    Set<DeviceToken> deviceTokens = getRecipient.getDeviceTokens();
-                    push(notification, deviceTokens.stream().toList());
+            if(notification instanceof PostSharedNotification){
+                List<Recipient> subscribers = subscriberSearch.findSubscribers(notification.getActorId());
+                for (Recipient subscriber : subscribers) {
+                    notification.setRecipientId(subscriber.getRecipientId());
+                    push(notification, subscriber.getDeviceTokens().stream().toList());
+                }
+            }else{
+                Optional<Recipient> recipient = recipientRepository.findByRecipientId(notification.getRecipientId());
+                if (recipient.isPresent()) {
+                    boolean eligibleForPush = recipientValidator.canBePushed(recipient.get().getRecipientId());
+                    if (eligibleForPush) {
+                        Recipient getRecipient = recipient.get();
+                        Set<DeviceToken> deviceTokens = getRecipient.getDeviceTokens();
+                        push(notification, deviceTokens.stream().toList());
+                    }
                 }
             }
+
         }
     }
 
@@ -115,6 +128,28 @@ public class PushNotificationService {
                             .linkToSource(linkToApp)
                             .type("chat")
                             .resourceId(chatMessageSentNotification.getChatRoomId().value().toString())
+                            .build();
+                }
+                case PostSharedNotification postSharedNotification -> {
+                    String linkToApp = webLink + "/posts/" + postSharedNotification.getPostId();
+
+                    String message;
+                    if(postSharedNotification.getType().equals(MediaType.any)){
+                        message = "@%s yeni bir paylaşım yaptı: %s".formatted(
+                                actor.getSlug(),
+                                postSharedNotification.getContent());
+                    }else{
+                        message = "@%s yeni bir %s paylaşımı yaptı: %s".formatted(
+                                actor.getSlug(),
+                                postSharedNotification.getType().getTitle(),
+                                postSharedNotification.getContent());
+                    }
+                    yield PushNotification.builder()
+                            .message(message)
+                            .deviceToken(deviceToken.getToken())
+                            .linkToSource(linkToApp)
+                            .type("post")
+                            .resourceId(postSharedNotification.getPostId().toString())
                             .build();
                 }
                 case SimpleNotification simpleNotification ->
