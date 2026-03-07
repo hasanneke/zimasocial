@@ -32,4 +32,4 @@ jobs:
           application_name: my-spring-app
           environment_name: my-spring-app-env
           version_label: github-${{ github.sha }}
-          deployment_package: target/myapp.jar
+          deployment_package: target/zimasocial-0.0.1-SNAPSHOT.jar
