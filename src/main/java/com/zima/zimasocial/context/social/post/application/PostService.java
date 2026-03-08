@@ -183,8 +183,8 @@ public class PostService {
             }
         }
         feedFilter.setReaderAuthorId(author.getId());
-        feedFilter.setSize(feedFilter.getSize());
-        feedFilter.setLastId(feedFilter.getLastId());
+        feedFilter.setSize(filterPlain.getSize());
+        feedFilter.setLastId(filterPlain.getLastPostId());
         feedFilter.setLastScore(filterPlain.getLastScore());
         feedFilter.setCategory(filterPlain.getCategory());
         feedFilter.setSortType(filterPlain.getSortType());
