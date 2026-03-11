@@ -150,7 +150,7 @@ public class PostService {
         Comment reply = parent.reply(author.getId(), content);
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId()));
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
         return savedReply;
     }
 

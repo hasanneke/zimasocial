@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
+import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.context.social.author.entity.Author;
@@ -64,7 +65,7 @@ public class AuthorDBRepository implements AuthorRepository {
     @Override
     public Optional<Author> findBySlugAndIsDisabledFalseAndNotBeingBlocked(String slug) {
         UserEntity authenticatedUser = CurrentUser.getCurrentUserProfile();
-        Author userToBeFound = findBySlugAndIsDisabledFalse(slug).orElse(null);
+        Author userToBeFound = findBySlugAndIsDisabledFalse(slug).orElseThrow(AuthorNotFoundException::new);
         assert userToBeFound != null;
         Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getValue(), authenticatedUser.getId(), Relation.blocked);
         if(blockRelation.isPresent()){

@@ -32,7 +32,10 @@ public class NotificationEventListener {
                 .actorId(new RecipientId(postSharedEvent.postOwnerId().getValue()))
                 .type(postSharedEvent.postContent().type())
                 .createdAt(OffsetDateTime.now())
-                .content(postSharedEvent.postContent().content())
+                .content(postSharedEvent
+                        .postContent()
+                        .content()
+                        .substring(0, Math.min(postSharedEvent.postContent().content().length(), 100)))
                 .build();
         notificationManager.throttled().sendNotification(postSharedNotification);
     }
@@ -90,6 +93,7 @@ public class NotificationEventListener {
                 .commentId(commentRepliedEvent.parentCommentId())
                 .actorId(new RecipientId(commentRepliedEvent.replyerId().getValue()))
                 .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
+                .postId(commentRepliedEvent.postId())
                 .createdAt(OffsetDateTime.now())
                 .build();
         notificationManager.sendNotification(commentRepliedNotification);

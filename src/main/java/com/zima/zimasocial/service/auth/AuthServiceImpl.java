@@ -130,7 +130,6 @@ public class AuthServiceImpl implements AuthService {
         if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
         refreshTokenEntity.setRevoked(true);
         refreshTokenRepository.save(refreshTokenEntity);
-
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
         Account account = accountRepository.findByUserId(userId);
         return createToken(account);
