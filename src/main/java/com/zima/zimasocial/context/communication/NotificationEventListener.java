@@ -32,10 +32,10 @@ public class NotificationEventListener {
                 .actorId(new RecipientId(postSharedEvent.postOwnerId().getValue()))
                 .type(postSharedEvent.postContent().type())
                 .createdAt(OffsetDateTime.now())
-                .content(postSharedEvent
+                .content(postSharedEvent.postContent().content() != null ? postSharedEvent
                         .postContent()
                         .content()
-                        .substring(0, Math.min(postSharedEvent.postContent().content().length(), 100)))
+                        .substring(0, Math.min(postSharedEvent.postContent().content().length(), 100)) : null)
                 .build();
         notificationManager.throttled().sendNotification(postSharedNotification);
     }
