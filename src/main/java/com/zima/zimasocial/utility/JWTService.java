@@ -67,7 +67,7 @@ public class JWTService {
         return createToken(id, email, provider, account);
     }
 
-    public TokenResponse createToken(Long id, String email, String provider, Account account) {
+    private TokenResponse createToken(Long id, String email, String provider, Account account) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("id", id);
@@ -79,7 +79,7 @@ public class JWTService {
                 .subject(String.valueOf(id))
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 60))
                 .signWith(getSigningKey())
                 .compact();
 

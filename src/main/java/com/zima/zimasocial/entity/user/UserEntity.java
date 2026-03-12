@@ -2,14 +2,12 @@ package com.zima.zimasocial.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.account.entity.Account;
-import com.zima.zimasocial.context.account.exception.CharachterLengthExceededException;
 import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
 import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.contentmoderation.user.User;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.UserDeviceToken;
 import com.zima.zimasocial.entity.UserRole;
 import jakarta.persistence.*;
@@ -103,10 +101,6 @@ public class UserEntity implements Serializable {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private Set<PostEntity> posts = new HashSet<>();
-
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
@@ -156,32 +150,6 @@ public class UserEntity implements Serializable {
 
     protected void setId(Long id){
         this.id = id;
-    }
-    public void attachFileName(String avatarFileName) {
-        this.avatarFileName = avatarFileName;
-    }
-    public void updateBio(String bio){
-        if(bio.length() > 128) {
-            throw new CharachterLengthExceededException(128);
-        }
-        this.bio = bio;
-    }
-    public void updateName(String name) {
-        if(name.length() > 32){
-            throw new CharachterLengthExceededException(32);
-        }
-        this.name = name;
-    }
-    public void updateSlug(String slug){
-        if(name.length() > 32){
-            throw new CharachterLengthExceededException(32);
-        }
-        this.slug = slug;
-    }
-    public void removeProfilePhoto() {
-        avatarFileName = null;
-    }
-    public void unfollowUser(UserEntity follower) {
     }
     public void mergeAccount(Account account) {
         this.isDeleted = account.getIsDeleted();
