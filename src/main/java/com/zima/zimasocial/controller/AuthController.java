@@ -29,6 +29,12 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
+    @GetMapping(path = "/v2/google-login")
+    ResponseEntity<TokenResponse> googleLoginV2(@RequestParam String token) throws Exception {
+        TokenResponse tokenResponse = authService.googleLoginV2(token);
+        return ResponseEntity.ok(tokenResponse);
+    }
+
     @GetMapping(path = "/refresh-token")
     ResponseEntity<TokenResponse> refreshToken(@RequestParam String refreshToken) throws TokenVerifier.VerificationException {
         TokenResponse tokenResponse = authService.refreshToken(refreshToken);

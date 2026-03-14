@@ -1,10 +1,9 @@
 package com.zima.zimasocial.context.social.author.entity;
 
 import com.zima.zimasocial.context.account.exception.*;
-import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorFollowedEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.exception.SlugCannotBeChangedException;
+import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEvent;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -102,7 +101,6 @@ public class Author {
         }
         decrementFollowerCount();
         follower.decrementFollowingCount();
-        StaticEventPublisher.publishEvent(new AuthorFollowedEvent(this, follower));
     }
 
     public void attachFileName(String fileName) {

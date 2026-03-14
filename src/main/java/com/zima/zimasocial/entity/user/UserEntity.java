@@ -39,7 +39,13 @@ public class UserEntity implements Serializable {
     public UserEntity(Long id) {
         this.id = id;
     }
-    public UserEntity(Long id, String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug){
+    public UserEntity(Long id,
+                      String email,
+                      String name,
+                      String familyName,
+                      String authProvider,
+                      Set<UserRole> roles,
+                      String slug){
         this.id = id;
         this.email = email;
         this.name = name;
@@ -48,6 +54,7 @@ public class UserEntity implements Serializable {
         this.roles = roles;
         this.slug = slug;
         this.isDeleted = false;
+        this.isBanned = false;
     }
     @Id
     private Long id;
@@ -127,6 +134,9 @@ public class UserEntity implements Serializable {
     @Column(name = "delete_reason")
     @Enumerated(EnumType.STRING)
     private DeleteReason deleteReason;
+
+    @Column(name = "is_banned")
+    private Boolean isBanned;
 
     @Column(name = "IS_DELETED", nullable = false)
     @Builder.Default

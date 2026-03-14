@@ -67,6 +67,42 @@ public class JWTService {
         return createToken(id, email, provider, account);
     }
 
+    public TokenResponse createShortLivedToken(Account account) {
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("id", account.getAccountId().getValue());
+        claims.put("email", account.getEmail());
+        claims.put("provider", account.getAuthProvider());
+        OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusMinutes(5);
+        OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusMonths(2);
+
+        String token = Jwts.builder()
+                .subject(String.valueOf(account.getAccountId().getValue()))
+                .claims(claims)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 5))
+                .signWith(getSigningKey())
+                .compact();
+
+        String hashedRefreshToken = Jwts.builder()
+                .subject(String.valueOf(account.getAccountId().getValue()))
+                .claims(claims)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 60))
+                .signWith(getSigningKey())
+                .compact();
+        TokenResponse refreshToken = TokenResponse.builder()
+                .token(hashedRefreshToken)
+                .expireDate(refreshTokenExpirationDate)
+                .build();
+
+        return TokenResponse.builder()
+                .token(token)
+                .expireDate(tokenExpirationDate)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
     private TokenResponse createToken(Long id, String email, String provider, Account account) {
         Map<String, Object> claims = new HashMap<>();
 
@@ -75,6 +111,7 @@ public class JWTService {
         claims.put("provider", provider);
         OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusMonths(2);
         OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusMonths(2);
+
         String token = Jwts.builder()
                 .subject(String.valueOf(id))
                 .claims(claims)
@@ -94,8 +131,10 @@ public class JWTService {
         RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
         tokenEntity.setToken(hashedRefreshToken);
         tokenEntity.setExpiresAt(refreshTokenExpirationDate);
+
         UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
         tokenEntity.setUser(user);
+        tokenEntity.setUserId(user.getId());
 
         TokenResponse refreshToken = TokenResponse.builder()
                 .token(hashedRefreshToken)

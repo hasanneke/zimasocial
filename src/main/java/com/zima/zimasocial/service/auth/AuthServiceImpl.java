@@ -7,9 +7,13 @@ import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEnti
 import com.zima.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.context.account.service.AccountService;
+import com.zima.zimasocial.context.account.value.AccountIdentity;
+import com.zima.zimasocial.context.account.value.PersonalInfo;
 import com.zima.zimasocial.entity.UserRole;
 import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.exception.UnauthorizedException;
 import com.zima.zimasocial.repository.UserJpaRepository;
+import com.zima.zimasocial.service.auth.exception.AccountBannedException;
 import com.zima.zimasocial.service.auth.impl.AppleTokenVerifier;
 import com.zima.zimasocial.service.auth.impl.GoogleTokenVerifier;
 import com.zima.zimasocial.utility.JWTService;
@@ -30,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final UserJpaRepository userRepository;
+    private final AccountFactory accountFactory;
     private final JWTService jwtService;
     private final Random random = new Random();
     private final RefreshTokenJpaRepository refreshTokenRepository;
@@ -40,14 +45,17 @@ public class AuthServiceImpl implements AuthService {
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
         Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "apple");
         if(account.isPresent()){
+            if(account.get().getIsBanned()){
+                throw new AccountBannedException();
+            }
             if(account.get().getIsDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
         }
-        String slug = generateUniqueSlug(oAuthTokenResult.getName());
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), oAuthTokenResult.getEmail(), oAuthTokenResult.getName(), oAuthTokenResult.getSurname(), "apple", Set.of(UserRole.regular), slug);
-        accountService.createAccount(newAccount);
+        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "apple");
+        accountRepository.save(newAccount);
+
         return createToken(newAccount);
     }
 
@@ -55,21 +63,51 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse googleLogin(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
+        Optional<Account> account = accountRepository
+                .findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
         if(account.isPresent()){
             if(account.get().getIsDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
         }
-        String slug = generateUniqueSlug(oAuthTokenResult.getName());
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), oAuthTokenResult.getEmail(), oAuthTokenResult.getName(), oAuthTokenResult.getSurname(), "google", Set.of(UserRole.regular), slug);
-        accountService.createAccount(newAccount);
+        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
+        accountRepository.save(newAccount);
         return createToken(newAccount);
     }
 
     @Override
-    public TokenResponse quickLogin() throws TokenVerifier.VerificationException {
+    public TokenResponse googleLoginV2(String token) throws Exception {
+        OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
+        OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
+        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
+        if(account.isPresent()){
+            if(account.get().getIsBanned()){
+                throw new AccountBannedException();
+            }
+            if(account.get().getIsDisabled()){
+                accountService.activateAccount(account.get());
+            }
+            return createRefreshToken(account.get());
+        }
+        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
+        accountRepository.save(newAccount);
+
+        return createRefreshToken(newAccount);
+    }
+
+    private TokenResponse createRefreshToken(Account account) {
+        TokenResponse tokenResponse = jwtService.createShortLivedToken(account);
+        RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
+        tokenEntity.setToken(tokenResponse.getRefreshToken().getToken());
+        tokenEntity.setExpiresAt(tokenResponse.getRefreshToken().getExpireDate());
+        tokenEntity.setUserId(account.getAccountId().getValue());
+        refreshTokenRepository.save(tokenEntity);
+        return tokenResponse;
+    }
+
+    @Override
+    public TokenResponse quickLogin() {
         String email = String.format("testmail%s@example.com", random.nextInt());
         String name = "acc%s".formatted(UUID.randomUUID().toString().substring(0, 8));
         String familyName = String.format("accountsur%s", random.nextInt());
@@ -81,13 +119,27 @@ public class AuthServiceImpl implements AuthService {
             return createToken(account.get());
         }
         String slug = generateUniqueSlug(name);
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "google", Set.of(UserRole.regular), slug);
-        accountService.createAccount(newAccount);
+        AccountIdentity accountIdentity = AccountIdentity
+                .builder()
+                .accountId(new AccountId(accountRepository.nextId()))
+                .email(email)
+                .authProvider("dummy")
+                .slug(slug)
+                .roles(Set.of(UserRole.regular))
+                .build();
+        PersonalInfo personalInfo = PersonalInfo
+                .builder()
+                .name(name)
+                .surname(familyName)
+                .build();
+
+        Account newAccount = Account.newAccount(accountIdentity, personalInfo);
+        accountRepository.save(newAccount);
         return createToken(newAccount);
     }
 
     @Override
-    public TokenResponse quickLoginNext() throws TokenVerifier.VerificationException {
+    public TokenResponse quickLoginNext() {
         String email = "hasansabbah0@example.com";
         String name = "Hasan Sabbah";
         String familyName = "Sabbah";
@@ -99,15 +151,27 @@ public class AuthServiceImpl implements AuthService {
             return createToken(account.get());
         }
         String slug = generateUniqueSlug(name);
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "test", Set.of(UserRole.regular), slug);
-        accountService.createAccount(newAccount);
+        AccountIdentity accountIdentity = AccountIdentity
+                .builder()
+                .accountId(new AccountId(accountRepository.nextId()))
+                .email(email)
+                .authProvider("dummy")
+                .slug(slug)
+                .roles(Set.of(UserRole.regular))
+                .build();
+        PersonalInfo personalInfo = PersonalInfo
+                .builder()
+                .name(name)
+                .surname(familyName)
+                .build();
+
+        Account newAccount = Account.newAccount(accountIdentity, personalInfo);
+        accountRepository.save(newAccount);
         return createToken(newAccount);
     }
     @Override
-    public TokenResponse quickLoginPrevious() throws TokenVerifier.VerificationException {
+    public TokenResponse quickLoginPrevious() {
         String email = "zimablue0@example.com";
-        String name = "Zima Blue";
-        String familyName = "Blue";
         Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "test");
         if(account.isPresent()){
             if(account.get().getIsDisabled()){
@@ -115,9 +179,8 @@ public class AuthServiceImpl implements AuthService {
             }
             return createToken(account.get());
         }
-        String slug = generateUniqueSlug(name);
-        Account newAccount = new Account(new AccountId(accountRepository.nextId()), email, name, familyName, "test", Set.of(UserRole.regular), slug);
-        accountService.createAccount(newAccount);
+        Account newAccount = accountFactory.createZimaAccount();
+        accountRepository.save(newAccount);
         return createToken(newAccount);
     }
 
@@ -125,14 +188,17 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public TokenResponse refreshToken(String refreshToken) throws TokenVerifier.VerificationException {
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByTokenAndRevoked(refreshToken, false)
-                .orElseThrow(()->new DataNotFoundException("Refresh token not found"));
+                .orElseThrow(() -> new DataNotFoundException("Refresh token not found"));
         boolean expired = refreshTokenEntity.getExpiresAt().isBefore(OffsetDateTime.now());
         if(expired) throw new TokenVerifier.VerificationException("Refresh Token Expired");
         refreshTokenEntity.setRevoked(true);
         refreshTokenRepository.save(refreshTokenEntity);
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
         Account account = accountRepository.findByUserId(userId);
-        return createToken(account);
+        if(account.getIsBanned()){
+            throw new UnauthorizedException();
+        }
+        return createRefreshToken(account);
     }
 
     private String generateUniqueSlug(String name) {

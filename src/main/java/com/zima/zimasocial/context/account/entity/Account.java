@@ -3,12 +3,11 @@ package com.zima.zimasocial.context.account.entity;
 import com.zima.zimasocial.context.account.event.AccountActivatedEvent;
 import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.event.AccountDisabledEvent;
-import com.zima.zimasocial.context.account.exception.SlugLengthExceededException;
-import com.zima.zimasocial.entity.UserRole;
 import com.zima.zimasocial.context.account.exception.AccountIsAlreadyPrivateException;
 import com.zima.zimasocial.context.account.exception.AccountIsAlreadyPublicException;
-import com.zima.zimasocial.context.account.value.DeleteReason;
-import com.zima.zimasocial.context.account.value.DisableReason;
+import com.zima.zimasocial.context.account.exception.SlugLengthExceededException;
+import com.zima.zimasocial.context.account.value.*;
+import com.zima.zimasocial.entity.UserRole;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -19,9 +18,9 @@ import java.util.UUID;
 
 @Getter
 public class Account {
-    private final AccountId accountId;
-    private final String email;
-    private final String authProvider;
+    private AccountId accountId;
+    private String email;
+    private String authProvider;
     private String name;
     private String familyName;
     private String slug;
@@ -33,65 +32,79 @@ public class Account {
     private Boolean termsOfUseAccepted;
     private DeleteReason deleteReason;
     private DisableReason disableReason;
-    private final Set<UserRole> roles;
-    public Account(AccountId accountId, String email, String slug, String authProvider, Set<UserRole> roles, Boolean isDisabled, LocalDate disableDate, LocalDate deleteDate, Boolean isDeleted, Boolean isPrivate, Boolean termsOfUseAccepted, DeleteReason deleteReason, DisableReason disableReason) {
-        Assert.notNull(email, "User must have email address");
-        Assert.notNull(authProvider, "User must have auth provider info");
-        Assert.notNull(accountId, "Account id cannot be null");
-        Assert.notNull(isDeleted, "Account is deleted cannot be null");
-        Assert.notNull(isDisabled, "Is disabled cannot be null");
-        Assert.notNull(isPrivate, "Is private cannot be null");
-        Assert.notNull(slug, "Slug cannot be null");
-        Assert.notNull(termsOfUseAccepted, "Terms of use accepted cannot be null");
-        this.slug = slug;
-        if(isDisabled) {
-            if(disableDate == null){
+    private Boolean isBanned;
+    private Set<UserRole> roles;
+    private Account() {}
+
+    public static Account newAccount(AccountIdentity accountIdentity, PersonalInfo personalInfo) {
+        Assert.notNull(accountIdentity.getEmail(), "User must have email address");
+        Assert.notNull(accountIdentity.getAuthProvider(), "User must have auth provider info");
+        Assert.notNull(accountIdentity.getAccountId(), "User id cannot be null");
+        Assert.notNull(accountIdentity.getSlug(), "Slug cannot be null");
+        if(accountIdentity.getSlug().length() > 16){
+            throw new SlugLengthExceededException();
+        }
+        Account account = new Account();
+        account.accountId = accountIdentity.getAccountId();
+        account.isDisabled = false;
+        account.isDeleted = false;
+        account.isPrivate = false;
+        account.termsOfUseAccepted = false;
+        account.authProvider = accountIdentity.getAuthProvider();
+        account.email = accountIdentity.getEmail();
+        account.roles = accountIdentity.getRoles();
+        account.name = personalInfo.getName();
+        account.familyName = personalInfo.getSurname();
+        account.slug = accountIdentity.getSlug();
+
+        return account;
+    }
+
+    public static Account reconstitute(AccountIdentity accountIdentity, PersonalInfo personalInfo, AccountState accountState) {
+        Assert.notNull(accountIdentity.getEmail(), "User must have email address");
+        Assert.notNull(accountIdentity.getAuthProvider(), "User must have auth provider info");
+        Assert.notNull(accountIdentity.getAccountId(), "Account id cannot be null");
+        Assert.notNull(accountState.getIsDeleted(), "Account is deleted cannot be null");
+        Assert.notNull(accountState.getIsDisabled(), "Is disabled cannot be null");
+        Assert.notNull(accountState.getIsPrivate(), "Is private cannot be null");
+        Assert.notNull(accountIdentity.getSlug(), "Slug cannot be null");
+        Assert.notNull(accountState.getTermsOfUseAccepted(), "Terms of use accepted cannot be null");
+
+        Account account = new Account();
+        account.slug = accountIdentity.getSlug();
+        if(accountState.getIsDeleted()) {
+            if(accountState.getDisableDate() == null){
                 throw new IllegalArgumentException("Disable date cannot be null if account is disabled");
             }
-            if(disableReason == null){
+            if(accountState.getDisableReason() == null){
                 throw new IllegalArgumentException("Disable reason cannot be null if account is disabled");
             }
         }
-        if(isDeleted){
-            if(deleteDate == null){
+        if(accountState.getIsDeleted()){
+            if(accountState.getDeleteDate() == null){
                 throw new IllegalArgumentException("Delete date cannot be null if account is disabled");
             }
-            if(deleteReason == null){
+            if(accountState.getDeleteReason() == null){
                 throw new IllegalArgumentException("Delete reason cannot be null if account is disabled");
             }
         }
-        this.accountId = accountId;
-        this.isDisabled = isDisabled;
-        this.disableDate = disableDate;
-        this.deleteDate = deleteDate;
-        this.isDeleted = isDeleted;
-        this.isPrivate = isPrivate;
-        this.deleteReason = deleteReason;
-        this.disableReason = disableReason;
-        this.authProvider = authProvider;
-        this.termsOfUseAccepted = termsOfUseAccepted;
-        this.email = email;
-        this.roles = roles;
-    }
-    public Account(AccountId accountId, String email, String name, String familyName, String authProvider, Set<UserRole> roles, String slug) {
-        Assert.notNull(email, "User must have email address");
-        Assert.notNull(authProvider, "User must have auth provider info");
-        Assert.notNull(accountId, "User id cannot be null");
-        Assert.notNull(slug, "Slug cannot be null");
-        if(slug.length() > 16){
-            throw new SlugLengthExceededException();
-        }
-        this.accountId = accountId;
-        this.isDisabled = false;
-        this.isDeleted = false;
-        this.isPrivate = false;
-        this.termsOfUseAccepted = false;
-        this.authProvider = authProvider;
-        this.email = email;
-        this.roles = roles;
-        this.name = name;
-        this.familyName = familyName;
-        this.slug = slug;
+        account.accountId = accountIdentity.getAccountId();
+        account.isDisabled = accountState.getIsDisabled();
+        account.disableDate = accountState.getDisableDate();
+        account.deleteDate = accountState.getDeleteDate();
+        account.isDeleted = accountState.getIsDeleted();
+        account.isPrivate = accountState.getIsPrivate();
+        account.deleteReason = accountState.getDeleteReason();
+        account.disableReason = accountState.getDisableReason();
+        account.authProvider = accountIdentity.getAuthProvider();
+        account.termsOfUseAccepted = accountState.getTermsOfUseAccepted();
+        account.email = accountIdentity.getEmail();
+        account.roles = accountIdentity.getRoles();
+        account.name = personalInfo.getName();
+        account.familyName = personalInfo.getSurname();
+        account.isBanned = accountState.getIsBanned();
+
+        return account;
     }
     public void disableAccount(DisableReason reason) {
         if(reason == null) throw new IllegalArgumentException("DisableReason cannot be null when account being disabled");

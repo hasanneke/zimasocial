@@ -20,8 +20,11 @@ public class RefreshTokenEntity {
     private Long id;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "token_hash")
     private String token;

@@ -71,10 +71,9 @@ server:
 jwt:
   secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
 
-logging:
-  level:
-    root: ERROR
-    com.zima.zimasocial: DEBUG
+#logging:
+#  level:
+#    com.zima.zimasocial: DEBUG
 
 aws:
   access:

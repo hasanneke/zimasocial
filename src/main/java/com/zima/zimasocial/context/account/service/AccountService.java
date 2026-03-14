@@ -45,10 +45,6 @@ public class AccountService {
         account.makeAccountPrivate();
         accountRepository.save(account);
     }
-    @Transactional
-    public Account createAccount(Account account) {
-        return accountRepository.createNewAccount(account);
-    }
 
     public void acceptTermsOfUse() {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());

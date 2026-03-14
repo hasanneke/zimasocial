@@ -31,14 +31,23 @@ public class AccountJpaRepository implements AccountRepository {
 
     @Override
     public void save(Account account) {
-        UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
-        user.mergeAccount(account);
-        userRepository.save(user);
+        Optional<UserEntity> user = userRepository.findById(account.getAccountId().getValue());
+        if(user.isPresent()){
+            user.get().mergeAccount(account);
+            userRepository.save(user.get());
+            return;
+        }
+        createNewAccount(account);
     }
 
-    @Override
-    public Account createNewAccount(Account account) {
-        UserEntity user = new UserEntity(account.getAccountId().getValue(), account.getEmail(), account.getName(), account.getFamilyName(), account.getAuthProvider(), account.getRoles(), account.getSlug());
+    private Account createNewAccount(Account account) {
+        UserEntity user = new UserEntity(
+                account.getAccountId().getValue(),
+                account.getEmail(), account.getName(),
+                account.getFamilyName(),
+                account.getAuthProvider(),
+                account.getRoles(),
+                account.getSlug());
         UserEntity createUserWithId = userRepository.save(user);
         return accountUserAdapter.convertUserEntityToAccount(createUserWithId);
     }
