@@ -6,6 +6,7 @@ import com.zima.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
+import com.zima.zimasocial.context.social.post.application.PostScorePunisherService;
 import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
@@ -17,7 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -32,18 +33,20 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/posts")
 @Tag(name = "Posts Controller", description = "APIs for managing posts")
 @Validated
+@RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private final PostScorePunisherService postScorePunisherService;
     private final PostControllerBridge postControllerBridge;
     private final CommentViewAdapter commentViewAdapter;
     private static final DateTimeFormatter CLIENT_TS_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
-    @Autowired
-    public PostController(PostControllerBridge postControllerBridge, PostService postService, CommentViewAdapter commentViewAdapter) {
-        this.postControllerBridge = postControllerBridge;
-        this.postService = postService;
-        this.commentViewAdapter = commentViewAdapter;
+
+    @GetMapping
+    public String punishPosts() {
+        postScorePunisherService.punishPosts();
+        return "";
     }
 
     @PostMapping

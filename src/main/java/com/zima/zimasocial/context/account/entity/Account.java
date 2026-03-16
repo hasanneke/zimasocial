@@ -41,7 +41,7 @@ public class Account {
         Assert.notNull(accountIdentity.getAuthProvider(), "User must have auth provider info");
         Assert.notNull(accountIdentity.getAccountId(), "User id cannot be null");
         Assert.notNull(accountIdentity.getSlug(), "Slug cannot be null");
-        if(accountIdentity.getSlug().length() > 16){
+        if(accountIdentity.getSlug().length() > 32){
             throw new SlugLengthExceededException();
         }
         Account account = new Account();

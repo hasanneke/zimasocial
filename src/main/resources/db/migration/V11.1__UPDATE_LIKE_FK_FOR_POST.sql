@@ -1,0 +1,5 @@
+ALTER TABLE likes
+DROP CONSTRAINT fk_like_post;
+
+ALTER TABLE likes
+ADD CONSTRAINT fk_like_post FOREIGN KEY (post_id) REFERENCES public.post(id) ON DELETE CASCADE;

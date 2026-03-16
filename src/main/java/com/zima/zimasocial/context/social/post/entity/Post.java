@@ -126,7 +126,7 @@ public class Post {
 
     private boolean isPunishable() {
         long passedHoursFromCreation = ChronoUnit.HOURS.between(createdAt, LocalDateTime.now());
-        return passedHoursFromCreation < 72 && score > 96;
+        return passedHoursFromCreation < 72;
     }
 
 

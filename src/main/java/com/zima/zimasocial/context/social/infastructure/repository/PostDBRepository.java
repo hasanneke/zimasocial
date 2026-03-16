@@ -155,7 +155,6 @@ public class PostDBRepository implements PostRepository {
         PostEntity savedPost = postJpaRepository.save(postEntity);
         return savedPost.rehydrate();
     }
-
     @Override
     public void makeInvisiblePostsOfAuthor(AuthorId authorId) {
         List<PostEntity> postEntityList = postJpaRepository.findAllByUserId(authorId.getValue());
