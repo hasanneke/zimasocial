@@ -47,7 +47,7 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("Qrtz_Push_Notifications_Trigger")
                 .withDescription("Quartz Triggers push notifications for mobile clients")
-                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(2).withMisfireHandlingInstructionFireNow())
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(5).withMisfireHandlingInstructionFireNow())
                 .build();
     }
     @Bean(name = "spotifyTokenRefresherJobDetail")
