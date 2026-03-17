@@ -143,6 +143,6 @@ public class NotificationEventListener {
                 .message(chatMessageSentEvent.message().message())
                 .chatRoomId(chatMessageSentEvent.message().chatRoomId())
                 .build();
-        notificationManager.sendNotification(chatMessageSentNotification);
+        notificationManager.throttled().sendNotification(chatMessageSentNotification);
     }
 }

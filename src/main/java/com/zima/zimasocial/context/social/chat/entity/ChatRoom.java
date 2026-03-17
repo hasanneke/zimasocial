@@ -34,7 +34,10 @@ public class ChatRoom {
         this.participant2 = participant2;
     }
 
-    public ChatMessage sendMessage(String message, Author sender, Author receiver, ChatMessageId chatMessageId) {
+    public ChatMessage sendMessage(String message,
+                                   Author sender,
+                                   Author receiver,
+                                   ChatMessageId chatMessageId) {
         if(!(sender.equals(participant1) || sender.equals(participant2))){
             throw new AuthorIsNotInRoom();
         }
