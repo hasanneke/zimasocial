@@ -59,6 +59,7 @@ jwt:
 
 logging:
   level:
+    org.springframework.web.context.request.async.StandardServletAsyncWebRequest: OFF
     root: ERROR
     com.zima.zimasocial: ERROR
 mediaprovider:
