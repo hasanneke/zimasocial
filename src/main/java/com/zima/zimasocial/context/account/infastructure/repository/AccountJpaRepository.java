@@ -59,6 +59,12 @@ public class AccountJpaRepository implements AccountRepository {
     }
 
     @Override
+    public Account findBySlug(String slug) {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
+        return accountUserAdapter.convertUserEntityToAccount(user);
+    }
+
+    @Override
     public Long nextId() {
         return userRepository.nextId();
     }

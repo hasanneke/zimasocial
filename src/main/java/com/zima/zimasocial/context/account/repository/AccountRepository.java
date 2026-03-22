@@ -10,5 +10,6 @@ public interface AccountRepository {
     void save(Account account);
 //    Account createNewAccount(Account account);
     Account findByUserId(Long userId);
+    Account findBySlug(String slug);
     Long nextId();
 }

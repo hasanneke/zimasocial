@@ -201,6 +201,11 @@ public class AuthServiceImpl implements AuthService {
         return createRefreshToken(account);
     }
 
+    @Override
+    public TokenResponse slugLogin(String slug) {
+        return createRefreshToken(accountRepository.findBySlug(slug));
+    }
+
     private String generateUniqueSlug(String name) {
         String slug = getTrimmedName(name);
 

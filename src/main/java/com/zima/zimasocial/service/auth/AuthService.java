@@ -11,4 +11,6 @@ public interface AuthService {
     TokenResponse quickLoginNext() throws TokenVerifier.VerificationException;
     TokenResponse quickLoginPrevious() throws TokenVerifier.VerificationException;
     TokenResponse refreshToken(String refreshToken) throws TokenVerifier.VerificationException;
+
+    TokenResponse slugLogin(String slug);
 }

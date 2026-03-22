@@ -41,7 +41,7 @@ public class NotificationReadDBQuery implements NotificationQuery {
                 .targetCollection(e.getTargetCollection())
                 .postId(e.getPostId())
                 .createdAt(e.getCreatedAt())
-                .actor(authorViewAdapter.authorViewFromAuthor(authorUserEntityAdapter.convertUserEntityToAuthor(e.getActor())))
+                .actor(authorViewAdapter.authorViewFromAuthor(authorUserEntityAdapter.convertUserEntityToAuthor(e.getActor()), false))
                 .build());
     }
 }

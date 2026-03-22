@@ -26,7 +26,8 @@ public class AuthorAuthorViewAdapter {
     private final AuthorRepository authorRepository;
     private final PlayListService playListService;
 
-    public AuthorView authorViewFromAuthor(Author author) {
+    public AuthorView authorViewFromAuthor(Author author, Boolean fetchPlaylist) {
+        AuthorView authorView = new AuthorView();
         Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
         Account account = accountRepository.getAuthenticatedAccount();
         Optional<FollowRelation> followRelation =
@@ -41,9 +42,10 @@ public class AuthorAuthorViewAdapter {
                 followRequestCollection.findByFollowedIdAndFollowerId(authenticatedUser.getId(), author.getId());
         Optional<FollowRequest> followRequestSent =
                 followRequestCollection.findByFollowedIdAndFollowerId(author.getId(), authenticatedUser.getId());
-        List<PlaylistDTO> playlists = playListService.getAllList(author.getSlug());
-        AuthorView authorView = new AuthorView();
-        authorView.setPlaylists(playlists);
+        if(fetchPlaylist){
+            List<PlaylistDTO> playlists = playListService.getAllList(author.getSlug());
+            authorView.setPlaylists(playlists);
+        }
         authorView.setId(author.getId().getValue());
         authorView.setSlug(author.getSlug());
         authorView.setName(author.getName());
@@ -60,6 +62,10 @@ public class AuthorAuthorViewAdapter {
         authorView.setIsBlocked(blockRelation.isPresent());
         authorView.setTermsOfUseAccepted(account.getTermsOfUseAccepted());
         return authorView;
+    }
+
+    public AuthorView authorViewFromAuthor(Author author){
+        return authorViewFromAuthor(author, true);
     }
 
     public DetailedAuthorView detailedAuthorViewFromAuthor(Author author) {

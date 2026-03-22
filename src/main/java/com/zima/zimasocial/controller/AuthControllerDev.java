@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +34,10 @@ public class AuthControllerDev {
     ResponseEntity<TokenResponse> quickLoginTest2() throws TokenVerifier.VerificationException {
         TokenResponse tokenResponse = authService.quickLoginPrevious();
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @GetMapping(path = "/slug-login/{slug}")
+    ResponseEntity<TokenResponse> slugLogin(@PathVariable String slug) {
+        return ResponseEntity.ok(authService.slugLogin(slug));
     }
 }
