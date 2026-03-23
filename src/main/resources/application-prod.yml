@@ -8,6 +8,7 @@ spring:
       org:
         quartz:
           jobStore:
+            isClustered: true
             tablePrefix: "QUARTZ.QRTZ_"
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
   jackson:

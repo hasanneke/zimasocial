@@ -14,6 +14,7 @@ spring:
           threadPool:
             threadCount: 5
           jobStore:
+            isClustered: true
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
   devtools:
     restart:

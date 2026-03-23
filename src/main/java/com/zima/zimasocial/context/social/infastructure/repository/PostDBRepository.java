@@ -68,7 +68,7 @@ public class PostDBRepository implements PostRepository {
                      	EXISTS (SELECT 1 FROM follow_request 	  WHERE follower_id = :user_id AND followed_id = Users.id) isFollowRequestSent,
                      	EXISTS (SELECT 1 FROM follow_request      WHERE followed_id = :user_id AND follower_id = Users.id) isFollowRequestReceived,
                      	EXISTS (SELECT 1 FROM likes				  WHERE user_id = :user_id AND post_id = Post.id AND like_type = 'post') isLiked,
-                     	EXISTS (SELECT 1 FROM report			  WHERE resource_id = Post.id AND reporter_id = Users.id AND resource_type = 'post') isReported
+                     	EXISTS (SELECT 1 FROM report			  WHERE resource_id = Post.id AND reporter_id = :user_id AND resource_type = 'post') isReported
                     FROM post Post
     """;
     @Override
