@@ -63,9 +63,7 @@ public class MediaProxyService {
             String apiKey = movieTVSearcher.getApiKey();
             headers.add("Authorization", "Bearer " + apiKey);
         }
-
        try{
-
            ResponseEntity<byte[]> upstream = restTemplate.exchange(uri, method, entity, byte[].class);
            headers.setContentType(MediaType.APPLICATION_JSON);
            headers.setContentLength(upstream.getBody() != null ? upstream.getBody().length : 0);

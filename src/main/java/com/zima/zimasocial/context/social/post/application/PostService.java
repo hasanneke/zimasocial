@@ -183,6 +183,7 @@ public class PostService {
             }
         }
         feedFilter.setReaderAuthorId(author.getId());
+        feedFilter.setOffset(filterPlain.getOffset());
         feedFilter.setSize(filterPlain.getSize());
         feedFilter.setLastId(filterPlain.getLastPostId());
         feedFilter.setLastScore(filterPlain.getLastScore());

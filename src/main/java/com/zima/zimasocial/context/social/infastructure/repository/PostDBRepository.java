@@ -274,11 +274,12 @@ public class PostDBRepository implements PostRepository {
         if(filter.getCategory() != null && filter.getCategory().getType().isPresent()){
             baseSQLStringBuilder.append(" AND Post.type = :type");
         }
-        baseSQLStringBuilder.append(" ORDER BY Post.id DESC LIMIT :size");
+        baseSQLStringBuilder.append(" ORDER BY Post.id DESC OFFSET :offset LIMIT :size");
         Query query = entityManager.createNativeQuery(baseSQLStringBuilder.toString(), "post_dto_mapping");
         query.setParameter("user_id", filter.getReaderAuthorId().getValue());
         query.setParameter("owner_author_id", filter.getOwnerAuthorId().getValue());
         query.setParameter("size", filter.getSize() != null ? filter.getSize() : 20);
+        query.setParameter("offset", filter.getOffset() != null ? filter.getOffset() : 0);
         if(filter.getCategory() != null && filter.getCategory().getType().isPresent()){
             query.setParameter("type", filter.getCategory().getType().get().name());
         }

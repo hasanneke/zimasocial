@@ -56,6 +56,7 @@ public class PostController {
 
     @GetMapping("/feed")
     public ResponseEntity<List<PostView>> getPostsPaginated(
+            @RequestParam(name = "offset", defaultValue = "0") Integer offset,
             @Max(20) @RequestParam(name = "size", defaultValue = "20") Integer size,
             @RequestParam(name = "lastScore", required = false) Integer lastScore,
             @Positive @RequestParam(name = "lastId", required = false) Long lastId,
@@ -63,6 +64,7 @@ public class PostController {
             @Size(max = 30) @RequestParam(name = "slug", required = false) String slug,
             @RequestParam(name = "sortType", required = false) PostSortType sortType) {
         return ResponseEntity.ok(postService.getFeed(FeedFilterPlain.builder()
+                .offset(offset)
                 .size(size == null ? 20 : size)
                 .lastScore(lastScore)
                 .lastPostId(lastId)

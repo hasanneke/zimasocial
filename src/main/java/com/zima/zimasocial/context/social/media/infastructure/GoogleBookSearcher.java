@@ -36,6 +36,7 @@ public class GoogleBookSearcher implements MediaSearcher {
         String url = String.format("%s/books/v1/volumes/%s", baseUrl, id);
         URI uri = UriComponentsBuilder.fromHttpUrl(String.format("%s/books/v1/volumes/%s", baseUrl, id))
                 .queryParam("language", "tr-TR")
+                .queryParam("key", "AIzaSyAZqdd_sxpQ05uqClGFl4AqeELF1XY4BEE")
                 .encode(StandardCharsets.UTF_8)
                 .build()
                 .toUri();

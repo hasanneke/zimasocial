@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class FeedFilterPlain {
+    Integer offset;
     Integer size;
     Integer lastScore;
     Long lastPostId;

@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeedFilter {
+    Integer offset;
     Integer size;
     Integer lastScore;
     Long lastId;

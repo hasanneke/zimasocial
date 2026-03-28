@@ -33,7 +33,8 @@ public class SecurityConfig {
             "/actuator/**",
             "/metrics",
             "/api/v1/files/images/**",
-            "/hello"
+            "/hello",
+            "/app-config**"
     };
 
     @Autowired
