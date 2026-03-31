@@ -155,5 +155,9 @@ public class PostEntity {
                 updatedAt,
                 lastPunishedAt);
     }
+
+    public Double baseScore() {
+        return commentCount * 3.5 + likeCount * 2;
+    }
 }
 

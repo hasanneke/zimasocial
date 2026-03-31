@@ -1,0 +1,2 @@
+ALTER TABLE app_config
+ADD COLUMN under_maintenance BOOLEAN DEFAULT FALSE;

@@ -43,13 +43,13 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
                 LocalDate.now().atStartOfDay()
         );
         List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
-                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
         List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))
-                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
         List<PostEntity> series = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.tv))
-                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
         List<PostEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.book))
-                .sorted(Comparator.comparing(PostEntity::getScore)).toList().reversed();
+                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
 
         PostEntity todaysMusic = musics.stream().findFirst().orElse(null);
         PostEntity todaysMovie = movies.stream().findFirst().orElse(null);
