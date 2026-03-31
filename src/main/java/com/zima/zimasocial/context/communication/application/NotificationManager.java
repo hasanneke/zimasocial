@@ -22,6 +22,7 @@ public class NotificationManager {
     private final NotificationPolicy notificationPolicy;
     private final Logger logger = LoggerFactory.getLogger(NotificationManager.class.getName());
     private boolean throttled = false;
+
     public void sendNotification(Notification notification){
         if(throttled){
             Optional<Notification> checkPreviousNotification = notificationRepository.getPreviousNotification(notification);
