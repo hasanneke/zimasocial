@@ -3,6 +3,7 @@ package com.zima.zimasocial.service.auth;
 import com.google.auth.oauth2.TokenVerifier;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.entity.AccountId;
+import com.zima.zimasocial.context.account.event.AccountCreatedEvent;
 import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
 import com.zima.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
@@ -19,6 +20,7 @@ import com.zima.zimasocial.service.auth.impl.GoogleTokenVerifier;
 import com.zima.zimasocial.utility.JWTService;
 import com.zima.zimasocial.utility.TokenResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +38,12 @@ public class AuthServiceImpl implements AuthService {
     private final UserJpaRepository userRepository;
     private final AccountFactory accountFactory;
     private final JWTService jwtService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final Random random = new Random();
     private final RefreshTokenJpaRepository refreshTokenRepository;
 
     @Override
+    @Transactional
     public TokenResponse appleLogin(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new AppleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
@@ -55,11 +59,12 @@ public class AuthServiceImpl implements AuthService {
         }
         Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "apple");
         accountRepository.save(newAccount);
-
+        applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
         return createToken(newAccount);
     }
 
     @Override
+    @Transactional
     public TokenResponse googleLogin(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
@@ -73,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
         }
         Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
         accountRepository.save(newAccount);
+        applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
         return createToken(newAccount);
     }
 
@@ -135,6 +141,7 @@ public class AuthServiceImpl implements AuthService {
 
         Account newAccount = Account.newAccount(accountIdentity, personalInfo);
         accountRepository.save(newAccount);
+        applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
         return createToken(newAccount);
     }
 

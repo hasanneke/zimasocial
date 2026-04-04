@@ -5,6 +5,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.MediaNotFoundException;
 import com.zima.zimasocial.context.social.media.infastructure.MediaItem;
@@ -16,8 +17,10 @@ import com.zima.zimasocial.context.social.playlist.repository.PlaylistRepository
 import com.zima.zimasocial.context.social.playlist.service.PlayListVerifier;
 import com.zima.zimasocial.context.social.playlist.values.*;
 import com.zima.zimasocial.context.social.post.value.MediaId;
+import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.exception.ConflictException;
 import com.zima.zimasocial.exception.UnauthorizedException;
+import com.zima.zimasocial.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +36,21 @@ public class PlayListService {
     private final AuthorRepository authorRepository;
     private final PlaylistRepository playlistRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
+    private final UserJpaRepository userJpaRepository;
+
 
     @Transactional
     public void create(PlayListPayload payload) {
         Author author = authorRepository.getAuthenticatedAuthor();
+        if(playListVerifier.maxNumberOfPlayListReached(author.getId())){
+            throw new ConflictException("max_number_of_play_list_reached", "max_number_of_play_list_reached");
+        }
+        Playlist playlist = Playlist.create(new PlayListId(UuidCreator.getTimeOrdered()), payload.getName(), author.getId(), payload.getType());
+        playlistRepository.save(playlist);
+    }
+
+    @Transactional
+    public void create(PlayListPayload payload, Author author) {
         if(playListVerifier.maxNumberOfPlayListReached(author.getId())){
             throw new ConflictException("max_number_of_play_list_reached", "max_number_of_play_list_reached");
         }
@@ -97,5 +111,34 @@ public class PlayListService {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
         Author owner = authorRepository.findById(playlist.getOwnerId()).orElseThrow(AuthorNotFoundException::new);
         return new PlaylistDTO(playlist, owner.getSlug());
+    }
+
+    @Transactional
+    public void createDefaultPlaylistsForAuthor(AuthorId authorId) {
+        Author author = authorRepository.findById(authorId).orElse(null);
+        if(author == null) return;
+
+        PlayListPayload moviePayload = PlayListPayload.builder()
+                .type(MediaType.movie)
+                .name("İzlenecek Filmler")
+                .build();
+        PlayListPayload tvPayload = PlayListPayload.builder()
+                .type(MediaType.tv)
+                .name("İzlenecek Diziler")
+                .build();
+        PlayListPayload musicPayload = PlayListPayload.builder()
+                .type(MediaType.music)
+                .name("Dinlenecek Müzikler")
+                .build();
+        PlayListPayload booksPayload = PlayListPayload.builder()
+                .type(MediaType.book)
+                .name("Okunacak Kitaplar")
+                .build();
+
+        List<PlayListPayload> playListPayloadList = List.of(booksPayload, tvPayload, moviePayload, musicPayload);
+
+        for (PlayListPayload payload : playListPayloadList) {
+            create(payload, author);
+        }
     }
 }

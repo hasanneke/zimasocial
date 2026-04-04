@@ -82,10 +82,10 @@ public class Playlist {
             throw new BadRequestException("Selected media cannot be added to this playlist");
         }
         if(items.stream().anyMatch(e->e.getMediaId().equals(new MediaId(mediaItem.getId())))){
-            throw new ConflictException("Item is already in the list");
+            throw new ConflictException("Listede mevcut tekrar eklenemez.");
         }
         if(items.size() >= 100){
-            throw new ConflictException("Playlist cannot have more than 100 item");
+            throw new ConflictException("Katalog 100 den fazla medya bulunduramaz");
         }
         items.add(new PlayListItem(new MediaId(mediaItem.getId())));
     }
