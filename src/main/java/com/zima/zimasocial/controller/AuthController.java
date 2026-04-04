@@ -23,11 +23,6 @@ public class AuthController {
         TokenResponse tokenResponse = authService.appleLogin(token);
         return ResponseEntity.ok(tokenResponse);
     }
-    @GetMapping(path = "/google-login")
-    ResponseEntity<TokenResponse> googleLogin(@RequestParam String token) throws Exception {
-        TokenResponse tokenResponse = authService.googleLogin(token);
-        return ResponseEntity.ok(tokenResponse);
-    }
 
     @GetMapping(path = "/v2/google-login")
     ResponseEntity<TokenResponse> googleLoginV2(@RequestParam String token) throws Exception {

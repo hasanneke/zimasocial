@@ -59,30 +59,13 @@ public class AuthServiceImpl implements AuthService {
         }
         Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "apple");
         accountRepository.save(newAccount);
+        TokenResponse response = createToken(newAccount);
         applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
-        return createToken(newAccount);
+        return response;
     }
 
     @Override
     @Transactional
-    public TokenResponse googleLogin(String token) throws Exception {
-        OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
-        OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
-        Optional<Account> account = accountRepository
-                .findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
-        if(account.isPresent()){
-            if(account.get().getIsDisabled()){
-                accountService.activateAccount(account.get());
-            }
-            return createToken(account.get());
-        }
-        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
-        accountRepository.save(newAccount);
-        applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
-        return createToken(newAccount);
-    }
-
-    @Override
     public TokenResponse googleLoginV2(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
@@ -98,17 +81,8 @@ public class AuthServiceImpl implements AuthService {
         }
         Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
         accountRepository.save(newAccount);
-
-        return createRefreshToken(newAccount);
-    }
-
-    private TokenResponse createRefreshToken(Account account) {
-        TokenResponse tokenResponse = jwtService.createShortLivedToken(account);
-        RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
-        tokenEntity.setToken(tokenResponse.getRefreshToken().getToken());
-        tokenEntity.setExpiresAt(tokenResponse.getRefreshToken().getExpireDate());
-        tokenEntity.setUserId(account.getAccountId().getValue());
-        refreshTokenRepository.save(tokenEntity);
+        TokenResponse tokenResponse = createRefreshToken(newAccount);
+        applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
         return tokenResponse;
     }
 
@@ -233,5 +207,14 @@ public class AuthServiceImpl implements AuthService {
 
     private TokenResponse createToken(Account account){
         return jwtService.generateToken(account.getAccountId().getValue(), account.getEmail(), account.getAuthProvider(), account);
+    }
+    private TokenResponse createRefreshToken(Account account) {
+        TokenResponse tokenResponse = jwtService.createShortLivedToken(account);
+        RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
+        tokenEntity.setToken(tokenResponse.getRefreshToken().getToken());
+        tokenEntity.setExpiresAt(tokenResponse.getRefreshToken().getExpireDate());
+        tokenEntity.setUserId(account.getAccountId().getValue());
+        refreshTokenRepository.save(tokenEntity);
+        return tokenResponse;
     }
 }
