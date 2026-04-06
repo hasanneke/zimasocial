@@ -12,10 +12,19 @@ public class PlaylistDTO {
     private String name;
     private MediaType type;
     private String slug;
+    private Long count;
     public PlaylistDTO(Playlist playlist, String slug) {
         this.id = playlist.getId().value();
         this.name = playlist.getName();
         this.type = playlist.getType();
         this.slug = slug;
+    }
+
+
+    public PlaylistDTO(UUID id, String name, MediaType type, Long count) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.count = count;
     }
 }

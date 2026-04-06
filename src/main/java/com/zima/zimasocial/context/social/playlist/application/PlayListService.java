@@ -13,6 +13,7 @@ import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistItemDTO;
 import com.zima.zimasocial.context.social.playlist.entity.Playlist;
 import com.zima.zimasocial.context.social.playlist.exception.PlaylistNotFoundException;
+import com.zima.zimasocial.context.social.playlist.infastructure.PlaylistJpaRepository;
 import com.zima.zimasocial.context.social.playlist.repository.PlaylistRepository;
 import com.zima.zimasocial.context.social.playlist.service.PlayListVerifier;
 import com.zima.zimasocial.context.social.playlist.values.*;
@@ -37,7 +38,7 @@ public class PlayListService {
     private final PlaylistRepository playlistRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final UserJpaRepository userJpaRepository;
-
+    private final PlaylistJpaRepository playlistJpaRepository;
 
     @Transactional
     public void create(PlayListPayload payload) {
@@ -93,7 +94,7 @@ public class PlayListService {
         Author author = slug == null ?
                 authorRepository.getAuthenticatedAuthor() :
                 authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(slug).orElseThrow(AuthorNotFoundException::new);
-        return playlistRepository.findByAuthorIdOrderByCreatedAtDesc(author.getId()).stream().map((e)->new PlaylistDTO(e, author.getSlug())).toList();
+        return playlistJpaRepository.findAllWithCount(author.getId().getValue());
     }
 
     public List<PlaylistItemDTO> getAllListItems(PlayListId playListId) throws JsonProcessingException {

@@ -1,6 +1,7 @@
 package com.zima.zimasocial.context.social.playlist.infastructure;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
 import com.zima.zimasocial.context.social.playlist.entity.Playlist;
 import com.zima.zimasocial.context.social.playlist.repository.PlaylistRepository;
 import com.zima.zimasocial.context.social.playlist.values.PlayListId;
@@ -20,6 +21,12 @@ public class PlaylistDBRepository implements PlaylistRepository {
         return playlistJpaRepository.findByUserIdOrderByCreatedAtDesc(authorId.getValue()).stream()
                 .map(PlaylistJpaEntity::rehydrate).toList();
     }
+
+    @Override
+    public List<PlaylistDTO> findAllWithCount(AuthorId authorId) {
+        return playlistJpaRepository.findAllWithCount(authorId.getValue());
+    }
+
     @Override
     public long countByAuthorId(AuthorId authorId) {
         return playlistJpaRepository.countByUserId(authorId.getValue());
