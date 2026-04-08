@@ -6,6 +6,7 @@ import com.zima.zimasocial.entity.NotificationEntity;
 import com.zima.zimasocial.entity.NotificationType;
 import com.zima.zimasocial.repository.NotificationJpaRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
+import com.zima.zimasocial.views.notification.NotificationView2;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,5 +44,11 @@ public class NotificationReadDBQuery implements NotificationQuery {
                 .createdAt(e.getCreatedAt())
                 .actor(authorViewAdapter.authorViewFromAuthor(authorUserEntityAdapter.convertUserEntityToAuthor(e.getActor()), false))
                 .build());
+    }
+
+    @Override
+    public Page<NotificationView2> findByRecipientIdV2(Long recipientId, Pageable pageable) {
+        Set<NotificationType> filteredNotificationsTypes = Set.of(NotificationType.NEW_MESSAGE);
+        return notificationJpaRepository.findAllNotifications(recipientId, filteredNotificationsTypes, pageable);
     }
 }

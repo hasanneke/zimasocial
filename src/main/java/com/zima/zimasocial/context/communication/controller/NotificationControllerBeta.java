@@ -4,6 +4,7 @@ import com.zima.zimasocial.context.communication.application.NotificationManager
 import com.zima.zimasocial.context.communication.infastructure.DeviceTokenPayload;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
+import com.zima.zimasocial.views.notification.NotificationView2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,12 +42,50 @@ public class NotificationControllerBeta {
     }
 
     @GetMapping
-    public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+    public Object getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                               @RequestParam(name = "size", defaultValue = "20") Integer size,
+                                                               @RequestParam(name = "v2", defaultValue = "false") Boolean version2) throws NoSuchMethodException {
+        if(version2){
+            return getNotificationsV2(page, size);
+        }else{
+            return getNotifications(page, size);
+        }
+    }
+
+    public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                     @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
         Long authorId = authorRepository.getAuthenticatedAuthor().getId().getValue();
         Pageable pageable = PageRequest.of(page, size);
         Page<NotificationView> notificationsPage = notificationReadRepository.findByRecipientId(authorId, pageable);
 
         PagedModel<NotificationView> pagedModel = PagedModel.of(
+                notificationsPage.getContent(),
+                new PagedModel.PageMetadata(notificationsPage.getSize(),
+                        notificationsPage.getNumber(),
+                        notificationsPage.getTotalElements(),
+                        notificationsPage.getTotalPages()));
+        Method method = this.getClass().getMethod("getNotifications", Integer.class, Integer.class);
+
+        if(page < notificationsPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
+        return new HttpEntity<>(pagedModel);
+    }
+
+
+    public HttpEntity<PagedModel<NotificationView2>> getNotificationsV2(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                      @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+        Long authorId = authorRepository.getAuthenticatedAuthor().getId().getValue();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NotificationView2> notificationsPage = notificationReadRepository.findByRecipientIdV2(authorId, pageable);
+
+        PagedModel<NotificationView2> pagedModel = PagedModel.of(
                 notificationsPage.getContent(),
                 new PagedModel.PageMetadata(notificationsPage.getSize(),
                         notificationsPage.getNumber(),
