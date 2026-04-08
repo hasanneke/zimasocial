@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.communication.controller;
 import com.zima.zimasocial.context.communication.application.NotificationManager;
 import com.zima.zimasocial.context.communication.infastructure.DeviceTokenPayload;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.views.notification.NotificationView;
+import com.zima.zimasocial.views.notification.NotificationView2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,13 +22,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController()
 @RequestMapping(path = "/api/v2/notifications")
-public class NotificationControllerBeta {
+public class NotificationController {
     private final NotificationQuery notificationReadRepository;
     private final NotificationManager notificationService;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public NotificationControllerBeta(NotificationQuery notificationReadRepository, NotificationManager notificationService, AuthorRepository authorRepository) {
+    public NotificationController(NotificationQuery notificationReadRepository, NotificationManager notificationService, AuthorRepository authorRepository) {
         this.notificationReadRepository = notificationReadRepository;
         this.notificationService = notificationService;
         this.authorRepository = authorRepository;
@@ -41,12 +41,13 @@ public class NotificationControllerBeta {
     }
 
     @GetMapping
-    public HttpEntity<PagedModel<NotificationView>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
+    public HttpEntity<PagedModel<NotificationView2>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                     @RequestParam(name = "size", defaultValue = "20") Integer size) throws NoSuchMethodException {
         Long authorId = authorRepository.getAuthenticatedAuthor().getId().getValue();
         Pageable pageable = PageRequest.of(page, size);
-        Page<NotificationView> notificationsPage = notificationReadRepository.findByRecipientId(authorId, pageable);
+        Page<NotificationView2> notificationsPage = notificationReadRepository.findByRecipientId(authorId, pageable);
 
-        PagedModel<NotificationView> pagedModel = PagedModel.of(
+        PagedModel<NotificationView2> pagedModel = PagedModel.of(
                 notificationsPage.getContent(),
                 new PagedModel.PageMetadata(notificationsPage.getSize(),
                         notificationsPage.getNumber(),

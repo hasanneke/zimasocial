@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
 @Builder
 @Getter
 @Setter
-public class NotificationView {
+public class NotificationView2 {
     private Long id;
     private String content;
     private String url;
@@ -25,4 +25,8 @@ public class NotificationView {
     private String name;
     private String familyName;
     private String avatarUrl;
+    private boolean isFollowed;
+    private boolean isFollowingMe;
+    private boolean isFollowRequestSent;
+    private boolean isFollowRequestReceived;
 }
