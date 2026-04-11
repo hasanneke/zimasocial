@@ -1,6 +1,7 @@
 package com.zima.zimasocial.context.social.post.application;
 
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
+import com.zima.zimasocial.context.social.api.dto.LikeDTO;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
@@ -22,15 +23,19 @@ import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.context.social.post.value.PostLike;
+import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.exception.ConflictException;
 import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.repository.LikeJpaRepository;
 import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import com.zima.zimasocial.views.post.PostDTO;
 import com.zima.zimasocial.views.post.PostView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +53,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final AuthorRelationService authorRelationService;
+    private final LikeJpaRepository likeJpaRepository;
     private final Clock clock;
 
     @Transactional
@@ -192,5 +198,15 @@ public class PostService {
 
         List<PostDTO> postDTOS = postRepository.findFeed(feedFilter);
         return postDTOS.stream().map(PostView::new).toList();
+    }
+
+    public Page<LikeDTO> getAllPostLikes(Long postId, Pageable pageable) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        return likeJpaRepository.findAllLikes(postId, author.getId().getValue(), LikeType.post.name(), pageable);
+    }
+
+    public Page<LikeDTO> getAllCommentLikes(Long commentId, Pageable pageable) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        return likeJpaRepository.findAllLikes(commentId, author.getId().getValue(), LikeType.comment.name(), pageable);
     }
 }

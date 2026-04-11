@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zima.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zima.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
+import com.zima.zimasocial.context.social.api.dto.LikeDTO;
 import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.application.PostScorePunisherService;
@@ -19,6 +20,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -92,6 +95,14 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping(path = "/{postId}/likes")
+    public ResponseEntity<Page<LikeDTO>> getPostLikes(
+            @PathVariable Long postId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size) {
+        return ResponseEntity.ok(postService.getAllPostLikes(postId, PageRequest.of(page, size)));
+    }
+
     @DeleteMapping(path = "/{postId}/unlike")
     public ResponseEntity<Void> unlikePost(@PathVariable Long postId) {
         postService.unlikePost(postId);
@@ -127,6 +138,14 @@ public class PostController {
             @PathVariable(name = "commentId") Long commentId) {
         postService.likeComment(commentId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping(path = "/{postId}/comments/{commentId}/likes")
+    public HttpEntity<Page<LikeDTO>> getCommentLikes(
+            @PathVariable(name = "commentId") Long commentId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "100") Integer size) {
+        return ResponseEntity.ok(postService.getAllCommentLikes(commentId, PageRequest.of(page, size)));
     }
 
     @DeleteMapping(path = "/{postId}/comments/{commentId}/unlike")
