@@ -23,7 +23,6 @@ import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.context.social.post.value.PostLike;
-import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.exception.ConflictException;
 import com.zima.zimasocial.exception.DataNotFoundException;
@@ -202,11 +201,11 @@ public class PostService {
 
     public Page<LikeDTO> getAllPostLikes(Long postId, Pageable pageable) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        return likeJpaRepository.findAllLikes(postId, author.getId().getValue(), LikeType.post.name(), pageable);
+        return likeJpaRepository.findAllLikes(postId, author.getId().getValue(), pageable);
     }
 
     public Page<LikeDTO> getAllCommentLikes(Long commentId, Pageable pageable) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        return likeJpaRepository.findAllLikes(commentId, author.getId().getValue(), LikeType.comment.name(), pageable);
+        return likeJpaRepository.findAllLikes(commentId, author.getId().getValue(), pageable);
     }
 }

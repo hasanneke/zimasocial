@@ -47,12 +47,10 @@ public interface LikeJpaRepository extends JpaRepository<LikeEntity, Long> {
         JOIN PostEntity post ON post.id = likeEntity.postId
         JOIN UserEntity user ON user.id = post.userId
         JOIN UserEntity liker ON liker.id = likeEntity.userId
-        WHERE ((:likeType = 'post' AND likeEntity.postId = :resourceId)
-        OR (:likeType = 'comment' AND likeEntity.commentId = :resourceId))
+        WHERE (likeEntity.postId = :resourceId AND likeEntity.commentId IS NULL)
         AND liker.isDisabled = false
         AND liker.isBanned = false
         AND likeEntity.userId != :readerId
     """)
-    Page<LikeDTO> findAllLikes(Long resourceId, Long readerId, String likeType,
-                               Pageable pageable);
+    Page<LikeDTO> findAllLikes(Long resourceId, Long readerId, Pageable pageable);
 }
