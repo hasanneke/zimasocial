@@ -39,6 +39,7 @@ public class CommentViewAdapter {
         commentView.setCreatedAt(comment.getCreatedAt());
         commentView.setLikeCount(comment.getLikeCount());
         commentView.setReplyCount(comment.getReplyCount());
+        commentView.setMediaId(comment.getMediaId());
 
         Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getId());
         commentView.setIsLiked(like.isPresent());

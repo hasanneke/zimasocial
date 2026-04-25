@@ -38,7 +38,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -99,10 +98,10 @@ public class PostService {
     }
 
     @Transactional
-    public Comment comment(Long postId, String content) {
+    public Comment comment(Long postId, String content, UUID mediaId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment comment = post.comment(author.getId(), content);
+        Comment comment = post.comment(author.getId(), content, mediaId);
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
         StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, savedComment.getCommentId(), author.getId(), post.getAuthorId()));
@@ -147,10 +146,10 @@ public class PostService {
     }
 
     @Transactional
-    public Comment replyComment(Long parentId, String content) {
+    public Comment replyComment(Long parentId, String content, UUID mediaId) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
-        Comment reply = parent.reply(author.getId(), content);
+        Comment reply = parent.reply(author.getId(), content, mediaId);
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
         StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId(), parent.getPostId()));

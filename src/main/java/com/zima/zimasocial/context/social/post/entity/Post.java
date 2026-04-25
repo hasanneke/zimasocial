@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class Post {
@@ -88,12 +89,12 @@ public class Post {
         StaticEventPublisher.publishEvent(new PostLikedEvent(postId, authorId, likerAuthorId));
         return new PostLike(postId, likerAuthorId);
     }
-    public Comment comment(AuthorId commenterAuthorId, String comment) {
+    public Comment comment(AuthorId commenterAuthorId, String comment, UUID mediaId) {
         commentCount += 1;
         if(!authorId.equals(commenterAuthorId)){
             score += 5;
         }
-        return new Comment(postId, null, commenterAuthorId, comment);
+        return new Comment(postId, null, commenterAuthorId, comment, mediaId);
     }
     public void removeComment(AuthorId commenterId) {
         commentCount = commentCount - 1;

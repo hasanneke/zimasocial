@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social.media.infastructure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.entity.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,9 +25,11 @@ public class MediaItem {
     private UUID id;
 
     @Column(name = "resource_id")
+    @JsonIgnore
     private String resourceId;
 
     @Column(name = "resource_url")
+    @JsonIgnore
     private String resourceUrl;
 
     @Column(name = "provider")

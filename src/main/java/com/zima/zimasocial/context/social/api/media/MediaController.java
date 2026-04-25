@@ -2,6 +2,7 @@ package com.zima.zimasocial.context.social.api.media;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.zima.zimasocial.context.social.api.dto.MediaDTO;
 import com.zima.zimasocial.context.social.media.MediaService;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,11 @@ public class MediaController {
     @GetMapping("/{mediaId}")
     public ResponseEntity<JsonNode> getMedia(@PathVariable UUID mediaId) throws JsonProcessingException {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getMedia(new MediaId(mediaId)));
+    }
+
+    @GetMapping("/v2/{mediaId}")
+    public ResponseEntity<MediaDTO> getMediaV2(@PathVariable UUID mediaId) throws JsonProcessingException {
+        return ResponseEntity.ok(mediaService.getMediaV2(mediaId));
     }
 
     @GetMapping("/external-media/{externalMediaId}/{provider}")

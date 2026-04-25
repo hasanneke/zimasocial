@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 public class Comment {
@@ -17,10 +18,11 @@ public class Comment {
     private String content;
     private int likeCount;
     private int replyCount;
+    private UUID mediaId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Comment(Long commentId, Long parentCommentId, Long postId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Comment(Long commentId, Long parentCommentId, Long postId, UUID mediaId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.notNull(commentId, "Comment Id cannot be null");
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
@@ -29,12 +31,14 @@ public class Comment {
         this.postId = postId;
         this.authorId = authorId;
         this.content = content;
+        this.mediaId = mediaId;
         this.likeCount = likeCount;
         this.replyCount = replyCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+
     }
-    public Comment(Long postId, Long parentCommentId, AuthorId authorId, String content) {
+    public Comment(Long postId, Long parentCommentId, AuthorId authorId, String content, UUID mediaId) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
         this.parentCommentId = parentCommentId;
@@ -44,10 +48,11 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
         this.likeCount = 0;
         this.replyCount = 0;
+        this.mediaId = mediaId;
     }
-    public Comment reply(AuthorId replierAuthorId, String comment){
+    public Comment reply(AuthorId replierAuthorId, String comment, UUID mediaId){
         replyCount += 1;
-        return new Comment(postId, commentId, replierAuthorId, comment);
+        return new Comment(postId, commentId, replierAuthorId, comment, mediaId);
     }
     public void removeReply(Comment reply) {
         replyCount -= 1;

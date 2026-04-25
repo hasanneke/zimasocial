@@ -12,6 +12,7 @@ public class CommentCommentEntityAdapter {
                 comment.getId(),
                 comment.getParent() != null ? comment.getParent().getId() : null,
                 comment.getPost().getId(),
+                comment.getMediaId(),
                 new AuthorId( comment.getUser().getId()),
                 comment.getContent(),
                 comment.getLikeCount(),

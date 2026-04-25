@@ -47,6 +47,7 @@ public class CommentDBRepository implements CommentRepository {
             commentEntity.setPost(post);
             commentEntity.setUser(user);
             commentEntity.setContent(comment.getContent());
+            commentEntity.setMediaId(comment.getMediaId());
             if(comment.getParentCommentId() != null){
                 CommentEntity parent = commentJpaRepository.findById(comment.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
                 commentEntity.setParent(parent);

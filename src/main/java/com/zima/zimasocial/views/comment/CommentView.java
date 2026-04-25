@@ -3,6 +3,7 @@ import com.zima.zimasocial.context.social.api.author.AuthorView;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +19,5 @@ public class CommentView {
     private LocalDateTime updatedAt;
     private Boolean isLiked;
     private Boolean isReported;
+    private UUID mediaId;
 }

@@ -65,7 +65,7 @@ class PostTest {
         AuthorId author = new AuthorId(102L);
         AuthorId commenter = new AuthorId(100L);
         Post post = dummyAnyPost(author);
-        post.comment(commenter, "");
+        post.comment(commenter, "", null);
         Assertions.assertEquals(105, post.getScore());
         Assertions.assertEquals(1, post.getCommentCount());
     }
@@ -85,7 +85,7 @@ class PostTest {
         AuthorId author = new AuthorId(100L);
         AuthorId commenter = new AuthorId(100L);
         Post post = dummyAnyPost(author);
-        post.comment(commenter, "");
+        post.comment(commenter, "", null);
         Assertions.assertEquals(100, post.getScore());
         Assertions.assertEquals(1, post.getCommentCount());
     }
@@ -133,6 +133,6 @@ class PostTest {
     }
 
     private static Comment dummyComment(AuthorId authorId) {
-        return new Comment(0L,  null, authorId, null);
+        return new Comment(0L,  null, authorId, null, null);
     }
 }

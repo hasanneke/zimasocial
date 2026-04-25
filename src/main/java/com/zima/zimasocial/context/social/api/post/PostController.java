@@ -120,7 +120,7 @@ public class PostController {
     public ResponseEntity<CommentView> makeComment(
             @PathVariable Long postId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postService.comment(postId, payload.getContent());
+        Comment comment = postService.comment(postId, payload.getContent(), payload.getMediaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
     @DeleteMapping(path = "/{postId}/comments/{commentId}")
@@ -160,7 +160,7 @@ public class PostController {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postService.replyComment(commentId, payload.getContent());
+        Comment comment = postService.replyComment(commentId, payload.getContent(), payload.getMediaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
 

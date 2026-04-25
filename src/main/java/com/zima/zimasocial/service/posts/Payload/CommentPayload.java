@@ -1,8 +1,12 @@
 package com.zima.zimasocial.service.posts.Payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @Schema(description = "Comment creation request")
 @Getter
@@ -10,6 +14,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentPayload {
-    @NotBlank(message = "Content is required")
     private String content;
+    private UUID mediaId;
 }

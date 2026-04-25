@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "comment")
@@ -52,9 +53,13 @@ public class CommentEntity {
     @JoinColumn(name = "parent_id")
     private CommentEntity parent;
 
+    @Column(name = "media_id")
+    private UUID mediaId;
+
     public void mergeDomain(Comment comment){
         this.likeCount = comment.getLikeCount();
         this.replyCount = comment.getReplyCount();
         this.content = comment.getContent();
+        this.mediaId = comment.getMediaId();
     }
 }

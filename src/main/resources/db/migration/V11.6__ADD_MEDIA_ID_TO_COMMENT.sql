@@ -1,0 +1,2 @@
+ALTER TABLE comment
+ADD COLUMN media_id UUID;
