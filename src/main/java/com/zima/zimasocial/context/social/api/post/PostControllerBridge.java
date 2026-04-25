@@ -108,6 +108,15 @@ public class PostControllerBridge {
                         commentPage.getNumber(),
                         commentPage.getTotalElements(),
                         commentPage.getTotalPages()));
+        Method method = PostController.class.getMethod("getComments", Integer.class, Integer.class, Long.class);
+        if(page + 1 < commentPage.getTotalPages()){
+            Link link = linkTo(method, page + 1, size, postId).withRel(LinkRelation.of("next"));
+            pagedModel.add(link);
+        }
+        if(page > 0){
+            Link link = linkTo(method, page - 1, size, postId).withRel(LinkRelation.of("previous"));
+            pagedModel.add(link);
+        }
         return pagedModel;
     }
 
