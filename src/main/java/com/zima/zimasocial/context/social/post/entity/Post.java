@@ -9,7 +9,6 @@ import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -33,12 +32,11 @@ public class Post {
     public static Post create(
             Long postId,
             AuthorId authorId,
-            PostContent content,
-            Clock clock
+            PostContent content
     ) {
         Assert.notNull(authorId, "Author is required");
 
-        LocalDateTime now = LocalDateTime.now(clock);
+        LocalDateTime now = LocalDateTime.now();
 
         Post post = new Post(postId);
         post.authorId = authorId;

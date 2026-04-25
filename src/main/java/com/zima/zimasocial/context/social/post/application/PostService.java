@@ -53,8 +53,6 @@ public class PostService {
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final AuthorRelationService authorRelationService;
     private final LikeJpaRepository likeJpaRepository;
-    private final Clock clock;
-
     @Transactional
     public Post createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
@@ -62,7 +60,7 @@ public class PostService {
         if(createPost.mediaId() != null){
             mediaId = new MediaId(mediaItemJpaRepository.findIdById(UUID.fromString(createPost.mediaId())).orElseThrow(()-> new DataNotFoundException("media_not_found")));
         }
-        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId), clock);
+        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId));
         postRepository.save(post);
         StaticEventPublisher.publishEvent(new PostSharedEvent(post.getPostId(), post.getAuthorId(), post.getContent()));;
         return post;
