@@ -53,6 +53,9 @@ public class CommentEntity {
     @JoinColumn(name = "parent_id")
     private CommentEntity parent;
 
+    @Column(name = "parent_id", insertable = false, updatable = false)
+    private Long parentId;
+
     @Column(name = "media_id")
     private UUID mediaId;
 

@@ -1,8 +1,8 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
 import com.zima.zimasocial.context.social.comment.Comment;
-import com.zima.zimasocial.context.social.infastructure.adapter.CommentCommentEntityAdapter;
 import com.zima.zimasocial.context.social.comment.CommentRepository;
+import com.zima.zimasocial.context.social.infastructure.adapter.CommentCommentEntityAdapter;
 import com.zima.zimasocial.entity.CommentEntity;
 import com.zima.zimasocial.entity.PostEntity;
 import com.zima.zimasocial.entity.user.UserEntity;
@@ -76,8 +76,10 @@ public class CommentDBRepository implements CommentRepository {
     public Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable) {
         return commentJpaRepository.findByPostIdAndParentIdIsNull(postId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
+
     @Override
     public void delete(Comment comment) {
+        commentJpaRepository.deleteByParentId(comment.getCommentId());
         commentJpaRepository.deleteById(comment.getCommentId());
     }
 }
