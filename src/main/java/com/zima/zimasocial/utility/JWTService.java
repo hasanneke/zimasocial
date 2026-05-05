@@ -45,7 +45,7 @@ public class JWTService {
     }
 
     public Claims extractAllClaims(String jwtToken) {
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(jwtToken).getPayload();
+        return Jwts.parser().verifyWith(getSigningKey()).clockSkewSeconds(30).build().parseSignedClaims(jwtToken).getPayload();
     }
 
     public SecretKey getSigningKey() {

@@ -1,21 +1,15 @@
 package com.zima.zimasocial.repository;
 
 import com.zima.zimasocial.entity.CommentEntity;
-import com.zima.zimasocial.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Query;
 
 public interface CommentJpaRepository extends JpaRepository<CommentEntity, Long> {
+    @Query("SELECT commentEntity FROM CommentEntity commentEntity JOIN FETCH commentEntity.user WHERE commentEntity.postId = :postId AND commentEntity.parentId IS NULL ORDER BY commentEntity.createdAt")
     Page<CommentEntity> findByPostIdAndParentIdIsNull(Long postId, Pageable pageable);
-    Page<CommentEntity> findByParentId(Long parentId, Pageable pageable);
-    Page<CommentEntity> findByParentIdOrderByCreatedAt(Long postId, Pageable pageable);
-    Page<CommentEntity> findByPostIdAndParentId(Pageable pageable, Long postId, Long parentId);
-    Page<CommentEntity> findByPostIdOrderByCreatedAtDesc(Pageable pageable, Long postId, Long parentId);
-    void deleteAllByUser(UserEntity user);
-    List<CommentEntity> findAllByUser(UserEntity user);
-
+    @Query("SELECT commentEntity FROM CommentEntity commentEntity JOIN FETCH commentEntity.user WHERE commentEntity.parentId = :parentId ORDER BY commentEntity.createdAt")
+    Page<CommentEntity> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable);
     void deleteByParentId(Long parentId);
 }

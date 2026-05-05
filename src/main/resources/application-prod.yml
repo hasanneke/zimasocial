@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:/opt/zima/env-prod.properties
   threads:
     virtual:
       enabled: true

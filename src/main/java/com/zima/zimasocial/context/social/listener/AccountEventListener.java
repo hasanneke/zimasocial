@@ -4,6 +4,7 @@ import com.zima.zimasocial.context.account.event.AccountActivatedEvent;
 import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.event.AccountDisabledEvent;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.comment.CommentRepository;
 import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.repository.PostRepository;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountEventListener {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final PostService postService;
 
     @EventListener
