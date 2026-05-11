@@ -1,5 +1,6 @@
 package com.zima.zimasocial.entity.userRelation;
 
+import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,16 @@ public class UserRelationEntity {
     @Column(name = "initiated_id")
     private Long actorId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "initiated_id",insertable = false, updatable = false)
+    private UserEntity actor;
+
     @Column(name = "receiver_id")
     private Long receiverId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id",insertable = false, updatable = false)
+    private UserEntity receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "relation")

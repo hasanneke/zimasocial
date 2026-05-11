@@ -59,19 +59,15 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
     @Override
     public Page<Author> findFollowers(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
-        Page<UserRelationEntity> followedRelations = userRelationJpaRepository.findByReceiverIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
-        List<UserEntity> followers = followedRelations.map(e->
-             userRepository.findById(e.getActorId()).orElseThrow(UserNotFoundException::new)).stream().toList();
-        return new PageImpl<>(followers.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size),followedRelations.getTotalElements());
+        Page<UserRelationEntity> followers = userRelationJpaRepository.findUserIdsByReceiverIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
+        return new PageImpl<>(followers.map(UserRelationEntity::getActor).stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followers.getTotalElements());
     }
 
     @Override
     public Page<Author> findFollowings(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
-        Page<UserRelationEntity> followingRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
-        List<UserEntity> followings = followingRelations.map(e->
-                userRepository.findById(e.getReceiverId()).orElseThrow(UserNotFoundException::new)).stream().toList();
-        return new PageImpl<>(followings.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
+        Page<UserEntity> followingRelations = userRelationJpaRepository.findAllByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size)).map(UserRelationEntity::getReceiver);
+        return new PageImpl<>(followingRelations.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
     }
 
     @Override

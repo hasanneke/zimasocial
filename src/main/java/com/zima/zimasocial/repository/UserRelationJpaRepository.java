@@ -19,7 +19,17 @@ public interface UserRelationJpaRepository extends JpaRepository<UserRelationEnt
     List<UserRelationEntity> findAllBlockRelations(Long userId);
     void deleteByActorIdAndReceiverIdAndRelation(Long actorId, Long receiverId, Relation relation);
     Page<UserRelationEntity> findByReceiverIdAndRelation(Long receiverId, Relation relation, Pageable pageable);
+    @Query("""
+            SELECT userRelation FROM UserRelationEntity userRelation
+            JOIN FETCH userRelation.actor WHERE userRelation.receiverId = :receiverId AND userRelation.relation = :relation
+    """)
+    Page<UserRelationEntity> findUserIdsByReceiverIdAndRelation(Long receiverId, Relation relation, Pageable pageable);
     List<UserRelationEntity> findAllByReceiverIdAndRelation(Long receiverId, Relation relation);
     Page<UserRelationEntity> findByActorIdAndRelation(Long actorId, Relation relation, Pageable pageable);
+    @Query("""
+            SELECT userRelation FROM UserRelationEntity userRelation
+            JOIN FETCH userRelation.receiver WHERE userRelation.actorId = :actorId AND userRelation.relation = :relation
+    """)
+    Page<UserRelationEntity> findAllByActorIdAndRelation(Long actorId, Relation relation, Pageable pageable);
     List<UserRelationEntity> findByActorIdAndRelation(Long actorId, Relation relation);
 }
