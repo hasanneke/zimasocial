@@ -37,6 +37,7 @@ public class PushNotificationService {
         for (Notification notification : notificationList) {
             if(notification instanceof PostSharedNotification){
                 List<Recipient> subscribers = subscriberSearch.findSubscribers(notification.getActorId());
+                if(subscribers.isEmpty()) markAsRead(notification);
                 for (Recipient subscriber : subscribers) {
                     notification.setRecipientId(subscriber.getRecipientId());
                     push(notification, subscriber.getDeviceTokens().stream().toList());
@@ -156,8 +157,7 @@ public class PushNotificationService {
                         PushNotification.builder().message(simpleNotification.getMessage()).deviceToken(deviceToken.getToken()).build();
             };
             try {
-                notification.push();
-                notificationRepository.save(notification);
+                markAsRead(notification);
                 pushNotificationProvider.push(pushNotification);
             } catch (FirebaseMessagingException e) {
                 switch (e.getMessagingErrorCode()) {
@@ -174,5 +174,9 @@ public class PushNotificationService {
                 logger.warning("Push Notification couldn't be sent %s".formatted(e.getMessage()));
             }
         }
+    }
+    private void markAsRead(Notification notification){
+        notification.push();
+        notificationRepository.save(notification);
     }
 }

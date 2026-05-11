@@ -50,7 +50,7 @@ public class AuthorControllerBridge {
 
     PagedModel<AuthorView> getFollowers(String slug, int page, int size) throws NoSuchMethodException {
         Page<Author> followersPage = authorRelationRepository.findFollowers(slug, page, size);
-        List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthor).toList();
+        List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthorLight).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
                 new PagedModel.PageMetadata(followersPage.getSize(),
@@ -77,7 +77,7 @@ public class AuthorControllerBridge {
 
     PagedModel<AuthorView> getFollowings(String slug, int page, int size) throws NoSuchMethodException {
         Page<Author> followersPage = authorRelationRepository.findFollowings(slug, page, size);
-        List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthor).toList();
+        List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthorLight).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
                 new PagedModel.PageMetadata(followersPage.getSize(),

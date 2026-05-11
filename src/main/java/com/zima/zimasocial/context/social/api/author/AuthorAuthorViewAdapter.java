@@ -64,6 +64,20 @@ public class AuthorAuthorViewAdapter {
         return authorView;
     }
 
+    public AuthorView authorViewFromAuthorLight(Author author) {
+        AuthorView authorView = new AuthorView();
+        authorView.setId(author.getId().getValue());
+        authorView.setSlug(author.getSlug());
+        authorView.setName(author.getName());
+        authorView.setFamilyName(author.getFamilyName());
+        authorView.setAvatarUrl(author.getAvatarFileName());
+        authorView.setBio(author.getBio());
+        authorView.setFollowerCount(author.getFollowersCount());
+        authorView.setFollowingCount(author.getFollowingCount());
+        authorView.setIsPrivate(author.getIsPrivate());
+        return authorView;
+    }
+
     public AuthorView authorViewFromAuthor(Author author){
         return authorViewFromAuthor(author, true);
     }
