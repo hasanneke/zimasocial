@@ -28,7 +28,7 @@ public class NotificationDBRepository implements NotificationRepository {
 
     @Override
     public void save(Notification notification) {
-        UserEntity recipient = notification.getRecipientId() != null ? userJpaRepository.findById(notification.getRecipientId().getValue()).orElse(null) : null;
+        UserEntity recipient = notification.getRecipientId() != null && notification.getRecipientId().getValue() != null ? userJpaRepository.findById(notification.getRecipientId().getValue()).orElse(null) : null;
         UserEntity actor = userJpaRepository.findById(notification.getActorId().getValue()).orElse(null);
         NotificationEntity notificationEntity = notificationJpaRepository.findById(notification.getId() == null ? -1 : notification.getId()).orElse(null);
         if(notificationEntity == null){

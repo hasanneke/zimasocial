@@ -31,6 +31,7 @@ public class PushNotificationService {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     @Value("${webLink}")
     private String webLink;
+
     @Transactional
     public void startPushing() {
         List<Notification> notificationList = notificationRepository.findAllByIsPushedFalse();
