@@ -2,7 +2,7 @@ package com.zima.zimasocial.calculators.todayspost;
 
 import com.zima.zimasocial.calculators.PostScoreCalculator;
 import com.zima.zimasocial.entity.MediaType;
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.entity.user.UserFactory;
@@ -35,56 +35,56 @@ public class TodaysPostsGeneratorTest {
     private TodaysPostRepository todaysPostRepository;
     @InjectMocks
     private TodaysPostsGeneratorImpl todaysPostGenerator;
-    final List<PostEntity> testPosts = new ArrayList<>();
+    final List<PostJpaEntity> testPosts = new ArrayList<>();
     final List<TodaysPost> testTodaysPosts = new ArrayList<>();
     @BeforeEach
     void setUp() {
         UserEntity author = UserFactory.createUser(0L);
         UserEntity author1 = UserFactory.createUser(0L);
         UserEntity author2 = UserFactory.createUser(0L);
-        PostEntity post = new PostEntity();
+        PostJpaEntity post = new PostJpaEntity();
         post.setId(0L);
         post.setLikeCount(0);
         post.setCommentCount(0);
         post.setUser(author);
         post.setType(MediaType.music);
-        PostEntity post1 = new PostEntity();
+        PostJpaEntity post1 = new PostJpaEntity();
         post1.setId(1L);
         post1.setLikeCount(2);
         post1.setCommentCount(2);
         post1.setUser(author);
         post1.setType(MediaType.music);
-        PostEntity post2 = new PostEntity();
+        PostJpaEntity post2 = new PostJpaEntity();
         post2.setId(2L);
         post2.setLikeCount(0);
         post2.setCommentCount(0);
         post2.setUser(author1);
         post2.setType(MediaType.movie);
-        PostEntity post3 = new PostEntity();
+        PostJpaEntity post3 = new PostJpaEntity();
         post3.setId(3L);
         post3.setLikeCount(2);
         post3.setCommentCount(2);
         post3.setUser(author1);
         post3.setType(MediaType.movie);
-        PostEntity post4 = new PostEntity();
+        PostJpaEntity post4 = new PostJpaEntity();
         post4.setId(4L);
         post4.setLikeCount(1);
         post4.setCommentCount(1);
         post4.setUser(author2);
         post4.setType(MediaType.book);
-        PostEntity post5 = new PostEntity();
+        PostJpaEntity post5 = new PostJpaEntity();
         post5.setId(5L);
         post5.setLikeCount(2);
         post5.setCommentCount(2);
         post5.setUser(author2);
         post5.setType(MediaType.book);
-        PostEntity post6 = new PostEntity();
+        PostJpaEntity post6 = new PostJpaEntity();
         post6.setId(6L);
         post6.setLikeCount(4);
         post6.setCommentCount(4);
         post6.setUser(author2);
         post6.setType(MediaType.music);
-        PostEntity post7 = new PostEntity();
+        PostJpaEntity post7 = new PostJpaEntity();
         post7.setId(7L);
         post7.setLikeCount(4);
         post7.setCommentCount(4);
@@ -106,8 +106,8 @@ public class TodaysPostsGeneratorTest {
         verify(todaysPostRepository).saveAll(todaysPostGenerator.selectTodaysPosts());
     }
 
-    PostEntity mockPost() {
-        PostEntity post = new PostEntity();
+    PostJpaEntity mockPost() {
+        PostJpaEntity post = new PostJpaEntity();
         post.setId(new Random().nextLong());
         post.setLikeCount(0);
         post.setCommentCount(0);

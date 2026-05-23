@@ -3,8 +3,8 @@ package com.zima.zimasocial.context.social.infastructure.repository;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.comment.CommentLike;
 import com.zima.zimasocial.context.social.infastructure.adapter.LikeAdapter;
-import com.zima.zimasocial.context.social.like.Like;
-import com.zima.zimasocial.context.social.like.LikeRepository;
+import com.zima.zimasocial.context.social.like.LikeDomain;
+import com.zima.zimasocial.context.social.like.LikeDomainRepository;
 import com.zima.zimasocial.context.social.post.value.PostLike;
 import com.zima.zimasocial.entity.LikeEntity;
 import com.zima.zimasocial.entity.LikeType;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class LikeDBRepository implements LikeRepository {
+public class LikeDBRepository implements LikeDomainRepository {
     private final LikeAdapter likeAdapter;
     private final LikeJpaRepository likeJpaRepository;
 
@@ -26,7 +26,7 @@ public class LikeDBRepository implements LikeRepository {
         this.likeJpaRepository = likeJpaRepository;
     }
     @Override
-    public Optional<Like> findByPostIdAndAuthorId(Long postId, AuthorId authorId) {
+    public Optional<LikeDomain> findByPostIdAndAuthorId(Long postId, AuthorId authorId) {
         Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(authorId.getValue(), postId, LikeType.post);
         return like.map(likeAdapter::convertLikeEntityToLikeForPost);
     }
@@ -37,7 +37,7 @@ public class LikeDBRepository implements LikeRepository {
     }
 
     @Override
-    public void save(Like like) {
+    public void save(LikeDomain like) {
         LikeEntity likeEntity = LikeEntity.builder()
                 .commentId(like.getCommentId())
                 .postId(like.getPostId())
@@ -48,7 +48,7 @@ public class LikeDBRepository implements LikeRepository {
     }
 
     @Override
-    public void delete(Like like) {
+    public void delete(LikeDomain like) {
         LikeEntity likeEntity;
         if(like instanceof PostLike){
             likeEntity =

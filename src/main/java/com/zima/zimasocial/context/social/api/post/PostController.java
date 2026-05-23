@@ -5,7 +5,7 @@ import com.zima.zimasocial.aop.ResourceAcess.HasCommentAccess;
 import com.zima.zimasocial.aop.ResourceAcess.HasPostAccess;
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.context.social.comment.Comment;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.application.PostScorePunisherService;
 import com.zima.zimasocial.context.social.post.application.PostService;
@@ -120,7 +120,7 @@ public class PostController {
     public ResponseEntity<CommentView> makeComment(
             @PathVariable Long postId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postService.comment(postId, payload.getContent(), payload.getMediaId());
+        CommentDomain comment = postService.comment(postId, payload.getContent(), payload.getMediaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
     @DeleteMapping(path = "/{postId}/comments/{commentId}")
@@ -160,7 +160,7 @@ public class PostController {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentPayload payload) {
-        Comment comment = postService.replyComment(commentId, payload.getContent(), payload.getMediaId());
+        CommentDomain comment = postService.replyComment(commentId, payload.getContent(), payload.getMediaId());
         return ResponseEntity.status(HttpStatus.CREATED).body(commentViewAdapter.populated(comment));
     }
 

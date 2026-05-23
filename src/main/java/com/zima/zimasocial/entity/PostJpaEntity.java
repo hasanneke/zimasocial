@@ -2,7 +2,7 @@ package com.zima.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
@@ -57,7 +57,7 @@ import java.util.UUID;
                 }
         )
 })
-public class PostEntity {
+public class PostJpaEntity {
     @Id
     private Long id;
 
@@ -119,7 +119,7 @@ public class PostEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PostEntity that = (PostEntity) o;
+        PostJpaEntity that = (PostJpaEntity) o;
         return Objects.equals(id, that.getId());
     }
 
@@ -128,7 +128,7 @@ public class PostEntity {
         return Objects.hash(id);
     }
 
-    public void merge(Post post) {
+    public void merge(PostDomain post) {
         this.id = post.getPostId();
         this.content = post.getContent().content();
         this.type = post.getContent().type();
@@ -142,8 +142,8 @@ public class PostEntity {
         this.updatedAt = post.getUpdatedAt();
     }
 
-    public Post rehydrate() {
-        return Post.reconstitute(
+    public PostDomain rehydrate() {
+        return PostDomain.reconstitute(
                 id,
                 new AuthorId(userId),
                 new PostContent(content, type, mediaId != null ? new MediaId(mediaId) : null),

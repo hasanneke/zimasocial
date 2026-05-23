@@ -2,7 +2,7 @@ package com.zima.zimasocial.utility;
 
 import com.zima.zimasocial.entity.LikeEntity;
 import com.zima.zimasocial.entity.LikeType;
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import com.zima.zimasocial.entity.report.ReportEntity;
 import com.zima.zimasocial.entity.report.ReportId;
 import com.zima.zimasocial.entity.report.ResourceType;
@@ -30,30 +30,30 @@ public class PostViewFactory {
         this.reportRepository = reportRepository;
     }
 
-    public PostView populated(PostEntity postEntity) {
+    public PostView populated(PostJpaEntity postJpaEntity) {
         UserEntity profile = CurrentUser.getCurrentUserProfile();
-        Optional<ReportEntity> report = reportRepository.findById(new ReportId(postEntity.getId(), profile.getId(), ResourceType.post));
-        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(profile.getId(), postEntity.getId(), LikeType.post);
+        Optional<ReportEntity> report = reportRepository.findById(new ReportId(postJpaEntity.getId(), profile.getId(), ResourceType.post));
+        Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(profile.getId(), postJpaEntity.getId(), LikeType.post);
 
         PostView postView = new PostView();
         if(like.isPresent()){
             postView.setLiked(true);;
         }
-        UserEntity user = Hibernate.unproxy(postEntity.getUser(), UserEntity.class);
+        UserEntity user = Hibernate.unproxy(postJpaEntity.getUser(), UserEntity.class);
         postView.setIsReported(report.isPresent());
         postView.setUser(userMapper.populated(user));
-        postView.setId( postEntity.getId() );
-        postView.setContent( postEntity.getContent() );
-        postView.setType( postEntity.getType() );
-        postView.setLikeCount( postEntity.getLikeCount() );
-        postView.setCommentCount( postEntity.getCommentCount() );
-        postView.setCreatedAt( postEntity.getCreatedAt() );
-        postView.setUpdatedAt( postEntity.getUpdatedAt() );
+        postView.setId( postJpaEntity.getId() );
+        postView.setContent( postJpaEntity.getContent() );
+        postView.setType( postJpaEntity.getType() );
+        postView.setLikeCount( postJpaEntity.getLikeCount() );
+        postView.setCommentCount( postJpaEntity.getCommentCount() );
+        postView.setCreatedAt( postJpaEntity.getCreatedAt() );
+        postView.setUpdatedAt( postJpaEntity.getUpdatedAt() );
 
         return postView;
     }
 
-    public List<PostView> populated(List<PostEntity> entities) {
+    public List<PostView> populated(List<PostJpaEntity> entities) {
         return entities.stream().map(this::populated).toList();
     }
 }

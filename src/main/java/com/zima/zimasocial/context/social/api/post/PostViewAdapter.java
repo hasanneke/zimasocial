@@ -3,9 +3,9 @@ import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.context.social.like.Like;
-import com.zima.zimasocial.context.social.like.LikeRepository;
-import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.like.LikeDomain;
+import com.zima.zimasocial.context.social.like.LikeDomainRepository;
+import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.views.post.PostView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +17,22 @@ import java.util.Optional;
 @Component
 public class PostViewAdapter {
     private final ReportRepository reportRepository;
-    private final LikeRepository likeRepository;
+    private final LikeDomainRepository likeRepository;
     private final AuthorRepository authorRepository;
     private final AuthorAuthorViewAdapter authorViewAdapter;
 
     @Autowired
-    public PostViewAdapter(ReportRepository reportRepository, LikeRepository likeRepository, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
+    public PostViewAdapter(ReportRepository reportRepository, LikeDomainRepository likeRepository, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
         this.authorRepository = authorRepository;
         this.reportRepository = reportRepository;
         this.likeRepository = likeRepository;
         this.authorViewAdapter = authorViewAdapter;
     }
 
-    public PostView populated(Post post) {
+    public PostView populated(PostDomain post) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         boolean postReported = reportRepository.checkReportExists(post.getPostId(), authenticatedAuthor.getId(), ResourceType.post);
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(post.getPostId(), authenticatedAuthor.getId());
+        Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(post.getPostId(), authenticatedAuthor.getId());
 
         PostView postView = new PostView();
         if(like.isPresent()){
@@ -54,7 +54,7 @@ public class PostViewAdapter {
         return postView;
     }
 
-    public List<PostView> populated(List<Post> entities) {
+    public List<PostView> populated(List<PostDomain> entities) {
         return entities.stream().map(this::populated).toList();
     }
 }

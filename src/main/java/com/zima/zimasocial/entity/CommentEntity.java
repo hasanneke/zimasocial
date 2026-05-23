@@ -1,6 +1,6 @@
 package com.zima.zimasocial.entity;
 
-import com.zima.zimasocial.context.social.comment.Comment;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class CommentEntity {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private PostEntity post;
+    private PostJpaEntity post;
 
     @Column(name = "post_id", insertable = false, updatable = false)
     private Long postId;
@@ -62,7 +62,7 @@ public class CommentEntity {
     @Column(name = "media_id")
     private UUID mediaId;
 
-    public void mergeDomain(Comment comment){
+    public void mergeDomain(CommentDomain comment){
         this.likeCount = comment.getLikeCount();
         this.replyCount = comment.getReplyCount();
         this.content = comment.getContent();

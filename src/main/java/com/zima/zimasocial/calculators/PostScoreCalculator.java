@@ -1,6 +1,6 @@
 package com.zima.zimasocial.calculators;
 
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class PostScoreCalculator {
     final static double likeScoreRatio = 1.5;
     final static double commentScoreRatio = 3.5;
-    public double calculateScore(PostEntity post) {
+    public double calculateScore(PostJpaEntity post) {
         int likeCount = post.getLikeCount();
         int commentCount = post.getCommentCount();
         return ((likeCount * likeScoreRatio) + (commentCount * commentScoreRatio));

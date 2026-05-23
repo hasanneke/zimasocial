@@ -5,9 +5,9 @@ import com.zima.zimasocial.context.social.comment.CommentLike;
 
 import java.util.Optional;
 
-public interface LikeRepository {
-    Optional<Like> findByPostIdAndAuthorId(Long postId, AuthorId authorId);
+public interface LikeDomainRepository {
+    Optional<LikeDomain> findByPostIdAndAuthorId(Long postId, AuthorId authorId);
     Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, AuthorId authorId);
-    void save(Like like);
-    void delete(Like like);
+    void save(LikeDomain like);
+    void delete(LikeDomain like);
 }

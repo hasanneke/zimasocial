@@ -2,7 +2,7 @@ package com.zima.zimasocial.calculators.todayspost;
 
 import com.zima.zimasocial.calculators.PostScoreCalculator;
 import com.zima.zimasocial.entity.MediaType;
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import com.zima.zimasocial.entity.todayspost.TodaysPost;
 import com.zima.zimasocial.repository.PostJpaRepository;
 import com.zima.zimasocial.repository.TodaysPostRepository;
@@ -38,25 +38,25 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
 
     @Override
     public List<TodaysPost> selectTodaysPosts() {
-        List<PostEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(
+        List<PostJpaEntity> yesterdaySharedPosts = postJpaRepository.findAllByCreatedAtBetween(
                 LocalDate.now().minusDays(1).atStartOfDay(),
                 LocalDate.now().atStartOfDay()
         );
-        List<PostEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
-                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
-        List<PostEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))
-                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
-        List<PostEntity> series = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.tv))
-                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
-        List<PostEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.book))
-                .sorted(Comparator.comparing(PostEntity::baseScore)).toList().reversed();
+        List<PostJpaEntity> musics = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.music))
+                .sorted(Comparator.comparing(PostJpaEntity::baseScore)).toList().reversed();
+        List<PostJpaEntity> movies = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.movie))
+                .sorted(Comparator.comparing(PostJpaEntity::baseScore)).toList().reversed();
+        List<PostJpaEntity> series = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.tv))
+                .sorted(Comparator.comparing(PostJpaEntity::baseScore)).toList().reversed();
+        List<PostJpaEntity> books = yesterdaySharedPosts.stream().filter(e->e.getType().equals(MediaType.book))
+                .sorted(Comparator.comparing(PostJpaEntity::baseScore)).toList().reversed();
 
-        PostEntity todaysMusic = musics.stream().findFirst().orElse(null);
-        PostEntity todaysMovie = movies.stream().findFirst().orElse(null);
-        PostEntity todaysBook = books.stream().findFirst().orElse(null);
-        PostEntity todaysSeries = series.stream().findFirst().orElse(null);
+        PostJpaEntity todaysMusic = musics.stream().findFirst().orElse(null);
+        PostJpaEntity todaysMovie = movies.stream().findFirst().orElse(null);
+        PostJpaEntity todaysBook = books.stream().findFirst().orElse(null);
+        PostJpaEntity todaysSeries = series.stream().findFirst().orElse(null);
 
-        List<PostEntity> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook, todaysSeries).toList().stream().filter(e->e != null).toList();
+        List<PostJpaEntity> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook, todaysSeries).toList().stream().filter(e->e != null).toList();
 
         List<TodaysPost> todaysPosts = selectedPosts.stream().map(e-> TodaysPost.builder()
                         .post(e)

@@ -1,14 +1,14 @@
 package com.zima.zimasocial.events;
 
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
 public class PostLikedEvent extends ApplicationEvent {
-    private final PostEntity post;
+    private final PostJpaEntity post;
 
-    public PostLikedEvent(Object source, PostEntity post) {
+    public PostLikedEvent(Object source, PostJpaEntity post) {
         super(source);
         this.post = post;
     }

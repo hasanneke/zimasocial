@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-public class Comment {
+public class CommentDomain {
     private Long commentId;
     private Long parentCommentId;
     private Long postId;
@@ -22,7 +22,7 @@ public class Comment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Comment(Long commentId, Long parentCommentId, Long postId, UUID mediaId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CommentDomain(Long commentId, Long parentCommentId, Long postId, UUID mediaId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.notNull(commentId, "Comment Id cannot be null");
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
@@ -38,7 +38,7 @@ public class Comment {
         this.updatedAt = updatedAt;
 
     }
-    public Comment(Long postId, Long parentCommentId, AuthorId authorId, String content, UUID mediaId) {
+    public CommentDomain(Long postId, Long parentCommentId, AuthorId authorId, String content, UUID mediaId) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
         this.parentCommentId = parentCommentId;
@@ -50,11 +50,11 @@ public class Comment {
         this.replyCount = 0;
         this.mediaId = mediaId;
     }
-    public Comment reply(AuthorId replierAuthorId, String comment, UUID mediaId){
+    public CommentDomain reply(AuthorId replierAuthorId, String comment, UUID mediaId){
         replyCount += 1;
-        return new Comment(postId, commentId, replierAuthorId, comment, mediaId);
+        return new CommentDomain(postId, commentId, replierAuthorId, comment, mediaId);
     }
-    public void removeReply(Comment reply) {
+    public void removeReply(CommentDomain reply) {
         replyCount -= 1;
     }
 

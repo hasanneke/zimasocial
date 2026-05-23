@@ -2,7 +2,7 @@ package com.zima.zimasocial;
 
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.entity.MediaType;
 
@@ -19,15 +19,15 @@ public class TestUtil {
         return new Author(new AuthorId(authorId), "mockSlug", "mockName", LocalDateTime.now());
     }
 
-    public static Post mockPostForScoring(LocalDateTime createdAt, LocalDateTime lastPunishedAt, Integer score) {
+    public static PostDomain mockPostForScoring(LocalDateTime createdAt, LocalDateTime lastPunishedAt, Integer score) {
         Clock clock = Clock.system(ZoneId.systemDefault());
-        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, score, false, createdAt, null, lastPunishedAt);
+        return PostDomain.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, score, false, createdAt, null, lastPunishedAt);
     }
 
-    public static Post mockAnyPost() {
-        return Post.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
+    public static PostDomain mockAnyPost() {
+        return PostDomain.reconstitute(new Random().nextLong(), mockAuthor(new Random().nextLong()).getId(), new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
     }
-    public static Post mockAnyPost(AuthorId authorId) {
-        return Post.reconstitute(new Random().nextLong(), authorId, new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
+    public static PostDomain mockAnyPost(AuthorId authorId) {
+        return PostDomain.reconstitute(new Random().nextLong(), authorId, new PostContent("", MediaType.any, null), 0, 0, 100, false, null, null, null);
     }
 }

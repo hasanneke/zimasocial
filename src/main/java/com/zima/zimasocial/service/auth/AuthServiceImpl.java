@@ -136,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .accountId(new AccountId(accountRepository.nextId()))
                 .email(email)
-                .authProvider("dummy")
+                .authProvider("test")
                 .slug(slug)
                 .roles(Set.of(UserRole.regular))
                 .build();

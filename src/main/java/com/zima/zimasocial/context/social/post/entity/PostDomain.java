@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.entity;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.comment.Comment;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.post.event.PostLikedEvent;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.context.social.post.value.PostLike;
@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class Post {
+public class PostDomain {
     private Long postId;
     private int likeCount;
     private int commentCount;
@@ -26,11 +26,11 @@ public class Post {
     private Boolean isVisible;
     private Integer score;
     private LocalDateTime lastPunishedAt;
-    private Post(Long postId) {
+    private PostDomain(Long postId) {
         this.postId = Objects.requireNonNull(postId, "Post id cannot be null");
     }
 
-    public static Post create(
+    public static PostDomain create(
             Long postId,
             AuthorId authorId,
             PostContent content
@@ -39,7 +39,7 @@ public class Post {
 
         LocalDateTime now = LocalDateTime.now();
 
-        Post post = new Post(postId);
+        PostDomain post = new PostDomain(postId);
         post.authorId = authorId;
         post.content = content;
 
@@ -55,7 +55,7 @@ public class Post {
         return post;
     }
 
-    public static Post reconstitute(
+    public static PostDomain reconstitute(
             Long postId,
             AuthorId authorId,
             PostContent content,
@@ -67,7 +67,7 @@ public class Post {
             LocalDateTime updatedAt,
             LocalDateTime lastPunishedAt
     ) {
-        Post post = new Post(postId);
+        PostDomain post = new PostDomain(postId);
         post.authorId = authorId;
         post.content = content;
         post.likeCount = likeCount;
@@ -89,12 +89,12 @@ public class Post {
         StaticEventPublisher.publishEvent(new PostLikedEvent(postId, authorId, likerAuthorId));
         return new PostLike(postId, likerAuthorId);
     }
-    public Comment comment(AuthorId commenterAuthorId, String comment, UUID mediaId) {
+    public CommentDomain comment(AuthorId commenterAuthorId, String comment, UUID mediaId) {
         commentCount += 1;
         if(!authorId.equals(commenterAuthorId)){
             score += 5;
         }
-        return new Comment(postId, null, commenterAuthorId, comment, mediaId);
+        return new CommentDomain(postId, null, commenterAuthorId, comment, mediaId);
     }
     public void removeComment(AuthorId commenterId) {
         commentCount = commentCount - 1;
@@ -139,7 +139,7 @@ public class Post {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Post post = (Post) o;
+        PostDomain post = (PostDomain) o;
         return Objects.equals(postId, post.postId);
     }
 

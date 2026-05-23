@@ -1,6 +1,6 @@
 package com.zima.zimasocial.entity.todayspost;
 
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,7 +30,7 @@ public class TodaysPost {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private PostEntity post;
+    private PostJpaEntity post;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

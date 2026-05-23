@@ -44,7 +44,7 @@ public interface LikeJpaRepository extends JpaRepository<LikeEntity, Long> {
                 ) THEN true ELSE false END,
                liker.isPrivate)
             FROM LikeEntity likeEntity
-        JOIN PostEntity post ON post.id = likeEntity.postId
+        JOIN PostJpaEntity post ON post.id = likeEntity.postId
         JOIN UserEntity user ON user.id = post.userId
         JOIN UserEntity liker ON liker.id = likeEntity.userId
         WHERE (likeEntity.postId = :resourceId AND likeEntity.commentId IS NULL)

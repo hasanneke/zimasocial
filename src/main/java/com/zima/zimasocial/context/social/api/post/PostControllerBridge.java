@@ -2,12 +2,12 @@ package com.zima.zimasocial.context.social.api.post;
 
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.comment.Comment;
-import com.zima.zimasocial.context.social.comment.CommentRepository;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
+import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.application.PostService;
-import com.zima.zimasocial.context.social.post.entity.Post;
-import com.zima.zimasocial.context.social.post.repository.PostRepository;
+import com.zima.zimasocial.context.social.post.entity.PostDomain;
+import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.service.posts.Payload.PostPayload;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
@@ -30,14 +30,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Component
 public class PostControllerBridge {
     private final PostService postService;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
+    private final PostDomainRepository postRepository;
+    private final CommentDomainRepository commentRepository;
     private final PostViewAdapter postViewAdapter;
     private final CommentViewAdapter commentViewAdapter;
     private final AuthorRepository authorRepository;
 
     @Autowired
-    public PostControllerBridge(PostService postService, PostRepository postRepository, CommentRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter, AuthorRepository authorRepository) {
+    public PostControllerBridge(PostService postService, PostDomainRepository postRepository, CommentDomainRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter, AuthorRepository authorRepository) {
         this.postService = postService;
         this.postRepository = postRepository;
         this.postViewAdapter = postViewAdapter;
@@ -47,7 +47,7 @@ public class PostControllerBridge {
     }
 
     public PostView createPost(PostPayload payload) {
-        Post post = postService.createPost(
+        PostDomain post = postService.createPost(
                 CreatePost.builder()
                         .type(payload.getType())
                         .mediaId(payload.getMediaId())
@@ -62,7 +62,7 @@ public class PostControllerBridge {
            PostCategory category,
            String slug
     ) throws NoSuchMethodException {
-        Page<Post> postPage;
+        Page<PostDomain> postPage;
         if(category == PostCategory.followings){
             AuthorId authorId = authorRepository.getAuthenticatedAuthor().getId();
             postPage = postRepository.findFollowingsPosts(PageRequest.of(page, size), authorId);
@@ -95,12 +95,12 @@ public class PostControllerBridge {
     }
 
     public PostView getPost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         return postViewAdapter.populated(post);
     }
 
     public PagedModel<CommentView> getComments(int page, int size, Long postId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        Page<CommentDomain> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
                 commentViewAdapter.populated(commentPage.getContent()),
@@ -121,7 +121,7 @@ public class PostControllerBridge {
     }
 
     public PagedModel<CommentView> getCommentReplies(int page, int size, Long commentId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAt(commentId, PageRequest.of(page, size));
+        Page<CommentDomain> commentPage = commentRepository.findByParentIdOrderByCreatedAt(commentId, PageRequest.of(page, size));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
                 commentViewAdapter.populated(commentPage.getContent()),

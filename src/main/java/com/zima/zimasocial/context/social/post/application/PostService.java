@@ -7,18 +7,18 @@ import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedExce
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
-import com.zima.zimasocial.context.social.comment.Comment;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentLike;
 import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
-import com.zima.zimasocial.context.social.comment.CommentRepository;
+import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
 import com.zima.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
-import com.zima.zimasocial.context.social.like.Like;
-import com.zima.zimasocial.context.social.like.LikeRepository;
-import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.like.LikeDomain;
+import com.zima.zimasocial.context.social.like.LikeDomainRepository;
+import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.event.PostCommentedEvent;
 import com.zima.zimasocial.context.social.post.event.PostSharedEvent;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.context.social.post.repository.PostRepository;
+import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
@@ -45,21 +45,21 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final PostRepository postRepository;
+    private final PostDomainRepository postRepository;
     private final AuthorRepository authorRepository;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+    private final LikeDomainRepository likeRepository;
+    private final CommentDomainRepository commentRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final AuthorRelationService authorRelationService;
     private final LikeJpaRepository likeJpaRepository;
     @Transactional
-    public Post createPost(CreatePost createPost) {
+    public PostDomain createPost(CreatePost createPost) {
         Author author = authorRepository.getAuthenticatedAuthor();
         MediaId mediaId = null;
         if(createPost.mediaId() != null){
             mediaId = new MediaId(mediaItemJpaRepository.findIdById(UUID.fromString(createPost.mediaId())).orElseThrow(()-> new DataNotFoundException("media_not_found")));
         }
-        Post post = Post.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId));
+        PostDomain post = PostDomain.create(postRepository.nextSequence(), author.getId(), new PostContent(createPost.content(), createPost.type() == null ? MediaType.any : createPost.type(), mediaId));
         postRepository.save(post);
         StaticEventPublisher.publishEvent(new PostSharedEvent(post.getPostId(), post.getAuthorId(), post.getContent()));;
         return post;
@@ -68,11 +68,11 @@ public class PostService {
     @Transactional
     public void like(Long postId) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
+        Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isPresent()){
             throw new ConflictException("Post is already liked");
         }
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         PostLike postLike = post.like(author.getId());
         postRepository.save(post);
         likeRepository.save(postLike);
@@ -81,8 +81,8 @@ public class PostService {
     @Transactional
     public void unlikePost(Long postId) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Optional<Like> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
+        PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isEmpty()){
             throw new ConflictException("Post is not liked");
         }
@@ -93,16 +93,16 @@ public class PostService {
 
     @Transactional
     public void delete(Long id){
-        Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        PostDomain post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         postRepository.delete(post);
     }
 
     @Transactional
-    public Comment comment(Long postId, String content, UUID mediaId) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+    public CommentDomain comment(Long postId, String content, UUID mediaId) {
+        PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment comment = post.comment(author.getId(), content, mediaId);
-        Comment savedComment = commentRepository.save(comment);
+        CommentDomain comment = post.comment(author.getId(), content, mediaId);
+        CommentDomain savedComment = commentRepository.save(comment);
         postRepository.save(post);
         StaticEventPublisher.publishEvent(new PostCommentedEvent(postId, savedComment.getCommentId(), author.getId(), post.getAuthorId()));
         return savedComment;
@@ -110,8 +110,8 @@ public class PostService {
 
     @Transactional
     public void removeComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-        Post post = postRepository.findById(comment.getPostId()).orElseThrow(PostNotFoundException::new);
+        CommentDomain comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        PostDomain post = postRepository.findById(comment.getPostId()).orElseThrow(PostNotFoundException::new);
         post.removeComment(comment.getAuthorId());
         postRepository.save(post);
         commentRepository.delete(comment);
@@ -120,7 +120,7 @@ public class PostService {
     @Transactional
     public void likeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
+        CommentDomain comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isEmpty()){
             CommentLike commentLike = comment.like(authenticatedAuthor);
@@ -134,7 +134,7 @@ public class PostService {
     @Transactional
     public void unlikeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
+        CommentDomain comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isPresent()){
             comment.unlike();
@@ -146,11 +146,11 @@ public class PostService {
     }
 
     @Transactional
-    public Comment replyComment(Long parentId, String content, UUID mediaId) {
+    public CommentDomain replyComment(Long parentId, String content, UUID mediaId) {
         Author author = authorRepository.getAuthenticatedAuthor();
-        Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
-        Comment reply = parent.reply(author.getId(), content, mediaId);
-        Comment savedReply = commentRepository.save(reply);
+        CommentDomain parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
+        CommentDomain reply = parent.reply(author.getId(), content, mediaId);
+        CommentDomain savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
         StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
         return savedReply;
@@ -158,17 +158,17 @@ public class PostService {
 
     @Transactional
     public void deleteReply(Long replyId) {
-        Comment reply = commentRepository.findById(replyId).orElseThrow(CommentNotFoundException::new);
-        Comment parent = commentRepository.findById(reply.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
+        CommentDomain reply = commentRepository.findById(replyId).orElseThrow(CommentNotFoundException::new);
+        CommentDomain parent = commentRepository.findById(reply.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
         parent.removeReply(reply);
         commentRepository.delete(reply);
         commentRepository.save(parent);
     }
-    public void makePostInvisible(Post post) {
+    public void makePostInvisible(PostDomain post) {
         post.makeInvisible();
         postRepository.save(post);
     }
-    public void makePostVisible(Post post) {
+    public void makePostVisible(PostDomain post) {
         post.makeVisible();
         postRepository.save(post);
     }

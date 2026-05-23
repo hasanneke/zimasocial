@@ -1,6 +1,6 @@
 package com.zima.zimasocial.repository;
 
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaSpecificationExecutor<PostEntity> {
-    @Query("Select post FROM PostEntity post JOIN UserEntity user ON user.id = post.userId WHERE post.createdAt BETWEEN :start AND :end")
-    List<PostEntity> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+public interface PostJpaRepository extends JpaRepository<PostJpaEntity, Long>, JpaSpecificationExecutor<PostJpaEntity> {
+    @Query("Select post FROM PostJpaEntity post JOIN UserEntity user ON user.id = post.userId WHERE post.createdAt BETWEEN :start AND :end")
+    List<PostJpaEntity> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     @Query(value = """
              SELECT P.* FROM post P
@@ -23,7 +23,7 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
              INNER JOIN user_relation UR on UR.receiver_id = U.id AND UR.initiated_id = :authorId AND UR.relation = 'followed'
              WHERE P.IS_VISIBLE = TRUE
             """, nativeQuery = true)
-    Page<PostEntity> findFollowingsPosts(Pageable pageable, Long authorId);
+    Page<PostJpaEntity> findFollowingsPosts(Pageable pageable, Long authorId);
 
     @Query(value = "SELECT nextval('post_sequence')")
     Long getNextSequence();
@@ -31,8 +31,8 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long>, JpaS
     @Query(value = """
             SELECT * FROM post WHERE post.is_visible = false AND post.user_id = :userId
             """, nativeQuery = true)
-    List<PostEntity> findAllInvisiblePostsByUserId(Long userId);
-    List<PostEntity> findAllByUserId(Long userId);
-    Optional<PostEntity> findByIdAndIsVisibleTrue(Long id);
-    List<PostEntity> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<PostJpaEntity> findAllInvisiblePostsByUserId(Long userId);
+    List<PostJpaEntity> findAllByUserId(Long userId);
+    Optional<PostJpaEntity> findByIdAndIsVisibleTrue(Long id);
+    List<PostJpaEntity> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

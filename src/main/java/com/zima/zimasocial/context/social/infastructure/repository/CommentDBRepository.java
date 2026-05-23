@@ -1,10 +1,10 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
-import com.zima.zimasocial.context.social.comment.Comment;
-import com.zima.zimasocial.context.social.comment.CommentRepository;
+import com.zima.zimasocial.context.social.comment.CommentDomain;
+import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
 import com.zima.zimasocial.context.social.infastructure.adapter.CommentCommentEntityAdapter;
 import com.zima.zimasocial.entity.CommentEntity;
-import com.zima.zimasocial.entity.PostEntity;
+import com.zima.zimasocial.entity.PostJpaEntity;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.CommentJpaRepository;
 import com.zima.zimasocial.repository.PostJpaRepository;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class CommentDBRepository implements CommentRepository {
+public class CommentDBRepository implements CommentDomainRepository {
     private final CommentJpaRepository commentJpaRepository;
     private final PostJpaRepository postJpaRepository;
     private final CommentCommentEntityAdapter commentCommentEntityAdapter;
@@ -32,17 +32,17 @@ public class CommentDBRepository implements CommentRepository {
     }
 
     @Override
-    public Optional<Comment> findById(Long id) {
+    public Optional<CommentDomain> findById(Long id) {
         Optional<CommentEntity> comment = commentJpaRepository.findById(id);
         return Optional.ofNullable(commentCommentEntityAdapter.convertCommentEntityToComment(comment.get()));
     }
 
     @Override
-    public Comment save(Comment comment) {
+    public CommentDomain save(CommentDomain comment) {
         CommentEntity commentEntity;
         if(comment.getCommentId() == null){
             commentEntity = new CommentEntity();
-            PostEntity post = postJpaRepository.findById(comment.getPostId()).orElseThrow(CommentNotFoundException::new);
+            PostJpaEntity post = postJpaRepository.findById(comment.getPostId()).orElseThrow(CommentNotFoundException::new);
             UserEntity user = CurrentUser.getCurrentUserProfile();
             commentEntity.setPost(post);
             commentEntity.setUser(user);
@@ -61,24 +61,24 @@ public class CommentDBRepository implements CommentRepository {
     }
 
     @Override
-    public void saveAll(List<Comment> comments) {
-        for (Comment comment : comments) {
+    public void saveAll(List<CommentDomain> comments) {
+        for (CommentDomain comment : comments) {
             save(comment);
         }
     }
 
     @Override
-    public Page<Comment> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable) {
+    public Page<CommentDomain> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable) {
         return commentJpaRepository.findByParentIdOrderByCreatedAt(parentId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
 
     @Override
-    public Page<Comment> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable) {
+    public Page<CommentDomain> findByPostIdOrderByCreatedAtDesc(Long postId, Pageable pageable) {
         return commentJpaRepository.findByPostIdAndParentIdIsNull(postId, pageable).map(commentCommentEntityAdapter::convertCommentEntityToComment);
     }
 
     @Override
-    public void delete(Comment comment) {
+    public void delete(CommentDomain comment) {
         commentJpaRepository.deleteByParentId(comment.getCommentId());
         commentJpaRepository.deleteById(comment.getCommentId());
     }
