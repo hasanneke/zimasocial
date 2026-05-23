@@ -3,8 +3,10 @@ package com.zima.zimasocial.exception;
 import com.google.auth.oauth2.TokenVerifier;
 import com.zima.zimasocial.utility.ResponseError;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -134,13 +136,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ResponseError> handleInternalError(Exception ex) {
-        logger.error("Internal Error: ", ex);
-        return new ResponseEntity<>(ResponseError.
-                builder().
-                timeStamp(System.currentTimeMillis()).
-                errorCode("internal_server_error").
-                message("Internal Error").build(),
+    public ResponseEntity<ResponseError> handleInternalError(Exception ex, HttpServletRequest request) {
+        try {
+            // Push HTTP data into context maps for the Logstash JSON Encoder
+            MDC.put("http_method", request.getMethod());
+            MDC.put("http_uri", request.getRequestURI());
+            MDC.put("http_query_string", request.getQueryString());
+
+            // This emits exactly 1 line of JSON containing fields + complete trace info
+            logger.error("[HTTP 500] Unhandled system failure occurred", ex);
+        } finally {
+            // Crucial: Clear out thread metadata context so subsequent traffic doesn't get cross-contaminated
+            MDC.clear();
+        }
+
+        return new ResponseEntity<>(ResponseError.builder()
+                .timeStamp(System.currentTimeMillis())
+                .errorCode("internal_server_error")
+                .message("Internal Error").build(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
