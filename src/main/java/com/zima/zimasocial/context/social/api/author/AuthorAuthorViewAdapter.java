@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.api.author;
 
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zima.zimasocial.context.social.authorrelation.FollowRequestCollection;
@@ -26,9 +26,9 @@ public class AuthorAuthorViewAdapter {
     private final AuthorRepository authorRepository;
     private final PlayListService playListService;
 
-    public AuthorView authorViewFromAuthor(Author author, Boolean fetchPlaylist) {
+    public AuthorView authorViewFromAuthor(AuthorDomain author, Boolean fetchPlaylist) {
         AuthorView authorView = new AuthorView();
-        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedUser = authorRepository.getAuthenticatedAuthor();
         Account account = accountRepository.getAuthenticatedAccount();
         Optional<FollowRelation> followRelation =
                 authorRelationRepository
@@ -64,7 +64,7 @@ public class AuthorAuthorViewAdapter {
         return authorView;
     }
 
-    public AuthorView authorViewFromAuthorLight(Author author) {
+    public AuthorView authorViewFromAuthorLight(AuthorDomain author) {
         AuthorView authorView = new AuthorView();
         authorView.setId(author.getId().getValue());
         authorView.setSlug(author.getSlug());
@@ -78,11 +78,11 @@ public class AuthorAuthorViewAdapter {
         return authorView;
     }
 
-    public AuthorView authorViewFromAuthor(Author author){
+    public AuthorView authorViewFromAuthor(AuthorDomain author){
         return authorViewFromAuthor(author, true);
     }
 
-    public DetailedAuthorView detailedAuthorViewFromAuthor(Author author) {
+    public DetailedAuthorView detailedAuthorViewFromAuthor(AuthorDomain author) {
         AuthorView authorView = authorViewFromAuthor(author);
         DetailedAuthorView detailedAuthorView = new DetailedAuthorView();
         detailedAuthorView.mergeAuthorView(authorView);

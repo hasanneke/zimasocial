@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
@@ -57,21 +57,21 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
     }
 
     @Override
-    public Page<Author> findFollowers(String slug, int page, int size) {
+    public Page<AuthorDomain> findFollowers(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
         Page<UserRelationEntity> followers = userRelationJpaRepository.findUserIdsByReceiverIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size));
         return new PageImpl<>(followers.map(UserRelationEntity::getActor).stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followers.getTotalElements());
     }
 
     @Override
-    public Page<Author> findFollowings(String slug, int page, int size) {
+    public Page<AuthorDomain> findFollowings(String slug, int page, int size) {
         UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
         Page<UserEntity> followingRelations = userRelationJpaRepository.findAllByActorIdAndRelation(user.getId(), Relation.followed, PageRequest.of(page, size)).map(UserRelationEntity::getReceiver);
         return new PageImpl<>(followingRelations.stream().map(AuthorUserEntityAdapter::convertUserEntityToAuthor).toList(), PageRequest.of(page, size), followingRelations.getTotalElements());
     }
 
     @Override
-    public Page<Author> findBlocks(int page, int size) {
+    public Page<AuthorDomain> findBlocks(int page, int size) {
         UserEntity user = CurrentUser.getCurrentUserProfile();
         Page<UserRelationEntity> blockedRelations = userRelationJpaRepository.findByActorIdAndRelation(user.getId(), Relation.blocked, PageRequest.of(page, size));
         List<UserEntity> blockedAuthors = blockedRelations.map(e->

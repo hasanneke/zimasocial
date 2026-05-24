@@ -4,7 +4,7 @@ import com.zima.zimasocial.context.common.SimplePagedModel;
 import com.zima.zimasocial.context.communication.RecipientNotFoundException;
 import com.zima.zimasocial.context.communication.controller.views.ChatMessageView;
 import com.zima.zimasocial.context.communication.controller.views.ChatRoomView;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.chat.application.ChatServiceApplication;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
@@ -27,8 +27,8 @@ public class ChatRestControllerBridge {
     private final ChatServiceApplication chatServiceApplication;
     private final ChatRoomRepository chatRoomRepository;
     public ChatRoomView createRoomWith(String slug){
-        Author author = recipientRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(RecipientNotFoundException::new);
-        Author me = recipientRepository.getAuthenticatedAuthor();
+        AuthorDomain author = recipientRepository.findBySlugAndIsDisabledFalse(slug).orElseThrow(RecipientNotFoundException::new);
+        AuthorDomain me = recipientRepository.getAuthenticatedAuthor();
         ChatRoom room = chatServiceApplication.createOrFindRoomWithParticipant(author.getId());
         return new ChatRoomView(room, me);
     }
@@ -39,7 +39,7 @@ public class ChatRestControllerBridge {
     }
 
     public SimplePagedModel<ChatRoomView> getChats(PageRequest request) {
-        Author recipient = recipientRepository.getAuthenticatedAuthor();
+        AuthorDomain recipient = recipientRepository.getAuthenticatedAuthor();
         Page<ChatRoom> chatRooms = chatRoomRepository.findByParticipantIn(recipient.getId(), request);
         return SimplePagedModel.of(chatRooms.getContent().stream().map(e->new ChatRoomView(e, recipient)).toList(),  chatRooms.getTotalElements(), chatRooms.getTotalPages());
     }

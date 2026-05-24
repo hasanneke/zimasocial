@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.comment;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -58,7 +58,7 @@ public class CommentDomain {
         replyCount -= 1;
     }
 
-    public CommentLike like(Author liker){
+    public CommentLike like(AuthorDomain liker){
         likeCount += 1;
         StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getCommentId(), authorId, liker.getId()));
         return new CommentLike(postId, liker.getId(), commentId);

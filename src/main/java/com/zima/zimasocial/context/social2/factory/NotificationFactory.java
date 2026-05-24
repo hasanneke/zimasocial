@@ -16,7 +16,7 @@ public class NotificationFactory {
                 .targetCollection(TargetCollection.post)
                 .receiverUserId(recipientId)
                 .isPushed(false)
-                .actorId(like.getUserId())
+                .actorId(like.getAuthorId())
                 .build();
     }
 }

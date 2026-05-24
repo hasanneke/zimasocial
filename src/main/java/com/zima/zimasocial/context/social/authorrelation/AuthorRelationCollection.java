@@ -1,5 +1,5 @@
 package com.zima.zimasocial.context.social.authorrelation;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
@@ -13,9 +13,9 @@ public interface AuthorRelationCollection {
     Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId);
     Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId);
     Optional<MutedRelation> findMutedRelationBetween(Long muterId, Long mutedId);
-    Page<Author> findFollowers(String slug, int page, int size);
-    Page<Author> findFollowings(String slug,int page, int size);
-    Page<Author> findBlocks(int page, int size);
+    Page<AuthorDomain> findFollowers(String slug, int page, int size);
+    Page<AuthorDomain> findFollowings(String slug, int page, int size);
+    Page<AuthorDomain> findBlocks(int page, int size);
     void save(AuthorRelation relation);
     void delete(AuthorRelation relation);
     boolean hasBlockRelationBetween(Long author1, Long author2);

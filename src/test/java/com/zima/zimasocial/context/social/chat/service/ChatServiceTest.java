@@ -4,7 +4,7 @@ import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedExce
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
 import com.zima.zimasocial.context.communication.controller.request.ChatMessageRequest;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessageId;
@@ -47,8 +47,8 @@ public class ChatServiceTest {
 
     @Test
     void testCreateChatRoom_WhenRoomAlreadyExist_ThrowRoomAlreadyExistException() {
-        Author roomCreator = AuthorTestUtility.mockPrivateAccountAuthor();
-        Author with = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain roomCreator = AuthorTestUtility.mockPrivateAccountAuthor();
+        AuthorDomain with = AuthorTestUtility.mockPublicAccountAuthor();
         ChatRoom chatRoom = ChatTestUtility.mockChatRoomPlain(roomCreator.getId(), with.getId());
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(roomCreator);
         when(authorRepository.findById(with.getId())).thenReturn(Optional.of(with));
@@ -58,8 +58,8 @@ public class ChatServiceTest {
 
     @Test
     void testCreateChatRoom_WhenUserIsPrivateAndNotFollowed_ThrowUserNotFollowedException() {
-        Author participant1 = AuthorTestUtility.mockPublicAccountAuthor();
-        Author withParticipant = AuthorTestUtility.mockPrivateAccountAuthor();
+        AuthorDomain participant1 = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain withParticipant = AuthorTestUtility.mockPrivateAccountAuthor();
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(participant1);
         when(authorRepository.findById(withParticipant.getId())).thenReturn(Optional.of(withParticipant));
         when(authorRelationCollection.findFollowRelationBetween(participant1.getId(), withParticipant.getId())).thenReturn(Optional.empty());
@@ -68,8 +68,8 @@ public class ChatServiceTest {
     @Test
     void testCreateChatRoom_WhenSuccess_ReturnRoom() {
         ChatRoomId chatRoomId = ChatTestUtility.mockChatRoomId();
-        Author participant1 = AuthorTestUtility.mockPublicAccountAuthor();
-        Author participant2 = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain participant1 = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain participant2 = AuthorTestUtility.mockPublicAccountAuthor();
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(participant1);
         when(authorRepository.findById(participant2.getId())).thenReturn(Optional.of(participant2));
         when(chatRoomRepository.findByParticipantsBetween(participant1.getId(), participant2.getId())).thenReturn(Optional.empty());
@@ -84,8 +84,8 @@ public class ChatServiceTest {
     @Test
     void testSendMessage_WhenSuccess_SaveMessage() {
         ChatMessageId chatMessageId = new ChatMessageId(UUID.randomUUID());
-        Author sender = AuthorTestUtility.mockPublicAccountAuthor();
-        Author receiver = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain sender = AuthorTestUtility.mockPublicAccountAuthor();
+        AuthorDomain receiver = AuthorTestUtility.mockPublicAccountAuthor();
         ChatRoom chatRoom = ChatTestUtility.mockChatRoomPlain(sender.getId(), receiver.getId());
         ChatMessageRequest chatMessageRequest = new ChatMessageRequest("Test message");
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(sender);

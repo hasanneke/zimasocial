@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.chat.entity;
 
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.chat.exception.AuthorIsNotInRoom;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -22,8 +22,8 @@ public class ChatRoomTest {
     public void testSendMessage_WhenSenderIsNotInRoom_ThrowRecipientOrSenderIsNotInChatRoom() {
         ChatRoom chatRoom = ChatTestUtility.mockChatRoom(0L, 1L);
         // Sender is not in room
-        Author sender = ChatTestUtility.mockAuthor(5L);
-        Author receiver = ChatTestUtility.mockAuthor(0L);
+        AuthorDomain sender = ChatTestUtility.mockAuthor(5L);
+        AuthorDomain receiver = ChatTestUtility.mockAuthor(0L);
         Assertions.assertThrows(AuthorIsNotInRoom.class,
                 () -> chatRoom.sendMessage("", sender, receiver, ChatTestUtility.mockChatMessageId()));
     }
@@ -32,8 +32,8 @@ public class ChatRoomTest {
     public void testSendMessage_WhenSuccess_ReturnChatMessage() {
         ChatRoom chatRoom = ChatTestUtility.mockChatRoom(0L, 1L);
         // Sender is not in room
-        Author sender = ChatTestUtility.mockAuthor(0L);
-        Author receiver = ChatTestUtility.mockAuthor(1L);
+        AuthorDomain sender = ChatTestUtility.mockAuthor(0L);
+        AuthorDomain receiver = ChatTestUtility.mockAuthor(1L);
         ChatMessageId mockChatMessageId = ChatTestUtility.mockChatMessageId();
         ChatMessage chatMessage = chatRoom.sendMessage("Message", sender, receiver, mockChatMessageId);
         Assertions.assertNotNull(chatMessage.message());

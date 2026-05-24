@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.api.post;
 import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.like.LikeDomain;
 import com.zima.zimasocial.context.social.like.LikeDomainRepository;
@@ -30,7 +30,7 @@ public class PostViewAdapter {
     }
 
     public PostView populated(PostDomain post) {
-        Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         boolean postReported = reportRepository.checkReportExists(post.getPostId(), authenticatedAuthor.getId(), ResourceType.post);
         Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(post.getPostId(), authenticatedAuthor.getId());
 
@@ -38,7 +38,7 @@ public class PostViewAdapter {
         if(like.isPresent()){
             postView.setLiked(true);;
         }
-        Author author = authorRepository.findById(post.getAuthorId()).orElse(null);
+        AuthorDomain author = authorRepository.findById(post.getAuthorId()).orElse(null);
         postView.setLiked(like.isPresent());
         postView.setIsReported(postReported);
         postView.setUser(authorViewAdapter.authorViewFromAuthor(author));

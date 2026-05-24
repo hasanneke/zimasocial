@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.author.value;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 
-public record AuthorFollowedEvent(Author followed, Author follower) {
+public record AuthorFollowedEvent(AuthorDomain followed, AuthorDomain follower) {
 }

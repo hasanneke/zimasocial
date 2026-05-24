@@ -14,4 +14,9 @@ public class CurrentUser {
         CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return principal.getProfile();
     }
+
+    public static Long getCurrentUserId() {
+        CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return principal.getProfile().getId();
+    }
 }

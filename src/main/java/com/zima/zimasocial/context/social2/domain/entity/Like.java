@@ -22,8 +22,8 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
-    private Long userId;
+    @Column(name = "user_id")
+    private Long authorId;
 
     @Column(name = "post_id")
     private Long postId;

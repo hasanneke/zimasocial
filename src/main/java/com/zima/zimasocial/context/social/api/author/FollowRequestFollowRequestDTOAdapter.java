@@ -1,5 +1,5 @@
 package com.zima.zimasocial.context.social.api.author;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
@@ -16,8 +16,8 @@ public class FollowRequestFollowRequestDTOAdapter {
     }
 
     FollowRequestDTO followRequestDTOFromFollowRequest(FollowRequest followRequest) {
-        Author follower = authorRepository.findById(followRequest.getFollowerAuthorId()).orElseThrow(() ->new AuthorNotFoundException(followRequest.getFollowerAuthorId().getValue()));
-        Author followed = authorRepository.findById(followRequest.getFollowedAuthorId()).orElseThrow(() ->new AuthorNotFoundException(followRequest.getFollowedAuthorId().getValue()));
+        AuthorDomain follower = authorRepository.findById(followRequest.getFollowerAuthorId()).orElseThrow(() ->new AuthorNotFoundException(followRequest.getFollowerAuthorId().getValue()));
+        AuthorDomain followed = authorRepository.findById(followRequest.getFollowedAuthorId()).orElseThrow(() ->new AuthorNotFoundException(followRequest.getFollowedAuthorId().getValue()));
 
         return new FollowRequestDTO(followRequest, authorViewAdapter.authorViewFromAuthor(follower), authorViewAdapter.authorViewFromAuthor(followed));
     }

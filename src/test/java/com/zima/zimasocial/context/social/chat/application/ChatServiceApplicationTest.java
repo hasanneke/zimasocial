@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.chat.application;
 
 
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
@@ -46,8 +46,8 @@ public class ChatServiceApplicationTest {
 
     @Test
     void testCreateOrFindRoomWithParticipant_WhenRoomNotExist_CreateRoomAndReturn() {
-        Author participant1 = ChatTestUtility.mockAuthor();
-        Author withParticipant = ChatTestUtility.mockAuthor();
+        AuthorDomain participant1 = ChatTestUtility.mockAuthor();
+        AuthorDomain withParticipant = ChatTestUtility.mockAuthor();
         ChatRoom newChatRoom = ChatTestUtility.mockChatRoomPlain(participant1, withParticipant);
         when(chatRoomRepository.findByParticipantsBetween(participant1.getId(), withParticipant.getId())).thenReturn(Optional.empty());
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(participant1);

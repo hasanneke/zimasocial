@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.api.author;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.application.AuthorService;
@@ -39,17 +39,17 @@ public class AuthorControllerBridge {
     }
 
     public DetailedAuthorView getMe() {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         return authorAuthorViewMapper.detailedAuthorViewFromAuthor(author);
     }
 
     public AuthorView getAuthor(String slug) {
-        Author author = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
+        AuthorDomain author = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(slug).orElseThrow(()-> new AuthorNotFoundException(slug));
         return authorAuthorViewMapper.authorViewFromAuthor(author);
     }
 
     PagedModel<AuthorView> getFollowers(String slug, int page, int size) throws NoSuchMethodException {
-        Page<Author> followersPage = authorRelationRepository.findFollowers(slug, page, size);
+        Page<AuthorDomain> followersPage = authorRelationRepository.findFollowers(slug, page, size);
         List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthorLight).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
@@ -76,7 +76,7 @@ public class AuthorControllerBridge {
     }
 
     PagedModel<AuthorView> getFollowings(String slug, int page, int size) throws NoSuchMethodException {
-        Page<Author> followersPage = authorRelationRepository.findFollowings(slug, page, size);
+        Page<AuthorDomain> followersPage = authorRelationRepository.findFollowings(slug, page, size);
         List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthorLight).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
@@ -103,7 +103,7 @@ public class AuthorControllerBridge {
     }
 
     PagedModel<AuthorView> getBlocks(int page, int size) throws NoSuchMethodException {
-        Page<Author> followersPage = authorRelationRepository.findBlocks(page, size);
+        Page<AuthorDomain> followersPage = authorRelationRepository.findBlocks(page, size);
         List<AuthorView> authorViewList = followersPage.get().map(authorAuthorViewMapper::authorViewFromAuthor).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
@@ -127,7 +127,7 @@ public class AuthorControllerBridge {
     }
 
     PagedModel<AuthorView> searchAuthors(String query, int page, int size) throws NoSuchMethodException {
-        Page<Author> userPage = authorRepository.search(query, page, size);
+        Page<AuthorDomain> userPage = authorRepository.search(query, page, size);
         List<AuthorView> authorViewList = userPage.get().map(authorAuthorViewMapper::authorViewFromAuthor).toList();
         PagedModel<AuthorView> pagedModel = PagedModel.of(
                 authorViewList,
@@ -154,17 +154,17 @@ public class AuthorControllerBridge {
     }
 
     List<FollowRequestDTO> getAllFollowRequests() {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         List<FollowRequest> followRequests = followRequestCollection.findAllByFollowedAuthorIdAndUpdatedAtIsNull(author.getId());
         return followRequests.stream().map(followRequestFollowRequestDTOAdapter::followRequestDTOFromFollowRequest).toList();
     }
 
     FollowRequestsInfo getFollowRequestInfo(String followedAuthorSlug) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         Optional<FollowRequest> latestFollowRequest = followRequestCollection.findFirstByFollowedAuthorIdOrderByCreatedAtDesc(author.getId());
         Integer waitingFollowRequestsCount = followRequestCollection.countByFollowedAuthorId(author.getId());
         if(latestFollowRequest.isPresent()){
-            Author follower = authorRepository.findById(latestFollowRequest.get().getFollowerAuthorId()).orElse(null);
+            AuthorDomain follower = authorRepository.findById(latestFollowRequest.get().getFollowerAuthorId()).orElse(null);
             if(follower != null){
                 return new FollowRequestsInfo(waitingFollowRequestsCount, authorAuthorViewMapper.authorViewFromAuthor(follower));
             }

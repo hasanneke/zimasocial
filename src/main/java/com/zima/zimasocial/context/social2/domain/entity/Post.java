@@ -16,8 +16,8 @@ public class Post {
     @Id
     private Long id;
 
-    @Column(name = "user_id",insertable = false, updatable = false)
-    private Long userId;
+    @Column(name = "user_id", updatable = false)
+    private Long authorId;
 
     @Embedded
     private PostContent content;
@@ -36,25 +36,25 @@ public class Post {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_visible")
+    @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
 
 
     public Like like(Long likerId) {
         stats.incrementLike();
-        if(!likerId.equals(userId)){
+        if(!likerId.equals(authorId)){
             stats.updateScoreBy(2);
         }
         return Like.builder()
                 .postId(id)
                 .type(LikeType.post)
-                .userId(likerId)
+                .authorId(likerId)
                 .build();
     }
 
     public void unlike(Long likerId) {
         stats.decrementLike();
-        if(!userId.equals(likerId)){
+        if(!authorId.equals(likerId)){
             stats.updateScoreBy(-2);
         }
     }
@@ -82,7 +82,7 @@ public class Post {
 
     public void removeComment(Long commenterId, boolean hasNoPreviousComments) {
         stats.decrementComment();
-        if(!commenterId.equals(userId) && hasNoPreviousComments){
+        if(!commenterId.equals(authorId) && hasNoPreviousComments){
             stats.updateScoreBy(-5);
         }
     }

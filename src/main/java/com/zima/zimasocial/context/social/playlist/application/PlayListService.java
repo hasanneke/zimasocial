@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.playlist.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
@@ -42,7 +42,7 @@ public class PlayListService {
 
     @Transactional
     public void create(PlayListPayload payload) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         if(playListVerifier.maxNumberOfPlayListReached(author.getId())){
             throw new ConflictException("max_number_of_play_list_reached", "max_number_of_play_list_reached");
         }
@@ -51,7 +51,7 @@ public class PlayListService {
     }
 
     @Transactional
-    public void create(PlayListPayload payload, Author author) {
+    public void create(PlayListPayload payload, AuthorDomain author) {
         if(playListVerifier.maxNumberOfPlayListReached(author.getId())){
             throw new ConflictException("max_number_of_play_list_reached", "max_number_of_play_list_reached");
         }
@@ -60,7 +60,7 @@ public class PlayListService {
     }
     @Transactional
     public void update(PlayListId id, PlayListUpdatePayload payload) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistRepository.findById(id).orElseThrow(PlaylistNotFoundException::new);
         playlist.updateName(payload.getName(), author.getId());
         playlistRepository.save(playlist);
@@ -68,21 +68,21 @@ public class PlayListService {
     @Transactional
     public void addItem(PlayListId playlistId, PlayListItemPayload payload) {
         MediaItem mediaItem = mediaItemJpaRepository.findById(payload.getMediaId()).orElseThrow(MediaNotFoundException::new);
-        Author modifier = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain modifier = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
         playlist.addItem(mediaItem, modifier.getId());
         playlistRepository.save(playlist);
     }
     @Transactional
     public void removeItem(PlayListId playListId, MediaId mediaId) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistRepository.findById(playListId).orElseThrow(PlaylistNotFoundException::new);
         playlist.removeItem(mediaId, author.getId());
         playlistRepository.save(playlist);
     }
     @Transactional
     public void remove(PlayListId playListId) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistRepository.findById(playListId).orElseThrow(PlaylistNotFoundException::new);
         if(!playlist.getOwnerId().equals(author.getId())){
             throw new UnauthorizedException("Author is not the owner of the list");
@@ -91,7 +91,7 @@ public class PlayListService {
     }
 
     public List<PlaylistDTO> getAllList(String slug) {
-        Author author = slug == null ?
+        AuthorDomain author = slug == null ?
                 authorRepository.getAuthenticatedAuthor() :
                 authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(slug).orElseThrow(AuthorNotFoundException::new);
         return playlistJpaRepository.findAllWithCount(author.getId().getValue());
@@ -110,13 +110,13 @@ public class PlayListService {
 
     public PlaylistDTO getById(PlayListId playlistId) {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
-        Author owner = authorRepository.findById(playlist.getOwnerId()).orElseThrow(AuthorNotFoundException::new);
+        AuthorDomain owner = authorRepository.findById(playlist.getOwnerId()).orElseThrow(AuthorNotFoundException::new);
         return new PlaylistDTO(playlist, owner.getSlug());
     }
 
     @Transactional
     public void createDefaultPlaylistsForAuthor(AuthorId authorId) {
-        Author author = authorRepository.findById(authorId).orElse(null);
+        AuthorDomain author = authorRepository.findById(authorId).orElse(null);
         if(author == null) return;
 
         PlayListPayload moviePayload = PlayListPayload.builder()

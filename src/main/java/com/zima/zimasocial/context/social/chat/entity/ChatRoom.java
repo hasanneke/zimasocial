@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.chat.entity;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.chat.event.ChatMessageSentEvent;
 import com.zima.zimasocial.context.social.chat.exception.AuthorIsNotInRoom;
 import com.zima.zimasocial.shared.StaticEventPublisher;
@@ -12,10 +12,10 @@ import java.time.OffsetDateTime;
 @Getter
 public class ChatRoom {
     private ChatRoomId id;
-    private Author participant1;
-    private Author participant2;
+    private AuthorDomain participant1;
+    private AuthorDomain participant2;
     private ChatMessage lastMessage;
-    public ChatRoom(ChatRoomId id, Author participant1, Author participant2, ChatMessage lastMessage) {
+    public ChatRoom(ChatRoomId id, AuthorDomain participant1, AuthorDomain participant2, ChatMessage lastMessage) {
         Assert.notNull(participant1, "participant1 cannot be null");
         Assert.notNull(participant2, "participant1 cannot be null");
         Assert.isTrue(id != null, "ChatRoomId cannot be null");
@@ -25,7 +25,7 @@ public class ChatRoom {
         this.lastMessage = lastMessage;
     }
 
-    public ChatRoom(ChatRoomId id, Author participant1, Author participant2) {
+    public ChatRoom(ChatRoomId id, AuthorDomain participant1, AuthorDomain participant2) {
         Assert.notNull(participant1, "participant1 cannot be null");
         Assert.notNull(participant2, "participant1 cannot be null");
         Assert.isTrue(id != null, "ChatRoomId cannot be null");
@@ -35,8 +35,8 @@ public class ChatRoom {
     }
 
     public ChatMessage sendMessage(String message,
-                                   Author sender,
-                                   Author receiver,
+                                   AuthorDomain sender,
+                                   AuthorDomain receiver,
                                    ChatMessageId chatMessageId) {
         if(!(sender.equals(participant1) || sender.equals(participant2))){
             throw new AuthorIsNotInRoom();
@@ -47,7 +47,7 @@ public class ChatRoom {
         return chatMessage;
     }
 
-    public Author getOtherParticipant(Author me) {
+    public AuthorDomain getOtherParticipant(AuthorDomain me) {
         if(me.equals(participant1)) {
             return participant2;
         }else if(me.equals(participant2)){
@@ -57,7 +57,7 @@ public class ChatRoom {
         }
     }
 
-    public boolean isAuthorInRoom(Author author){
+    public boolean isAuthorInRoom(AuthorDomain author){
         return author.equals(participant1) || author.equals(participant2);
     }
 }

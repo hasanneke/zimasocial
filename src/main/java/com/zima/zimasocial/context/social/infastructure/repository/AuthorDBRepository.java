@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.infastructure.repository;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.entity.userRelation.Relation;
@@ -33,39 +33,39 @@ public class AuthorDBRepository implements AuthorRepository {
     }
 
     @Override
-    public Author getAuthenticatedAuthor() {
+    public AuthorDomain getAuthenticatedAuthor() {
         UserEntity user = CurrentUser.getCurrentUserProfile();
         return authorUserEntityAdapter.convertUserEntityToAuthor(user);
     }
 
     @Override
-    public Optional<Author> findById(AuthorId authorId) {
+    public Optional<AuthorDomain> findById(AuthorId authorId) {
         return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId.getValue()).orElse(null)));
     }
 
-    public void save(Author author){
+    public void save(AuthorDomain author){
         UserEntity user = userRepository.findById(author.getId().getValue()).orElseThrow(UserNotFoundException::new);
         user.margeAuthor(author);
         userRepository.save(user);
     }
 
     @Override
-    public void saveAll(List<Author> authors) {
-        for (Author author : authors) {
+    public void saveAll(List<AuthorDomain> authors) {
+        for (AuthorDomain author : authors) {
             save(author);
         }
     }
 
     @Override
-    public Optional<Author> findBySlugAndIsDisabledFalse(String slug) {
+    public Optional<AuthorDomain> findBySlugAndIsDisabledFalse(String slug) {
         Optional<UserEntity> user = userRepository.findBySlugAndIsDisabledFalse(slug);
         return user.map(AuthorUserEntityAdapter::convertUserEntityToAuthor);
     }
 
     @Override
-    public Optional<Author> findBySlugAndIsDisabledFalseAndNotBeingBlocked(String slug) {
+    public Optional<AuthorDomain> findBySlugAndIsDisabledFalseAndNotBeingBlocked(String slug) {
         UserEntity authenticatedUser = CurrentUser.getCurrentUserProfile();
-        Author userToBeFound = findBySlugAndIsDisabledFalse(slug).orElseThrow(AuthorNotFoundException::new);
+        AuthorDomain userToBeFound = findBySlugAndIsDisabledFalse(slug).orElseThrow(AuthorNotFoundException::new);
         assert userToBeFound != null;
         Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getValue(), authenticatedUser.getId(), Relation.blocked);
         if(blockRelation.isPresent()){
@@ -75,7 +75,7 @@ public class AuthorDBRepository implements AuthorRepository {
     }
 
     @Override
-    public Page<Author> search(String query, int page, int size) {
+    public Page<AuthorDomain> search(String query, int page, int size) {
         Page<UserEntity> userEntities = userRepository.searchUser(query, PageRequest.of(page, size));
         return userEntities.map(AuthorUserEntityAdapter::convertUserEntityToAuthor);
     }

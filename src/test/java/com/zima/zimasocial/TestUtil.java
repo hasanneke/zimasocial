@@ -1,6 +1,6 @@
 package com.zima.zimasocial;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.value.PostContent;
@@ -12,11 +12,11 @@ import java.time.ZoneId;
 import java.util.Random;
 
 public class TestUtil {
-    public static Author mockAuthor(Long authorId){
-        return new Author(new AuthorId(authorId), "mockSlug", "mockName", LocalDateTime.now());
+    public static AuthorDomain mockAuthor(Long authorId){
+        return new AuthorDomain(new AuthorId(authorId), "mockSlug", "mockName", LocalDateTime.now());
     }
-    public static Author mockAuthor(Long authorId, String slug){
-        return new Author(new AuthorId(authorId), "mockSlug", "mockName", LocalDateTime.now());
+    public static AuthorDomain mockAuthor(Long authorId, String slug){
+        return new AuthorDomain(new AuthorId(authorId), "mockSlug", "mockName", LocalDateTime.now());
     }
 
     public static PostDomain mockPostForScoring(LocalDateTime createdAt, LocalDateTime lastPunishedAt, Integer score) {

@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class Author {
+public class AuthorDomain {
     private final AuthorId id;
     private String slug;
     private String name;
@@ -30,7 +30,7 @@ public class Author {
     private LocalDate lastSlugChangedAt;
     private final LocalDateTime createdAt;
 
-    public Author(AuthorId id, String slug, String name, String bio, String familyName, String avatarFileName,Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt, LocalDate lastSlugChangedAt) {
+    public AuthorDomain(AuthorId id, String slug, String name, String bio, String familyName, String avatarFileName, Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt, LocalDate lastSlugChangedAt) {
         Assert.notNull(id, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
@@ -49,7 +49,7 @@ public class Author {
         this.lastSlugChangedAt = lastSlugChangedAt;
     }
 
-    public Author(AuthorId authorId, String slug, String name, LocalDateTime createdAt){
+    public AuthorDomain(AuthorId authorId, String slug, String name, LocalDateTime createdAt){
         Assert.notNull(authorId, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
@@ -87,7 +87,7 @@ public class Author {
         avatarFileName = null;
     }
 
-    public void follow(Author follower){
+    public void follow(AuthorDomain follower){
         if(this.equals(follower)){
             throw new CircularFollowException();
         }
@@ -95,7 +95,7 @@ public class Author {
         follower.incrementFollowingCount();
     }
 
-    public void unfollow(Author follower){
+    public void unfollow(AuthorDomain follower){
         if(this.equals(follower)){
             throw new CircularUnfollowException();
         }
@@ -131,7 +131,7 @@ public class Author {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
+        AuthorDomain author = (AuthorDomain) o;
         return Objects.equals(id, author.getId());
     }
 

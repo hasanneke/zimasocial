@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.author;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.TestUtil;
 import com.zima.zimasocial.context.social.author.application.AuthorService;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
@@ -55,8 +55,8 @@ public class AuthorServiceTest {
 
     @Test
     void requestToFollowAuthor_WhenAuthorFoundAndFollowRequestSuccess_ThenSaveFollowRequestToCollection() {
-        Author followerAuthor = new Author(new AuthorId(0L), "", "", LocalDateTime.now());
-        Author followedAuthor = new Author(new AuthorId(1L), "", "", LocalDateTime.now());
+        AuthorDomain followerAuthor = new AuthorDomain(new AuthorId(0L), "", "", LocalDateTime.now());
+        AuthorDomain followedAuthor = new AuthorDomain(new AuthorId(1L), "", "", LocalDateTime.now());
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(followerAuthor);
         when(authorRepository.findBySlugAndIsDisabledFalse(any(String.class))).thenReturn(Optional.of(followedAuthor));
 

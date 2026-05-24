@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.chat.service;
 
 import com.zima.zimasocial.context.communication.controller.request.ChatMessageRequest;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
@@ -40,9 +40,9 @@ public class ChatService {
     }
     @Transactional
     public ChatMessage sendMessage(ChatRoomId chatRoomId, ChatMessageRequest messageRequest) {
-        Author sender = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain sender = authorRepository.getAuthenticatedAuthor();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(ChatRoomNotFoundException::new);
-        Author receiver = chatRoom.getOtherParticipant(sender);
+        AuthorDomain receiver = chatRoom.getOtherParticipant(sender);
         boolean hasBlockRelationBetween = authorRelationCollection.hasBlockRelationBetween(sender.getId().getValue(), receiver.getId().getValue());
         if(hasBlockRelationBetween){
             throw new UnauthorizedException("Messenger is blocked");
@@ -54,8 +54,8 @@ public class ChatService {
     }
     @Transactional
     public ChatRoom createChatRoomWith(AuthorId participant) {
-        Author roomCreator = authorRepository.getAuthenticatedAuthor();
-        Author otherParticipant = authorRepository.findById(participant).orElseThrow(()->new AuthorNotFoundException(participant.getValue()));
+        AuthorDomain roomCreator = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain otherParticipant = authorRepository.findById(participant).orElseThrow(()->new AuthorNotFoundException(participant.getValue()));
         Optional<BlockRelation> blockRelation = authorRelationCollection.findBlockRelationBetween(otherParticipant.getId(), roomCreator.getId());
         if(blockRelation.isPresent()){
             throw new UnauthorizedException("Messenger is blocked");
@@ -78,7 +78,7 @@ public class ChatService {
     @Transactional
     public void deleteChat(ChatRoomId chatId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElseThrow(ChatRoomNotFoundException::new);
-        Author me = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain me = authorRepository.getAuthenticatedAuthor();
         if(chatRoom.isAuthorInRoom(me)){
             chatRoomRepository.delete(chatRoom);
         }else{

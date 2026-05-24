@@ -8,7 +8,7 @@ import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.contentmoderation.report.ReportService;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.entity.report.ReportReason;
@@ -38,7 +38,7 @@ public class ReportServiceTest {
     @InjectMocks
     private ReportService reportService;
 
-    private Author testAuthor = new Author(new AuthorId(0L), "", "", LocalDateTime.now());
+    private AuthorDomain testAuthor = new AuthorDomain(new AuthorId(0L), "", "", LocalDateTime.now());
     private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
     private PostContent dummyPostContent = new PostContent(0L,new AuthorId(0L));
     private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorId(0L));

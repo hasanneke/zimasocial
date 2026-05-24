@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.post.application;
 
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
@@ -54,7 +54,7 @@ public class PostService {
     private final LikeJpaRepository likeJpaRepository;
     @Transactional
     public PostDomain createPost(CreatePost createPost) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         MediaId mediaId = null;
         if(createPost.mediaId() != null){
             mediaId = new MediaId(mediaItemJpaRepository.findIdById(UUID.fromString(createPost.mediaId())).orElseThrow(()-> new DataNotFoundException("media_not_found")));
@@ -67,7 +67,7 @@ public class PostService {
 
     @Transactional
     public void like(Long postId) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isPresent()){
             throw new ConflictException("Post is already liked");
@@ -80,7 +80,7 @@ public class PostService {
 
     @Transactional
     public void unlikePost(Long postId) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Optional<LikeDomain> like = likeRepository.findByPostIdAndAuthorId(postId, author.getId());
         if(like.isEmpty()){
@@ -100,7 +100,7 @@ public class PostService {
     @Transactional
     public CommentDomain comment(Long postId, String content, UUID mediaId) {
         PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         CommentDomain comment = post.comment(author.getId(), content, mediaId);
         CommentDomain savedComment = commentRepository.save(comment);
         postRepository.save(post);
@@ -119,7 +119,7 @@ public class PostService {
 
     @Transactional
     public void likeComment(Long commentId) {
-        Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         CommentDomain comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isEmpty()){
@@ -133,7 +133,7 @@ public class PostService {
 
     @Transactional
     public void unlikeComment(Long commentId) {
-        Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         CommentDomain comment = commentRepository.findById(commentId).orElseThrow(()-> new DataNotFoundException("Comment not found"));
         Optional<CommentLike> checkLike = likeRepository.findByCommentIdAndAuthorId(commentId, authenticatedAuthor.getId());
         if(checkLike.isPresent()){
@@ -147,7 +147,7 @@ public class PostService {
 
     @Transactional
     public CommentDomain replyComment(Long parentId, String content, UUID mediaId) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         CommentDomain parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
         CommentDomain reply = parent.reply(author.getId(), content, mediaId);
         CommentDomain savedReply = commentRepository.save(reply);
@@ -174,10 +174,10 @@ public class PostService {
     }
 
     public List<PostView> getFeed(FeedFilterPlain filterPlain) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         FeedFilter feedFilter = new FeedFilter();
         if(filterPlain.getSlug() != null){
-            Author ownerAuthor = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
+            AuthorDomain ownerAuthor = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
             if(ownerAuthor.equals(author) || !ownerAuthor.getIsPrivate() || authorRelationService.isAuthorFollowed(author.getId(), ownerAuthor.getId())){
                 feedFilter.setOwnerAuthorId(ownerAuthor.getId());
             }else{
@@ -197,12 +197,12 @@ public class PostService {
     }
 
     public Page<LikeDTO> getAllPostLikes(Long postId, Pageable pageable) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         return likeJpaRepository.findAllLikes(postId, author.getId().getValue(), pageable);
     }
 
     public Page<LikeDTO> getAllCommentLikes(Long commentId, Pageable pageable) {
-        Author author = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
         return likeJpaRepository.findAllLikes(commentId, author.getId().getValue(), pageable);
     }
 }

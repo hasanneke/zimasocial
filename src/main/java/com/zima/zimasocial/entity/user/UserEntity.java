@@ -6,7 +6,7 @@ import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
 import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.contentmoderation.user.User;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.entity.UserDeviceToken;
 import com.zima.zimasocial.entity.UserRole;
@@ -173,7 +173,7 @@ public class UserEntity implements Serializable {
         this.termsOfUseAccepted = account.getTermsOfUseAccepted();
     }
 
-    public void margeAuthor(Author author){
+    public void margeAuthor(AuthorDomain author){
         this.name = author.getName();
         this.familyName = author.getFamilyName();
         this.slug = author.getSlug();
@@ -196,7 +196,7 @@ public class UserEntity implements Serializable {
         return name + " " + familyName;
     }
 
-    public Author toDomain() {
-        return new Author(new AuthorId(this.getId()), this.getSlug(), this.getName(),  this.getBio(), this.getFamilyName(), this.getAvatarFileName(), this.isPrivate(), this.getEmail(), this.getFollowerCount(), this.getFollowingCount(), this.getCreatedAt(), this.getLastSlugChangedAt());
+    public AuthorDomain toDomain() {
+        return new AuthorDomain(new AuthorId(this.getId()), this.getSlug(), this.getName(),  this.getBio(), this.getFamilyName(), this.getAvatarFileName(), this.isPrivate(), this.getEmail(), this.getFollowerCount(), this.getFollowingCount(), this.getCreatedAt(), this.getLastSlugChangedAt());
     }
 }

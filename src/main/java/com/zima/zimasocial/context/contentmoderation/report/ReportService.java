@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
 import com.zima.zimasocial.context.contentmoderation.report.exception.ReportAlreadyMadeException;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
@@ -29,7 +29,7 @@ public class ReportService {
 
     @Transactional
     public void reportPost(Long postId, ReportReason reason, String description) {
-        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedUser = authorRepository.getAuthenticatedAuthor();
         boolean reportExists = reportRepository.checkReportExists(postId, authenticatedUser.getId(), ResourceType.post);
         if(reportExists){
             throw new ReportAlreadyMadeException();
@@ -39,7 +39,7 @@ public class ReportService {
     }
     @Transactional
     public void reportComment(Long commentId, ReportReason reason, String description) {
-        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedUser = authorRepository.getAuthenticatedAuthor();
         boolean reportExists = reportRepository.checkReportExists(commentId, authenticatedUser.getId(), ResourceType.comment);
         if(reportExists){
             throw new ReportAlreadyMadeException();

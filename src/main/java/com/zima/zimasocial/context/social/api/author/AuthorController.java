@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.api.author;
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.application.AuthorService;
 import com.zima.zimasocial.context.social.author.exception.SlugAlreadyTakenException;
@@ -49,7 +49,7 @@ public class AuthorController {
 
     @PatchMapping(path = "/me/upload-image")
     public ResponseEntity<AuthorView> uploadProfileImage(MultipartFile image) throws IOException {
-        Author author = authorService.updateProfileImage(image);
+        AuthorDomain author = authorService.updateProfileImage(image);
         return ResponseEntity.ok(authorAuthorViewMapper.authorViewFromAuthor(author));
     }
 
@@ -79,7 +79,7 @@ public class AuthorController {
 
     @RequestMapping(path = "/check-username-exists", method = RequestMethod.HEAD)
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam(name = "slug") String slug){
-        Optional<Author> author = authorRepository.findBySlugAndIsDisabledFalse(slug);
+        Optional<AuthorDomain> author = authorRepository.findBySlugAndIsDisabledFalse(slug);
         if(author.isPresent()){
             throw new SlugAlreadyTakenException(slug);
         }

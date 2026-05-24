@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.comment;
 import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.like.LikeDomainRepository;
@@ -28,11 +28,11 @@ public class CommentViewAdapter {
     }
 
     public CommentView populated(CommentDomain comment) {
-        Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         // Create domain instance
         CommentView commentView = new CommentView();
         // UnProxy Proxies
-        Author author = authorRepository.findById(comment.getAuthorId()).orElse(null);
+        AuthorDomain author = authorRepository.findById(comment.getAuthorId()).orElse(null);
         // Set domain values
         commentView.setContent(comment.getContent());
         commentView.setId(comment.getCommentId());
@@ -52,11 +52,11 @@ public class CommentViewAdapter {
     }
 
     public CommentView populatedV2(Comment comment) {
-        Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
+        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         // Create domain instance
         CommentView commentView = new CommentView();
         // UnProxy Proxies
-        Author author = authorRepository.findById(new AuthorId(comment.getUserId())).orElse(null);
+        AuthorDomain author = authorRepository.findById(new AuthorId(comment.getUserId())).orElse(null);
         // Set domain values
         commentView.setContent(comment.getContent());
         commentView.setId(comment.getId());
