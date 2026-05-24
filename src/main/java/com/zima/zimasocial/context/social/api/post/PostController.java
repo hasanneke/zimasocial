@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/v1/posts")
+@RequestMapping(path = "/api/v0/posts")
 @Tag(name = "Posts Controller", description = "APIs for managing posts")
 @Validated
 @RequiredArgsConstructor

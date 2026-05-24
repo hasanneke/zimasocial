@@ -52,6 +52,7 @@ public class PostService {
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final AuthorRelationService authorRelationService;
     private final LikeJpaRepository likeJpaRepository;
+
     @Transactional
     public PostDomain createPost(CreatePost createPost) {
         AuthorDomain author = authorRepository.getAuthenticatedAuthor();

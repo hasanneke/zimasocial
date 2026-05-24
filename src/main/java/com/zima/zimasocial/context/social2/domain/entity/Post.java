@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -40,6 +43,10 @@ public class Post {
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
 
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Comment> comments = new HashSet<>();
 
     public Like like(AuthorId likerId) {
         stats.incrementLike();
@@ -86,6 +93,13 @@ public class Post {
         if(!commenterId.equals(authorId) && hasNoPreviousComments){
             stats.updateScoreBy(-5);
         }
+    }
+
+    public void makeInvisible() {
+        this.isVisible = false;
+    }
+    public void makeVisible() {
+        this.isVisible = true;
     }
 
     @Override

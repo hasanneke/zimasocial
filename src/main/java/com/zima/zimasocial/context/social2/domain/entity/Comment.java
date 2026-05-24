@@ -1,6 +1,11 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
+import com.zima.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.entity.CommentEntity;
+import com.zima.zimasocial.entity.LikeType;
+import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,8 +31,16 @@ public class Comment {
     @Column(name = "post_id")
     private Long postId;
 
+    @JoinColumn(name = "post_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Post post;
+
     @Embedded
     private AuthorId authorId;
+
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne
+    private Author author;
 
     @Column(name = "like_count")
     private int likeCount = 0;
@@ -37,6 +50,10 @@ public class Comment {
 
     @Column(name = "parent_id")
     private Long parentId;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id", insertable = false, updatable = false)
+    private CommentEntity parent;
 
     @Column(name = "media_id")
     private UUID mediaId;
@@ -65,5 +82,20 @@ public class Comment {
 
     public void removeReply() {
         replyCount -= 1;
+    }
+
+    public Like like(AuthorId likerId) {
+        likeCount += 1;
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getId(), new AuthorDomainId(authorId.getValue()), new AuthorDomainId(likerId.getValue())));
+        return Like.builder()
+                .postId(postId)
+                .commentId(id)
+                .authorId(likerId)
+                .type(LikeType.comment)
+                .build();
+    }
+
+    public void unlike() {
+        likeCount -= 1;
     }
 }

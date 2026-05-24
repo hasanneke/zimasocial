@@ -23,7 +23,7 @@ public class UserRelationEntity {
     private Long actorId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiated_id",insertable = false, updatable = false)
+    @JoinColumn(name = "initiated_id", insertable = false, updatable = false)
     private UserEntity actor;
 
     @Column(name = "receiver_id")

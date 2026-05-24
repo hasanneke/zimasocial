@@ -78,4 +78,8 @@ public class CommentViewAdapter {
     public List<CommentView> populated(List<CommentDomain> comments) {
         return comments.stream().map(this::populated).toList();
     }
+
+    public List<CommentView> populatedV2(List<Comment> comments) {
+        return comments.stream().map(this::populatedV2).toList();
+    }
 }

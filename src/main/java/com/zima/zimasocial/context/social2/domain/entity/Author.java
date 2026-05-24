@@ -56,4 +56,10 @@ public class Author {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    @Column(name = "is_disabled")
+    private Boolean isDisabled = false;
+
+    @Column(name = "is_banned")
+    private Boolean isBanned = false;
 }
