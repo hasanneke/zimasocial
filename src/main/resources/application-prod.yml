@@ -62,9 +62,12 @@ jwt:
 
 logging:
   level:
-    org.springframework.web.context.request.async.StandardServletAsyncWebRequest: OFF
-    root: ERROR
-    com.zima.zimasocial: ERROR
+      root: INFO
+      org.springframework.boot: INFO
+      org.springframework.web: INFO
+      org.hibernate: WARN
+      org.springframework.web.context.request.async.StandardServletAsyncWebRequest: OFF
+      com.zima.zimasocial: INFO
 mediaprovider:
   movie:
     baseurl: https://api.themoviedb.org/3

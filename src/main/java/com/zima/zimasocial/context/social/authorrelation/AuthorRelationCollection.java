@@ -18,4 +18,5 @@ public interface AuthorRelationCollection {
     Page<Author> findBlocks(int page, int size);
     void save(AuthorRelation relation);
     void delete(AuthorRelation relation);
+    boolean hasBlockRelationBetween(Long author1, Long author2);
 }

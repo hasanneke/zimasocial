@@ -29,7 +29,17 @@ public class MediaProxyService {
     private final SpotifyMusicSearcher spotifyMusicSearcher;
     private final TMDBMovieSearcher movieTVSearcher;
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
+    private static final List<String> BLOCKED_RESPONSE_HEADERS = List.of(
+            "transfer-encoding",
+            "connection",
+            "keep-alive",
+            "proxy-authenticate",
+            "proxy-authorization",
+            "te",
+            "trailer",
+            "upgrade",
+            "content-length"
+    );
     @Autowired
     public MediaProxyService(SpotifyMusicSearcher spotifyMusicSearcher, TMDBMovieSearcher movieTVSearcher, ServletRequest servletRequest) {
         this.spotifyMusicSearcher = spotifyMusicSearcher;
@@ -68,7 +78,7 @@ public class MediaProxyService {
            headers.setContentType(MediaType.APPLICATION_JSON);
            headers.setContentLength(upstream.getBody() != null ? upstream.getBody().length : 0);
            return ResponseEntity.status(upstream.getStatusCode())
-                   .headers(upstream.getHeaders())
+                   .headers(filterResponseHeaders(upstream.getHeaders()))
                    .body(upstream.getBody());
        }catch (HttpClientErrorException httpClientErrorException){
            logger.error("Proxy search failed", httpClientErrorException);
@@ -83,4 +93,22 @@ public class MediaProxyService {
            return ResponseEntity.internalServerError().build();
        }
     }
+    private HttpHeaders filterResponseHeaders(HttpHeaders upstreamHeaders) {
+        HttpHeaders filtered = new HttpHeaders();
+
+        if (upstreamHeaders == null) {
+            filtered.setContentType(MediaType.APPLICATION_JSON);
+            return filtered;
+        }
+
+        upstreamHeaders.forEach((name, values) -> {
+            if (!BLOCKED_RESPONSE_HEADERS.contains(name.toLowerCase())) {
+                filtered.put(name, values);
+            }
+        });
+
+        return filtered;
+    }
+
 }
+

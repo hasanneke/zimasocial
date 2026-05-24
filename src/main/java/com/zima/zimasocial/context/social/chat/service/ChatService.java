@@ -30,6 +30,7 @@ public class ChatService {
     private final AuthorRepository authorRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final AuthorRelationCollection authorRelationCollection;
+
     @Autowired
     public ChatService(ChatRoomRepository chatRoomRepository, AuthorRepository authorRepository, ChatMessageRepository chatMessageRepository, AuthorRelationCollection authorRelationCollection) {
         this.chatRoomRepository = chatRoomRepository;
@@ -42,6 +43,10 @@ public class ChatService {
         Author sender = authorRepository.getAuthenticatedAuthor();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(ChatRoomNotFoundException::new);
         Author receiver = chatRoom.getOtherParticipant(sender);
+        boolean hasBlockRelationBetween = authorRelationCollection.hasBlockRelationBetween(sender.getId().getValue(), receiver.getId().getValue());
+        if(hasBlockRelationBetween){
+            throw new UnauthorizedException("Messenger is blocked");
+        }
         ChatMessage chatMessage = chatRoom.sendMessage(messageRequest.getMessage(), sender, receiver, chatMessageRepository.nextId());
         chatMessageRepository.save(chatMessage);
         chatRoomRepository.save(chatRoom);

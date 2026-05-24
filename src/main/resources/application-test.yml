@@ -1,11 +1,22 @@
 spring:
+  config:
+    import: optional:file:/Users/hasaneke/Development/spring_dev/zimasocial/src/main/resources/env-prod.properties
+  threads:
+    virtual:
+      enabled: true
   quartz:
-    job-store-type: "jdbc"
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
     properties:
       org:
         quartz:
+          scheduler:
+            instanceName: MyScheduler
+          threadPool:
+            threadCount: 5
           jobStore:
-            tablePrefix: "QUARTZ.QRTZ_"
+            isClustered: true
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
   devtools:
     restart:
@@ -24,17 +35,17 @@ spring:
       max-file-size: 500KB
       max-request-size: 500KB
   datasource:
-    url: jdbc:postgresql://zimadb.cn0oq4k4gnmz.eu-central-1.rds.amazonaws.com/zimasocial
-    username: zima
-    password: test123123
     driver-class-name: org.postgresql.Driver
+    url: ${DATASOURCE_URL}
+    password: ${DATASOURCE_PASSWORD}
+    username: ${DATASOURCE_USERNAME}
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
-      format_sql: true
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
   security:
     oauth2:
       resourceserver:
@@ -48,8 +59,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 584169392701-fddlu0av81lthm2jj0eq20hed8k7ruv7.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: openid,profile,email
   flyway:
     locations: classpath:db/migration
@@ -61,6 +72,10 @@ server:
 jwt:
   secret: NkYyNjE5N0UzNEIzMzgyNUY1OTQ2QUZGNkE0NTJFN0U=
 
+#logging:
+#  level:
+#    com.zima.zimasocial: DEBUG
+
 aws:
   access:
     key:
@@ -71,26 +86,29 @@ aws:
   s3:
     bucket: zimapublic
     region: eu-central-1
-logging:
-  level:
-    root: ERROR
-    com.zima.zimasocial: DEBUG
-mediaprovider:
-  movie:
-    baseurl: https://api.themoviedb.org/3
-    apikey: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MzliYTVlMDYwNWVhZGQ2ZjFhOWY5NGU4NWNlYTU4NCIsIm5iZiI6MTczMDczNzgxNC4yOTQ1NjQsInN1YiI6IjY3MjhmNjM5NTkxODEzN2NmYzM5YzI0YSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.JL7yTW0W-j_xvqXm84mHIkmd-pat0dkCeGp-QV1Onwc
-  spotify:
-    clientId: 95ab647256b140eb9aa7cb7fdd7d126e
-    clientSecret: 6678fd1040a64d929afa806168fe27dc
+
+  jmx:
+    enabled: true
 management:
   endpoints:
+    jmx:
+      exposure:
+        include: "*"
     web:
       exposure:
         include: "*"
     endpoint:
       health:
         show-detail: always
-webLink: "https://zimas.io"
+
+mediaprovider:
+  movie:
+    baseurl: https://api.themoviedb.org/3
+    apikey: ${TMDB_API_KEY}
+  spotify:
+    clientId: ${SPOTIFY_CLIENT_ID}
+    clientSecret: ${SPOTIFY_CLIENT_SECRET}
+webLink: ${WEB_SITE}
 links:
-  website: "https://zimasi.io"
+  website: ${WEB_SITE}
   uri: "zima://app"

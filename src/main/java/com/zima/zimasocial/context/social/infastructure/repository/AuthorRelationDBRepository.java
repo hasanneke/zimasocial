@@ -99,4 +99,10 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
             default -> throw new IllegalStateException("Unexpected value: " + relation);
         }
     }
+
+    @Override
+    public boolean hasBlockRelationBetween(Long author1, Long author2) {
+        List<UserRelationEntity> userRelationEntityList = userRelationJpaRepository.hasAnyBlockRelationBetween(author1, author2);
+        return !userRelationEntityList.isEmpty();
+    }
 }
