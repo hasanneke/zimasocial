@@ -11,6 +11,7 @@ import com.zima.zimasocial.context.social.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public class ChatServiceApplication {
         return existingRoom.orElseGet(() -> chatService.createChatRoomWith(participantId));
     }
 
+    @Transactional
     public void sendMessage(ChatRoomId id, ChatMessageRequest request) {
         ChatMessage chatMessage = chatService.sendMessage(id, request);
         simpMessagingTemplate.convertAndSend("/topic/chats/%s".formatted(id.value()), new ChatMessageView(chatMessage));

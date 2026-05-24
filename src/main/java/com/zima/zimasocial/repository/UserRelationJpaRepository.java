@@ -12,6 +12,15 @@ import java.util.Optional;
 
 public interface UserRelationJpaRepository extends JpaRepository<UserRelationEntity, Long> {
     Optional<UserRelationEntity> findByActorIdAndReceiverIdAndRelation(Long actorId, Long receiverId, Relation relation);
+
+    @Query("""
+        SELECT userRelation
+        FROM UserRelationEntity userRelation
+        WHERE userRelation.relation = Relation.blocked
+        AND userRelation.actorId IN (:author1, :author2)
+        AND userRelation.receiverId IN (:author1, :author2)""")
+    List<UserRelationEntity> hasAnyBlockRelationBetween(Long author1, Long author2);
+
     @Query("""
                 SELECT userRelation FROM UserRelationEntity userRelation
                 WHERE userRelation.relation = Relation.blocked AND (userRelation.actorId = :userId OR userRelation.receiverId = :userId)
