@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.author.application;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.*;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.author.value.AuthorFollowedEvent;
 import com.zima.zimasocial.context.social.authorrelation.*;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
@@ -25,12 +25,12 @@ import java.util.Optional;
 
 @Service
 public class AuthorService {
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final AuthorRelationCollection authorRelationRepository;
     private final ImageService imageService;
     private final FollowRequestCollection followRequestCollection;
     @Autowired
-    public AuthorService(AuthorRepository authorRepository, AuthorRelationCollection authorRelationRepository, ImageService imageService, FollowRequestCollection followRequestCollection) {
+    public AuthorService(AuthorRepositoryDomain authorRepository, AuthorRelationCollection authorRelationRepository, ImageService imageService, FollowRequestCollection followRequestCollection) {
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;
         this.imageService = imageService;

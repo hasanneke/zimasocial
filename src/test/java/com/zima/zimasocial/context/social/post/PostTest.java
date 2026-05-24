@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post;
 
 import com.zima.zimasocial.TestUtil;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.shared.StaticEventPublisher;
@@ -23,8 +23,8 @@ class PostTest {
     private StaticEventPublisher staticEventPublisher;
     @Test
     void testLike_WhenOtherAuthorLikes_IncrementLikeCountAndIncreaseScore() {
-        AuthorId otherAuthor = new AuthorId(102L);
-        AuthorId ownerAuthor = new AuthorId(100L);
+        AuthorDomainId otherAuthor = new AuthorDomainId(102L);
+        AuthorDomainId ownerAuthor = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(ownerAuthor);
         post.like(otherAuthor);
         Assertions.assertEquals(102, post.getScore());
@@ -33,8 +33,8 @@ class PostTest {
 
     @Test
     void testLike_WhenOtherAuthorUnlikes_DecrementLikeCountAndDecrementScore() {
-        AuthorId otherAuthor = new AuthorId(102L);
-        AuthorId ownerAuthor = new AuthorId(100L);
+        AuthorDomainId otherAuthor = new AuthorDomainId(102L);
+        AuthorDomainId ownerAuthor = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(ownerAuthor);
         post.unliked(otherAuthor);
         Assertions.assertEquals(98, post.getScore());
@@ -43,8 +43,8 @@ class PostTest {
 
     @Test
     void testLike_WhenAuthorSelfLikes_IncrementLikeCountAndScoreNotChanged() {
-        AuthorId author = new AuthorId(100L);
-        AuthorId ownerAuthor = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(100L);
+        AuthorDomainId ownerAuthor = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(ownerAuthor);
         post.like(author);
         Assertions.assertEquals(100, post.getScore());
@@ -53,8 +53,8 @@ class PostTest {
 
     @Test
     void testLike_WhenAuthorSelfUnlikes_DecrementLikeCountAndScoreNotChanged() {
-        AuthorId author = new AuthorId(100L);
-        AuthorId ownerAuthor = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(100L);
+        AuthorDomainId ownerAuthor = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(ownerAuthor);
         post.unliked(author);
         Assertions.assertEquals(100, post.getScore());
@@ -62,8 +62,8 @@ class PostTest {
     }
     @Test
     void testComment_WhenOtherAuthorComments_IncreaseScoreAndCommentCount() {
-        AuthorId author = new AuthorId(102L);
-        AuthorId commenter = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(102L);
+        AuthorDomainId commenter = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(author);
         post.comment(commenter, "", null);
         Assertions.assertEquals(105, post.getScore());
@@ -72,8 +72,8 @@ class PostTest {
 
     @Test
     void testComment_WhenOtherAuthorRemovesComment_DecreaseScoreAndCommentCount() {
-        AuthorId author = new AuthorId(102L);
-        AuthorId commenter = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(102L);
+        AuthorDomainId commenter = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(author);
         post.removeComment(commenter);
         Assertions.assertEquals(95, post.getScore());
@@ -82,8 +82,8 @@ class PostTest {
 
     @Test
     void testComment_WhenAuthorSelfComments_ScoreNotChangedAndCommentCountIncreased() {
-        AuthorId author = new AuthorId(100L);
-        AuthorId commenter = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(100L);
+        AuthorDomainId commenter = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(author);
         post.comment(commenter, "", null);
         Assertions.assertEquals(100, post.getScore());
@@ -92,8 +92,8 @@ class PostTest {
 
     @Test
     void testComment_WhenAuthorSelfRemovesComment_ScoreNotChangesAndCommentCountDecreased() {
-        AuthorId author = new AuthorId(100L);
-        AuthorId commenter = new AuthorId(100L);
+        AuthorDomainId author = new AuthorDomainId(100L);
+        AuthorDomainId commenter = new AuthorDomainId(100L);
         PostDomain post = dummyAnyPost(author);
         post.removeComment(commenter);
         Assertions.assertEquals(100, post.getScore());
@@ -128,11 +128,11 @@ class PostTest {
         Assertions.assertEquals(50, post.getScore());
     }
 
-    private static PostDomain dummyAnyPost(AuthorId ownerAuthorId) {
+    private static PostDomain dummyAnyPost(AuthorDomainId ownerAuthorId) {
         return TestUtil.mockAnyPost(ownerAuthorId);
     }
 
-    private static CommentDomain dummyComment(AuthorId authorId) {
+    private static CommentDomain dummyComment(AuthorDomainId authorId) {
         return new CommentDomain(0L,  null, authorId, null, null);
     }
 }

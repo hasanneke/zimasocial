@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.comment;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
 import org.springframework.util.Assert;
@@ -14,7 +14,7 @@ public class CommentDomain {
     private Long commentId;
     private Long parentCommentId;
     private Long postId;
-    private AuthorId authorId;
+    private AuthorDomainId authorId;
     private String content;
     private int likeCount;
     private int replyCount;
@@ -22,7 +22,7 @@ public class CommentDomain {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public CommentDomain(Long commentId, Long parentCommentId, Long postId, UUID mediaId, AuthorId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CommentDomain(Long commentId, Long parentCommentId, Long postId, UUID mediaId, AuthorDomainId authorId, String content, int likeCount, int replyCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.notNull(commentId, "Comment Id cannot be null");
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
@@ -38,7 +38,7 @@ public class CommentDomain {
         this.updatedAt = updatedAt;
 
     }
-    public CommentDomain(Long postId, Long parentCommentId, AuthorId authorId, String content, UUID mediaId) {
+    public CommentDomain(Long postId, Long parentCommentId, AuthorDomainId authorId, String content, UUID mediaId) {
         Assert.notNull(postId, "Post Id cannot be null");
         Assert.notNull(authorId, "Author Id cannot be null");
         this.parentCommentId = parentCommentId;
@@ -50,7 +50,7 @@ public class CommentDomain {
         this.replyCount = 0;
         this.mediaId = mediaId;
     }
-    public CommentDomain reply(AuthorId replierAuthorId, String comment, UUID mediaId){
+    public CommentDomain reply(AuthorDomainId replierAuthorId, String comment, UUID mediaId){
         replyCount += 1;
         return new CommentDomain(postId, commentId, replierAuthorId, comment, mediaId);
     }

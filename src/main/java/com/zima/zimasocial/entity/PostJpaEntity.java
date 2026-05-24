@@ -1,7 +1,7 @@
 package com.zima.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
@@ -145,7 +145,7 @@ public class PostJpaEntity {
     public PostDomain rehydrate() {
         return PostDomain.reconstitute(
                 id,
-                new AuthorId(userId),
+                new AuthorDomainId(userId),
                 new PostContent(content, type, mediaId != null ? new MediaId(mediaId) : null),
                 likeCount,
                 commentCount,

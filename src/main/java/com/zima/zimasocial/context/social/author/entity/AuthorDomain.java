@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.author.entity;
 import com.zima.zimasocial.context.account.exception.*;
 import com.zima.zimasocial.context.social.author.exception.SlugCannotBeChangedException;
 import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Getter
 public class AuthorDomain {
-    private final AuthorId id;
+    private final AuthorDomainId id;
     private String slug;
     private String name;
     private String familyName;
@@ -30,7 +30,7 @@ public class AuthorDomain {
     private LocalDate lastSlugChangedAt;
     private final LocalDateTime createdAt;
 
-    public AuthorDomain(AuthorId id, String slug, String name, String bio, String familyName, String avatarFileName, Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt, LocalDate lastSlugChangedAt) {
+    public AuthorDomain(AuthorDomainId id, String slug, String name, String bio, String familyName, String avatarFileName, Boolean isPrivate, String email, int followersCount, int followingCount, LocalDateTime createdAt, LocalDate lastSlugChangedAt) {
         Assert.notNull(id, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
@@ -49,7 +49,7 @@ public class AuthorDomain {
         this.lastSlugChangedAt = lastSlugChangedAt;
     }
 
-    public AuthorDomain(AuthorId authorId, String slug, String name, LocalDateTime createdAt){
+    public AuthorDomain(AuthorDomainId authorId, String slug, String name, LocalDateTime createdAt){
         Assert.notNull(authorId, "Author Id cannot be null");
         Assert.notNull(slug, "Slug cannot be null");
         Assert.notNull(name, "Name cannot be null");
@@ -119,7 +119,7 @@ public class AuthorDomain {
         followersCount = getFollowersCount() - 1;
     }
 
-    public FollowRequest requestToFollow(AuthorId followerAuthorId, UUID id) {
+    public FollowRequest requestToFollow(AuthorDomainId followerAuthorId, UUID id) {
         if(followerAuthorId.equals(this.id)){
             throw new CircularFollowException();
         }

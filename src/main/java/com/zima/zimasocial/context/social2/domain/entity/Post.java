@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,8 +17,8 @@ public class Post {
     @Id
     private Long id;
 
-    @Column(name = "user_id", updatable = false)
-    private Long authorId;
+    @Embedded
+    private AuthorId authorId;
 
     @Embedded
     private PostContent content;
@@ -40,7 +41,7 @@ public class Post {
     private Boolean isVisible = true;
 
 
-    public Like like(Long likerId) {
+    public Like like(AuthorId likerId) {
         stats.incrementLike();
         if(!likerId.equals(authorId)){
             stats.updateScoreBy(2);
@@ -52,14 +53,14 @@ public class Post {
                 .build();
     }
 
-    public void unlike(Long likerId) {
+    public void unlike(AuthorId likerId) {
         stats.decrementLike();
         if(!authorId.equals(likerId)){
             stats.updateScoreBy(-2);
         }
     }
 
-    public Comment comment(Long commenterId,
+    public Comment comment(AuthorId commenterId,
                            String content,
                            UUID mediaId,
                            boolean hasNoPreviousComments) {
@@ -69,7 +70,7 @@ public class Post {
         stats.incrementComment();
         return Comment
                 .builder()
-                .userId(commenterId)
+                .authorId(commenterId)
                 .postId(id)
                 .content(content)
                 .mediaId(mediaId)
@@ -80,7 +81,7 @@ public class Post {
         stats.updateScoreBy(-5);
     }
 
-    public void removeComment(Long commenterId, boolean hasNoPreviousComments) {
+    public void removeComment(AuthorId commenterId, boolean hasNoPreviousComments) {
         stats.decrementComment();
         if(!commenterId.equals(authorId) && hasNoPreviousComments){
             stats.updateScoreBy(-5);

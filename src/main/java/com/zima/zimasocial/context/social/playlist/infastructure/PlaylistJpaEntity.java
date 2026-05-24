@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.playlist.infastructure;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.playlist.entity.Playlist;
 import com.zima.zimasocial.context.social.playlist.values.PlayListId;
 import com.zima.zimasocial.context.social.playlist.values.PlayListItem;
@@ -57,7 +57,7 @@ public class PlaylistJpaEntity {
     }
 
     public Playlist rehydrate() {
-        return Playlist.reconstitute(new PlayListId(id), name, new AuthorId(userId), type, items.stream().map(e->new PlayListItem(new MediaId(e.getMediaItemId()))).collect(Collectors.toSet()), createdAt, updatedAt);
+        return Playlist.reconstitute(new PlayListId(id), name, new AuthorDomainId(userId), type, items.stream().map(e->new PlayListItem(new MediaId(e.getMediaItemId()))).collect(Collectors.toSet()), createdAt, updatedAt);
     }
 
     public void merge(Playlist playlist){

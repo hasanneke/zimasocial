@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollectio
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
 import com.zima.zimasocial.context.communication.controller.request.ChatMessageRequest;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessageId;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
@@ -37,7 +37,7 @@ public class ChatServiceTest {
     @Mock
     private ChatRoomRepository chatRoomRepository;
     @Mock
-    private AuthorRepository authorRepository;
+    private AuthorRepositoryDomain authorRepository;
     @Mock
     private ChatMessageRepository chatMessageRepository;
     @Mock

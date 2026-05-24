@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.MediaNotFoundException;
 import com.zima.zimasocial.context.social.media.infastructure.MediaItem;
@@ -34,7 +34,7 @@ import java.util.List;
 public class PlayListService {
 
     private final PlayListVerifier playListVerifier;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final PlaylistRepository playlistRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final UserJpaRepository userJpaRepository;
@@ -115,7 +115,7 @@ public class PlayListService {
     }
 
     @Transactional
-    public void createDefaultPlaylistsForAuthor(AuthorId authorId) {
+    public void createDefaultPlaylistsForAuthor(AuthorDomainId authorId) {
         AuthorDomain author = authorRepository.findById(authorId).orElse(null);
         if(author == null) return;
 

@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
 import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
@@ -108,7 +108,7 @@ public class PostDBRepository implements PostDomainRepository {
         return postEntityPage.map(PostJpaEntity::rehydrate);
     }
     @Override
-    public Page<PostDomain> findFollowingsPosts(Pageable page, AuthorId authorId) {
+    public Page<PostDomain> findFollowingsPosts(Pageable page, AuthorDomainId authorId) {
         return postJpaRepository.findFollowingsPosts(page, authorId.getValue()).map(PostJpaEntity::rehydrate);
     }
 
@@ -129,12 +129,12 @@ public class PostDBRepository implements PostDomainRepository {
     }
 
     @Override
-    public List<PostDomain> findAllByAuthorId(AuthorId authorId) {
+    public List<PostDomain> findAllByAuthorId(AuthorDomainId authorId) {
         return postJpaRepository.findAllByUserId(authorId.getValue()).stream().map(PostJpaEntity::rehydrate).toList();
     }
 
     @Override
-    public List<PostDomain> findAllInvisiblePostsByAuthorId(AuthorId authorId) {
+    public List<PostDomain> findAllInvisiblePostsByAuthorId(AuthorDomainId authorId) {
         return postJpaRepository.
                 findAllInvisiblePostsByUserId(authorId.getValue()).
                 stream().map(PostJpaEntity::rehydrate).toList();
@@ -156,14 +156,14 @@ public class PostDBRepository implements PostDomainRepository {
         return savedPost.rehydrate();
     }
     @Override
-    public void makeInvisiblePostsOfAuthor(AuthorId authorId) {
+    public void makeInvisiblePostsOfAuthor(AuthorDomainId authorId) {
         List<PostJpaEntity> postJpaEntityList = postJpaRepository.findAllByUserId(authorId.getValue());
         postJpaEntityList.forEach(e->e.setIsVisible(false));
         postJpaRepository.saveAll(postJpaEntityList);
     }
 
     @Override
-    public void makePostsVisibleOfAuthor(AuthorId authorId) {
+    public void makePostsVisibleOfAuthor(AuthorDomainId authorId) {
         List<PostJpaEntity> postJpaEntityList = postJpaRepository.findAllInvisiblePostsByUserId(authorId.getValue());
         postJpaEntityList.forEach(e->e.setIsVisible(true));
         postJpaRepository.saveAll(postJpaEntityList);

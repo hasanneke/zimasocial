@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,8 +26,8 @@ public class Comment {
     @Column(name = "post_id")
     private Long postId;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Embedded
+    private AuthorId authorId;
 
     @Column(name = "like_count")
     private int likeCount = 0;
@@ -50,4 +51,19 @@ public class Comment {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public Comment reply(AuthorId replierAuthorId, String comment, UUID mediaId){
+        replyCount += 1;
+        return Comment.builder()
+                .postId(postId)
+                .authorId(replierAuthorId)
+                .content(comment)
+                .mediaId(mediaId)
+                .parentId(id)
+                .build();
+    }
+
+    public void removeReply() {
+        replyCount -= 1;
+    }
 }

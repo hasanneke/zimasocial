@@ -1,5 +1,6 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,8 +23,8 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long authorId;
+    @Embedded
+    private AuthorId authorId;
 
     @Column(name = "post_id")
     private Long postId;

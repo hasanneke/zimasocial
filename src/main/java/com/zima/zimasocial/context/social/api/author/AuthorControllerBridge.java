@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.api.author;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.author.application.AuthorService;
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
@@ -22,14 +22,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Component
 public class AuthorControllerBridge {
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final AuthorService authorService;
     private final AuthorRelationCollection authorRelationRepository;
     private final AuthorAuthorViewAdapter authorAuthorViewMapper;
     private final FollowRequestCollection followRequestCollection;
     private final FollowRequestFollowRequestDTOAdapter followRequestFollowRequestDTOAdapter;
     @Autowired
-    public AuthorControllerBridge(AuthorRepository authorRepository, AuthorService authorService, AuthorRelationCollection authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper, FollowRequestCollection followRequestCollection, FollowRequestFollowRequestDTOAdapter followRequestFollowRequestDTOAdapter) {
+    public AuthorControllerBridge(AuthorRepositoryDomain authorRepository, AuthorService authorService, AuthorRelationCollection authorRelationRepository, AuthorAuthorViewAdapter authorAuthorViewMapper, FollowRequestCollection followRequestCollection, FollowRequestFollowRequestDTOAdapter followRequestFollowRequestDTOAdapter) {
         this.authorRepository = authorRepository;
         this.authorRelationRepository = authorRelationRepository;
         this.authorAuthorViewMapper = authorAuthorViewMapper;

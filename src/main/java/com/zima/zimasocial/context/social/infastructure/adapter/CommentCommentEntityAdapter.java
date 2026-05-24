@@ -1,5 +1,5 @@
 package com.zima.zimasocial.context.social.infastructure.adapter;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.entity.CommentEntity;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ public class CommentCommentEntityAdapter {
                 comment.getParent() != null ? comment.getParent().getId() : null,
                 comment.getPost().getId(),
                 comment.getMediaId(),
-                new AuthorId( comment.getUser().getId()),
+                new AuthorDomainId( comment.getUser().getId()),
                 comment.getContent(),
                 comment.getLikeCount(),
                 comment.getReplyCount(),

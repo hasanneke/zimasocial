@@ -1,10 +1,10 @@
 package com.zima.zimasocial.context.social.author.exception;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.exception.ConflictException;
 
 public class AuthorAlreadyFollowedException extends ConflictException {
-    public AuthorAlreadyFollowedException(AuthorId authorId) {
+    public AuthorAlreadyFollowedException(AuthorDomainId authorId) {
         super("author_already_followed", String.format("Author with given id: %s is already followed", authorId.getValue()));
     }
 

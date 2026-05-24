@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.authorrelation;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.FollowRelation;
@@ -10,8 +10,8 @@ import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public interface AuthorRelationCollection {
-    Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId);
-    Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId);
+    Optional<FollowRelation> findFollowRelationBetween(AuthorDomainId followerId, AuthorDomainId followedId);
+    Optional<BlockRelation> findBlockRelationBetween(AuthorDomainId blockerId, AuthorDomainId blockedId);
     Optional<MutedRelation> findMutedRelationBetween(Long muterId, Long mutedId);
     Page<AuthorDomain> findFollowers(String slug, int page, int size);
     Page<AuthorDomain> findFollowings(String slug, int page, int size);

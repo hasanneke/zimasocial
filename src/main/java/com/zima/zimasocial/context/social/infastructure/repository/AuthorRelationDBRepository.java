@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.FollowRelation;
@@ -38,15 +38,15 @@ public class AuthorRelationDBRepository implements AuthorRelationCollection {
     }
 
     @Override
-    public Optional<FollowRelation> findFollowRelationBetween(AuthorId followerId, AuthorId followedId) {
+    public Optional<FollowRelation> findFollowRelationBetween(AuthorDomainId followerId, AuthorDomainId followedId) {
         Optional<UserRelationEntity> followRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(followerId.getValue(), followedId.getValue(), Relation.followed);
-        return followRelation.map(userRelationEntity -> new FollowRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
+        return followRelation.map(userRelationEntity -> new FollowRelation(new AuthorDomainId(userRelationEntity.getActorId()), new AuthorDomainId(userRelationEntity.getReceiverId())));
     }
 
     @Override
-    public Optional<BlockRelation> findBlockRelationBetween(AuthorId blockerId, AuthorId blockedId) {
+    public Optional<BlockRelation> findBlockRelationBetween(AuthorDomainId blockerId, AuthorDomainId blockedId) {
         Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(blockerId.getValue(), blockedId.getValue(), Relation.blocked);
-        return blockRelation.map(userRelationEntity -> new BlockRelation(new AuthorId(userRelationEntity.getActorId()), new AuthorId(userRelationEntity.getReceiverId())));
+        return blockRelation.map(userRelationEntity -> new BlockRelation(new AuthorDomainId(userRelationEntity.getActorId()), new AuthorDomainId(userRelationEntity.getReceiverId())));
 
     }
 

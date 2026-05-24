@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.contentmoderation.report.instracture;
 import com.zima.zimasocial.context.contentmoderation.report.ContentRepository;
 import com.zima.zimasocial.context.contentmoderation.report.content.CommentContent;
 import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
@@ -16,9 +16,9 @@ import java.util.Optional;
 public class ContentDBRepository implements ContentRepository {
     private final PostDomainRepository postRepository;
     private final CommentDomainRepository commentRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
 
-    public ContentDBRepository(PostDomainRepository postRepository, CommentDomainRepository commentRepository, AuthorRepository authorRepository) {
+    public ContentDBRepository(PostDomainRepository postRepository, CommentDomainRepository commentRepository, AuthorRepositoryDomain authorRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.authorRepository = authorRepository;

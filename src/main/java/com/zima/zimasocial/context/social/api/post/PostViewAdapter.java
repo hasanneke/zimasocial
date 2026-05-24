@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.api.post;
 import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.like.LikeDomain;
 import com.zima.zimasocial.context.social.like.LikeDomainRepository;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
@@ -18,11 +18,11 @@ import java.util.Optional;
 public class PostViewAdapter {
     private final ReportRepository reportRepository;
     private final LikeDomainRepository likeRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final AuthorAuthorViewAdapter authorViewAdapter;
 
     @Autowired
-    public PostViewAdapter(ReportRepository reportRepository, LikeDomainRepository likeRepository, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
+    public PostViewAdapter(ReportRepository reportRepository, LikeDomainRepository likeRepository, AuthorRepositoryDomain authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
         this.authorRepository = authorRepository;
         this.reportRepository = reportRepository;
         this.likeRepository = likeRepository;

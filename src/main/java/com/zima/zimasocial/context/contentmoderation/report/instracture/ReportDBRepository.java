@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.contentmoderation.report.instracture;
 import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.entity.report.ReportEntity;
 import com.zima.zimasocial.entity.report.ReportId;
 import com.zima.zimasocial.entity.report.ResourceType;
@@ -33,7 +33,7 @@ public class ReportDBRepository implements ReportRepository {
     }
 
     @Override
-    public boolean checkReportExists(Long resourceId, AuthorId reporterId, ResourceType resourceType) {
+    public boolean checkReportExists(Long resourceId, AuthorDomainId reporterId, ResourceType resourceType) {
         return reportJpaRepository.findById(ReportId.builder()
                 .reporterId(reporterId.getValue())
                 .resourceId(resourceId)

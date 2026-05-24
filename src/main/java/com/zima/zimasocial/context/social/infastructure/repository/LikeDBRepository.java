@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentLike;
 import com.zima.zimasocial.context.social.infastructure.adapter.LikeAdapter;
 import com.zima.zimasocial.context.social.like.LikeDomain;
@@ -26,13 +26,13 @@ public class LikeDBRepository implements LikeDomainRepository {
         this.likeJpaRepository = likeJpaRepository;
     }
     @Override
-    public Optional<LikeDomain> findByPostIdAndAuthorId(Long postId, AuthorId authorId) {
+    public Optional<LikeDomain> findByPostIdAndAuthorId(Long postId, AuthorDomainId authorId) {
         Optional<LikeEntity> like = likeJpaRepository.findByUserIdAndPostIdAndType(authorId.getValue(), postId, LikeType.post);
         return like.map(likeAdapter::convertLikeEntityToLikeForPost);
     }
 
     @Override
-    public Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, AuthorId authorId) {
+    public Optional<CommentLike> findByCommentIdAndAuthorId(Long commentId, AuthorDomainId authorId) {
         return likeJpaRepository.findByUserIdAndCommentId(authorId.getValue(), commentId).map(likeAdapter::convertLikeEntityToLikeForComment);
     }
 

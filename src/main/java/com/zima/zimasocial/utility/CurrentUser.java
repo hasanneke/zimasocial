@@ -1,6 +1,7 @@
 package com.zima.zimasocial.utility;
 
 import com.zima.zimasocial.config.CustomUserDetails;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,8 @@ public class CurrentUser {
         return principal.getProfile();
     }
 
-    public static Long getCurrentUserId() {
+    public static AuthorId getCurrentUserId() {
         CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal.getProfile().getId();
+        return new AuthorId(principal.getProfile().getId());
     }
 }

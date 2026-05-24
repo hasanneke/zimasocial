@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.playlist.entity;
 
 import com.zima.zimasocial.context.account.exception.CharachterLengthExceededException;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.media.infastructure.MediaItem;
 import com.zima.zimasocial.context.social.playlist.values.PlayListId;
 import com.zima.zimasocial.context.social.playlist.values.PlayListItem;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class Playlist {
     private final PlayListId id;
     private String name;
-    private AuthorId ownerId;
+    private AuthorDomainId ownerId;
     private MediaType type;
     private Set<PlayListItem> items = new HashSet<>();
     private LocalDateTime createdAt;
@@ -29,7 +29,7 @@ public class Playlist {
     private Playlist(PlayListId id) {
         this.id = id;
     }
-    public Playlist(PlayListId id, String name, AuthorId authorId, MediaType type, Set<PlayListItem> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Playlist(PlayListId id, String name, AuthorDomainId authorId, MediaType type, Set<PlayListItem> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.isTrue(type != MediaType.any, "type cannot be any");
         Assert.notNull(type, "type cannot be null");
         Assert.notNull(id, "id cannot be null");
@@ -45,7 +45,7 @@ public class Playlist {
         this.updatedAt = updatedAt;
     }
 
-    public static Playlist create(PlayListId id, String name, AuthorId authorId, MediaType type){
+    public static Playlist create(PlayListId id, String name, AuthorDomainId authorId, MediaType type){
         Assert.isTrue(type != MediaType.any, "type cannot be any");
         Assert.notNull(type, "type cannot be null");
         Assert.notNull(id, "id cannot be null");
@@ -59,7 +59,7 @@ public class Playlist {
         return playlist;
     }
 
-    public static Playlist reconstitute(PlayListId id, String name, AuthorId ownerId, MediaType type, Set<PlayListItem> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public static Playlist reconstitute(PlayListId id, String name, AuthorDomainId ownerId, MediaType type, Set<PlayListItem> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
         Assert.isTrue(type != MediaType.any, "type cannot be any");
         Assert.notNull(type, "type cannot be null");
         Assert.notNull(id, "id cannot be null");
@@ -76,7 +76,7 @@ public class Playlist {
         return playlist;
     }
 
-    public void addItem(MediaItem mediaItem, AuthorId modifier) {
+    public void addItem(MediaItem mediaItem, AuthorDomainId modifier) {
         verifyOwnership(modifier);
         if(!mediaItem.getType().equals(type)){
             throw new BadRequestException("Selected media cannot be added to this playlist");
@@ -90,17 +90,17 @@ public class Playlist {
         items.add(new PlayListItem(new MediaId(mediaItem.getId())));
     }
 
-    public void removeItem(MediaId mediaId, AuthorId authorId) {
+    public void removeItem(MediaId mediaId, AuthorDomainId authorId) {
         verifyOwnership(authorId);
         items.removeIf(e->e.getMediaId().equals(mediaId));
     }
-    public void updateName(String name, AuthorId modifier) {
+    public void updateName(String name, AuthorDomainId modifier) {
         verifyOwnership(modifier);
         verifyName(name);
         this.name = name;
     }
 
-    private void verifyOwnership(AuthorId modifier) {
+    private void verifyOwnership(AuthorDomainId modifier) {
         if(!modifier.equals(ownerId)){
             throw new UnauthorizedException("Author is not the owner of the list");
         }

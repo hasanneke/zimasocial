@@ -9,8 +9,8 @@ import com.zima.zimasocial.context.contentmoderation.report.ReportService;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.service.report.dto.ReportRequest;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ReportServiceTest {
     @Mock
-    private AuthorRepository authorRepository;
+    private AuthorRepositoryDomain authorRepository;
     @Mock
     private ContentRepository contentRepository;
     @Mock
@@ -38,14 +38,14 @@ public class ReportServiceTest {
     @InjectMocks
     private ReportService reportService;
 
-    private AuthorDomain testAuthor = new AuthorDomain(new AuthorId(0L), "", "", LocalDateTime.now());
+    private AuthorDomain testAuthor = new AuthorDomain(new AuthorDomainId(0L), "", "", LocalDateTime.now());
     private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
-    private PostContent dummyPostContent = new PostContent(0L,new AuthorId(0L));
-    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorId(0L));
+    private PostContent dummyPostContent = new PostContent(0L,new AuthorDomainId(0L));
+    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorDomainId(0L));
     @Test
     void testReportPost_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
-        when(reportRepository.checkReportExists(0L, new AuthorId(0L), ResourceType.post)).thenReturn(true);
+        when(reportRepository.checkReportExists(0L, new AuthorDomainId(0L), ResourceType.post)).thenReturn(true);
 
         Assertions.assertThrows(ReportAlreadyMadeException.class,
                 ()-> reportService.reportPost(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));
@@ -65,7 +65,7 @@ public class ReportServiceTest {
     @Test
     void testReportComment_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);
-        when(reportRepository.checkReportExists(0L,  new AuthorId(0L), ResourceType.comment)).thenReturn(true);
+        when(reportRepository.checkReportExists(0L,  new AuthorDomainId(0L), ResourceType.comment)).thenReturn(true);
 
         Assertions.assertThrows(ReportAlreadyMadeException.class,
                 ()-> reportService.reportComment(testRequest.getResourceId(), testRequest.getReason(), testRequest.getDescription()));

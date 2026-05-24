@@ -4,8 +4,8 @@ import com.zima.zimasocial.context.communication.controller.request.ChatMessageR
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
 import com.zima.zimasocial.context.social.authorrelation.values.FollowRelation;
@@ -27,17 +27,18 @@ import java.util.Optional;
 @Service
 public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final AuthorRelationCollection authorRelationCollection;
 
     @Autowired
-    public ChatService(ChatRoomRepository chatRoomRepository, AuthorRepository authorRepository, ChatMessageRepository chatMessageRepository, AuthorRelationCollection authorRelationCollection) {
+    public ChatService(ChatRoomRepository chatRoomRepository, AuthorRepositoryDomain authorRepository, ChatMessageRepository chatMessageRepository, AuthorRelationCollection authorRelationCollection) {
         this.chatRoomRepository = chatRoomRepository;
         this.authorRepository = authorRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.authorRelationCollection = authorRelationCollection;
     }
+
     @Transactional
     public ChatMessage sendMessage(ChatRoomId chatRoomId, ChatMessageRequest messageRequest) {
         AuthorDomain sender = authorRepository.getAuthenticatedAuthor();
@@ -53,7 +54,7 @@ public class ChatService {
         return chatMessage;
     }
     @Transactional
-    public ChatRoom createChatRoomWith(AuthorId participant) {
+    public ChatRoom createChatRoomWith(AuthorDomainId participant) {
         AuthorDomain roomCreator = authorRepository.getAuthenticatedAuthor();
         AuthorDomain otherParticipant = authorRepository.findById(participant).orElseThrow(()->new AuthorNotFoundException(participant.getValue()));
         Optional<BlockRelation> blockRelation = authorRelationCollection.findBlockRelationBetween(otherParticipant.getId(), roomCreator.getId());

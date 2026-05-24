@@ -5,11 +5,13 @@ import com.zima.zimasocial.context.communication.domain.entity.PostCommentedNoti
 import com.zima.zimasocial.context.communication.domain.entity.PostLikedNotification;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social2.domain.entity.Author;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.entity.Like;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.context.social2.repository.AuthorRepository;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
 import com.zima.zimasocial.context.social2.repository.LikeRepository;
@@ -19,6 +21,7 @@ import com.zima.zimasocial.exception.ConflictException;
 import com.zima.zimasocial.exception.UnauthorizedException;
 import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
+import com.zima.zimasocial.shared.StaticEventPublisher;
 import com.zima.zimasocial.utility.CurrentUser;
 import com.zima.zimasocial.views.comment.CommentView;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +44,10 @@ public class PostApplicationService {
     private final AuthorRepository authorRepository;
     @Transactional
     public void likePost(Long postId) {
-        Long userId = CurrentUser.getCurrentUserId();
-        Author author = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
+        AuthorId authorId = CurrentUser.getCurrentUserId();
+        Author author = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Optional<Like> existingLike = likeRepository.findByAuthorIdAndPostIdAndType(postId, author.getId(), LikeType.post);
+        Optional<Like> existingLike = likeRepository.findByAuthorIdAndPostIdAndType(author.getId(), postId, LikeType.post);
         if(existingLike.isPresent()){
             throw new ConflictException("Post is already liked");
         }
@@ -54,8 +57,8 @@ public class PostApplicationService {
         if(!post.getAuthorId().equals(like.getAuthorId())){
             PostLikedNotification postLikedNotification = PostLikedNotification.builder()
                     .postId(post.getId())
-                    .actorId(new RecipientId(like.getAuthorId()))
-                    .recipientId(new RecipientId(post.getAuthorId()))
+                    .actorId(new RecipientId(like.getAuthorId().getValue()))
+                    .recipientId(new RecipientId(post.getAuthorId().getValue()))
                     .createdAt(OffsetDateTime.now())
                     .build();
             notificationManager.throttled().sendNotification(postLikedNotification);
@@ -65,8 +68,8 @@ public class PostApplicationService {
 
     @Transactional
     public void unlikePost(Long postId) {
-        Long userId = CurrentUser.getCurrentUserId();
-        Author liker = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
+        AuthorId authorId = CurrentUser.getCurrentUserId();
+        Author liker = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Optional<Like> like = likeRepository.findByAuthorIdAndPostIdAndType(liker.getId(), postId, LikeType.post);
         if(like.isEmpty()){
@@ -80,8 +83,8 @@ public class PostApplicationService {
     @Transactional
     public void deletePost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Long userId = CurrentUser.getCurrentUserId();
-        Author attempter = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
+        AuthorId authorId = CurrentUser.getCurrentUserId();
+        Author attempter = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         if(!post.getAuthorId().equals(attempter.getId())) {
             throw new UnauthorizedException();
         }
@@ -91,18 +94,18 @@ public class PostApplicationService {
 
     @Transactional
     public CommentView comment(Long postId, String content, UUID mediaId) {
-        Long userId = CurrentUser.getCurrentUserId();
+        AuthorId userId = CurrentUser.getCurrentUserId();
         Author commenter = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        List<Comment> previousComments = commentRepository.findByUserIdAndPostIdAndParentIdIsNull(commenter.getId(), postId);
+        List<Comment> previousComments = commentRepository.findByAuthorIdAndPostIdAndParentIdIsNull(commenter.getId(), postId);
         Comment comment = post.comment(commenter.getId(), content, mediaId, previousComments.isEmpty());
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
         if(!commenter.getId().equals(post.getAuthorId())){
             PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
                     .postId(post.getId())
-                    .actorId(new RecipientId(commenter.getId()))
-                    .recipientId(new RecipientId(post.getAuthorId()))
+                    .actorId(new RecipientId(commenter.getId().getValue()))
+                    .recipientId(new RecipientId(post.getAuthorId().getValue()))
                     .createdAt(OffsetDateTime.now())
                     .build();
             notificationManager.sendNotification(postCommentedNotification);
@@ -114,16 +117,36 @@ public class PostApplicationService {
     public void removeComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         Post post = postRepository.findById(comment.getPostId()).orElseThrow(PostNotFoundException::new);
-        Long userId = CurrentUser.getCurrentUserId();
+        AuthorId userId = CurrentUser.getCurrentUserId();
         Author remover = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
-        List<Comment> previousComments = commentRepository.findByUserIdAndPostIdAndParentIdIsNull(remover.getId(), post.getId());
+        List<Comment> previousComments = commentRepository.findByAuthorIdAndPostIdAndParentIdIsNull(remover.getId(), post.getId());
         if(previousComments.isEmpty()){
             post.decreaseCommentScore();
         }
-        if(!comment.getUserId().equals(remover.getId())){
+        if(!comment.getAuthorId().equals(remover.getId())){
             throw new UnauthorizedException();
         }
         post.removeComment(remover.getId(), previousComments.isEmpty());
         commentRepository.delete(comment);
     }
+
+    @Transactional
+    public CommentView replyComment(Long parentId, String content, UUID mediaId) {
+        Author author = authorRepository.findById(CurrentUser.getCurrentUserId()).orElseThrow(AuthorNotFoundException::new);
+        Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
+        Comment reply = parent.reply(author.getId(), content, mediaId);
+        Comment savedReply = commentRepository.save(reply);
+        commentRepository.save(parent);
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getId(), parent.getAuthorId().getValue(), author.getId().getValue(), parent.getPostId()));
+        return commentViewAdapter.populatedV2(savedReply);
+    }
+    @Transactional
+    public void deleteReply(Long replyId) {
+        Comment reply = commentRepository.findById(replyId).orElseThrow(CommentNotFoundException::new);
+        Comment parent = commentRepository.findById(reply.getParentId()).orElseThrow(CommentNotFoundException::new);
+        parent.removeReply();
+        commentRepository.delete(reply);
+        commentRepository.save(parent);
+    }
+
 }

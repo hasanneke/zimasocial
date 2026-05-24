@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.api.author;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import com.zima.zimasocial.context.social.authorrelation.FollowRequestCollection;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
@@ -23,7 +23,7 @@ public class AuthorAuthorViewAdapter {
     private final AuthorRelationCollection authorRelationRepository;
     private final AccountRepository accountRepository;
     private final FollowRequestCollection followRequestCollection;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final PlayListService playListService;
 
     public AuthorView authorViewFromAuthor(AuthorDomain author, Boolean fetchPlaylist) {

@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.api.author;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.author.application.AuthorService;
 import com.zima.zimasocial.context.social.author.exception.SlugAlreadyTakenException;
 import jakarta.validation.Valid;
@@ -24,11 +24,11 @@ import java.util.Optional;
 public class AuthorController {
     private final AuthorControllerBridge authorControllerBridge;
     private final AuthorService authorService;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final AuthorAuthorViewAdapter authorAuthorViewMapper;
 
     @Autowired
-    public AuthorController(AuthorControllerBridge authorControllerBridge, AuthorService authorService, AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
+    public AuthorController(AuthorControllerBridge authorControllerBridge, AuthorService authorService, AuthorRepositoryDomain authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
         this.authorControllerBridge = authorControllerBridge;
         this.authorService = authorService;
         this.authorRepository = authorRepository;

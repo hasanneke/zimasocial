@@ -1,13 +1,11 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
+import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.entity.userRelation.UserRelationEntity;
+import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.repository.UserRelationJpaRepository;
 import com.zima.zimasocial.service.users.exception.UserNotFoundException;
@@ -21,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class AuthorDBRepository implements AuthorRepository {
+public class AuthorDBRepository implements AuthorRepositoryDomain {
     private final AuthorUserEntityAdapter authorUserEntityAdapter;
     private final UserJpaRepository userRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
@@ -39,7 +37,7 @@ public class AuthorDBRepository implements AuthorRepository {
     }
 
     @Override
-    public Optional<AuthorDomain> findById(AuthorId authorId) {
+    public Optional<AuthorDomain> findById(AuthorDomainId authorId) {
         return Optional.ofNullable(authorUserEntityAdapter.convertUserEntityToAuthor(userRepository.findById(authorId.getValue()).orElse(null)));
     }
 
@@ -67,10 +65,10 @@ public class AuthorDBRepository implements AuthorRepository {
         UserEntity authenticatedUser = CurrentUser.getCurrentUserProfile();
         AuthorDomain userToBeFound = findBySlugAndIsDisabledFalse(slug).orElseThrow(AuthorNotFoundException::new);
         assert userToBeFound != null;
-        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getValue(), authenticatedUser.getId(), Relation.blocked);
-        if(blockRelation.isPresent()){
-            return Optional.empty();
-        }
+//        Optional<UserRelationEntity> blockRelation = userRelationJpaRepository.findByActorIdAndReceiverIdAndRelation(userToBeFound.getId().getValue(), authenticatedUser.getId(), Relation.blocked);
+//        if(blockRelation.isPresent()){
+//            return Optional.empty();
+//        }
         return Optional.of(userToBeFound);
     }
 

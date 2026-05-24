@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.social.api.dto.LikeDTO;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentLike;
@@ -46,7 +46,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PostService {
     private final PostDomainRepository postRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final LikeDomainRepository likeRepository;
     private final CommentDomainRepository commentRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
@@ -152,7 +152,7 @@ public class PostService {
         CommentDomain reply = parent.reply(author.getId(), content, mediaId);
         CommentDomain savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getCommentId(), parent.getAuthorId().getValue(), author.getId().getValue(), parent.getPostId()));
         return savedReply;
     }
 

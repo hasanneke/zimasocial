@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.post.entity;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.post.event.PostLikedEvent;
 import com.zima.zimasocial.context.social.post.value.PostContent;
@@ -21,7 +21,7 @@ public class PostDomain {
     private int commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private AuthorId authorId;
+    private AuthorDomainId authorId;
     private PostContent content;
     private Boolean isVisible;
     private Integer score;
@@ -32,7 +32,7 @@ public class PostDomain {
 
     public static PostDomain create(
             Long postId,
-            AuthorId authorId,
+            AuthorDomainId authorId,
             PostContent content
     ) {
         Assert.notNull(authorId, "Author is required");
@@ -57,7 +57,7 @@ public class PostDomain {
 
     public static PostDomain reconstitute(
             Long postId,
-            AuthorId authorId,
+            AuthorDomainId authorId,
             PostContent content,
             int likeCount,
             int commentCount,
@@ -81,7 +81,7 @@ public class PostDomain {
         return post;
     }
 
-    public PostLike like(AuthorId likerAuthorId) {
+    public PostLike like(AuthorDomainId likerAuthorId) {
         likeCount += 1;
         if(!authorId.equals(likerAuthorId)){
             score += 2;
@@ -89,20 +89,20 @@ public class PostDomain {
         StaticEventPublisher.publishEvent(new PostLikedEvent(postId, authorId, likerAuthorId));
         return new PostLike(postId, likerAuthorId);
     }
-    public CommentDomain comment(AuthorId commenterAuthorId, String comment, UUID mediaId) {
+    public CommentDomain comment(AuthorDomainId commenterAuthorId, String comment, UUID mediaId) {
         commentCount += 1;
         if(!authorId.equals(commenterAuthorId)){
             score += 5;
         }
         return new CommentDomain(postId, null, commenterAuthorId, comment, mediaId);
     }
-    public void removeComment(AuthorId commenterId) {
+    public void removeComment(AuthorDomainId commenterId) {
         commentCount = commentCount - 1;
         if(!authorId.equals(commenterId)){
             score -= 5;
         }
     }
-    public void unliked(AuthorId unlikerAuthorId) {
+    public void unliked(AuthorDomainId unlikerAuthorId) {
         likeCount = likeCount - 1;
         if(!authorId.equals(unlikerAuthorId)){
             score -= 2;

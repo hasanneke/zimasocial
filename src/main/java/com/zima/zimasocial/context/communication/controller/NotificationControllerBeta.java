@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.communication.controller;
 
 import com.zima.zimasocial.context.communication.application.NotificationManager;
 import com.zima.zimasocial.context.communication.infastructure.DeviceTokenPayload;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.views.notification.NotificationView;
 import com.zima.zimasocial.views.notification.NotificationView2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class NotificationControllerBeta {
     private final NotificationQuery notificationReadRepository;
     private final NotificationManager notificationService;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
 
     @Autowired
-    public NotificationControllerBeta(NotificationQuery notificationReadRepository, NotificationManager notificationService, AuthorRepository authorRepository) {
+    public NotificationControllerBeta(NotificationQuery notificationReadRepository, NotificationManager notificationService, AuthorRepositoryDomain authorRepository) {
         this.notificationReadRepository = notificationReadRepository;
         this.notificationService = notificationService;
         this.authorRepository = authorRepository;

@@ -91,8 +91,8 @@ public class NotificationEventListener {
         }
         CommentRepliedNotification commentRepliedNotification = CommentRepliedNotification.builder()
                 .commentId(commentRepliedEvent.parentCommentId())
-                .actorId(new RecipientId(commentRepliedEvent.replyerId().getValue()))
-                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
+                .actorId(new RecipientId(commentRepliedEvent.replyerId()))
+                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId()))
                 .postId(commentRepliedEvent.postId())
                 .createdAt(OffsetDateTime.now())
                 .build();

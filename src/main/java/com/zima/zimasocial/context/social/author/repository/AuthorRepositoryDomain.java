@@ -1,15 +1,15 @@
 package com.zima.zimasocial.context.social.author.repository;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface AuthorRepository {
+public interface AuthorRepositoryDomain {
     AuthorDomain getAuthenticatedAuthor();
-    Optional<AuthorDomain> findById(AuthorId id);
+    Optional<AuthorDomain> findById(AuthorDomainId id);
     void save(AuthorDomain author);
     void saveAll(List<AuthorDomain> authors);
     Optional<AuthorDomain> findBySlugAndIsDisabledFalse(String slug);

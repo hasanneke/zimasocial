@@ -3,8 +3,8 @@ package com.zima.zimasocial.context.social.chat.application;
 
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zima.zimasocial.context.social.chat.repository.ChatRoomRepository;
 import com.zima.zimasocial.context.social.chat.service.ChatService;
@@ -24,7 +24,7 @@ public class ChatServiceApplicationTest {
     @Mock
     private ChatService chatService;
     @Mock
-    private AuthorRepository authorRepository;
+    private AuthorRepositoryDomain authorRepository;
     @Mock
     private ChatRoomRepository chatRoomRepository;
     @InjectMocks
@@ -32,8 +32,8 @@ public class ChatServiceApplicationTest {
 
     @Test
     void testCreateOrFindRoomWithParticipant_WhenRoomExistReturnRoom() {
-        AuthorId participant1 = ChatTestUtility.mockAuthorId();
-        AuthorId participant2 = ChatTestUtility.mockAuthorId();
+        AuthorDomainId participant1 = ChatTestUtility.mockAuthorId();
+        AuthorDomainId participant2 = ChatTestUtility.mockAuthorId();
         ChatRoom chatRoom = ChatTestUtility.mockChatRoomPlain(participant1, participant2);
         when(chatRoomRepository.findByParticipantsBetween(participant1, participant2)).thenReturn(Optional.of(chatRoom));
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(ChatTestUtility.mockAuthor(participant1.getValue()));

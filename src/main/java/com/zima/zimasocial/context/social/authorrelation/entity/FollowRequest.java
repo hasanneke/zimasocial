@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.authorrelation.entity;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
 import com.zima.zimasocial.context.social.authorrelation.FollowRequestAlreadyProcessed;
 import com.zima.zimasocial.shared.StaticEventPublisher;
@@ -13,20 +13,20 @@ import java.util.UUID;
 @Getter
 public class FollowRequest {
     private final UUID id;
-    private final AuthorId followerAuthorId;
-    private final AuthorId followedAuthorId;
+    private final AuthorDomainId followerAuthorId;
+    private final AuthorDomainId followedAuthorId;
     private Boolean isAccepted;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public FollowRequest(UUID id, AuthorId followerAuthorId, AuthorId followedAuthorId, Boolean isAccepted, LocalDateTime createdAt) {
+    public FollowRequest(UUID id, AuthorDomainId followerAuthorId, AuthorDomainId followedAuthorId, Boolean isAccepted, LocalDateTime createdAt) {
         this.id = id;
         this.followerAuthorId = followerAuthorId;
         this.followedAuthorId = followedAuthorId;
         this.isAccepted = isAccepted;
         this.createdAt = createdAt;
     }
-    public FollowRequest(UUID id, AuthorId followerAuthorId, AuthorId followedAuthorId, Boolean isAccepted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FollowRequest(UUID id, AuthorDomainId followerAuthorId, AuthorDomainId followedAuthorId, Boolean isAccepted, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.followerAuthorId = followerAuthorId;
         this.followedAuthorId = followedAuthorId;

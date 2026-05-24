@@ -53,4 +53,22 @@ public class PostControllerV2 {
         postService.removeComment(commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @PostMapping(path = "/{postId}/comments/{commentId}/replies")
+    public ResponseEntity<CommentView> replyComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody CommentPayload payload) {
+        CommentView commentView = postService.replyComment(commentId, payload.getContent(), payload.getMediaId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentView);
+    }
+
+    @DeleteMapping(path = "/{postId}/comments/{commentId}/replies/{replyId}")
+    public ResponseEntity<CommentView> deleteReply(
+            @PathVariable(name = "postId") Long postId,
+            @PathVariable(name = "commentId") Long commentId,
+            @PathVariable(name = "replyId") Long replyId) {
+        postService.deleteReply(replyId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

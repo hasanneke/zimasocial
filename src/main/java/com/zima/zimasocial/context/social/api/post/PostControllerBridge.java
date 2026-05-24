@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.api.post;
 
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
@@ -34,10 +34,10 @@ public class PostControllerBridge {
     private final CommentDomainRepository commentRepository;
     private final PostViewAdapter postViewAdapter;
     private final CommentViewAdapter commentViewAdapter;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
 
     @Autowired
-    public PostControllerBridge(PostService postService, PostDomainRepository postRepository, CommentDomainRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter, AuthorRepository authorRepository) {
+    public PostControllerBridge(PostService postService, PostDomainRepository postRepository, CommentDomainRepository commentRepository, PostViewAdapter postViewAdapter, CommentViewAdapter commentViewAdapter, AuthorRepositoryDomain authorRepository) {
         this.postService = postService;
         this.postRepository = postRepository;
         this.postViewAdapter = postViewAdapter;
@@ -64,7 +64,7 @@ public class PostControllerBridge {
     ) throws NoSuchMethodException {
         Page<PostDomain> postPage;
         if(category == PostCategory.followings){
-            AuthorId authorId = authorRepository.getAuthenticatedAuthor().getId();
+            AuthorDomainId authorId = authorRepository.getAuthenticatedAuthor().getId();
             postPage = postRepository.findFollowingsPosts(PageRequest.of(page, size), authorId);
         }else{
             postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by("score","createdAt").descending()), slug, category);

@@ -1,9 +1,7 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
@@ -17,8 +15,12 @@ import java.time.OffsetDateTime;
 @Getter
 @SQLRestriction(value = "IS_DELETED IS FALSE AND IS_DISABLED IS FALSE AND IS_BANNED IS FALSE")
 public class Author {
-    @Id
-    private Long id;
+    @EmbeddedId
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "id", updatable = false)
+    )
+    private AuthorId id;
 
     @Column(name = "slug", unique = true, length = 65)
     private String slug;

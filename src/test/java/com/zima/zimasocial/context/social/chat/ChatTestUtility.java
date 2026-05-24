@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.chat;
 
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessageId;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
@@ -20,13 +20,13 @@ public class ChatTestUtility {
         return new ChatRoomId(UUID.randomUUID());
     }
     public static AuthorDomain mockAuthor(Long authorId) {
-        return new AuthorDomain(new AuthorId(authorId), "mock", "mockName", LocalDateTime.now());
+        return new AuthorDomain(new AuthorDomainId(authorId), "mock", "mockName", LocalDateTime.now());
     }
-    public static AuthorId mockAuthorId() {
-        return new AuthorId(ThreadLocalRandom.current().nextLong());
+    public static AuthorDomainId mockAuthorId() {
+        return new AuthorDomainId(ThreadLocalRandom.current().nextLong());
     }
     public static AuthorDomain mockAuthor() {
-        return new AuthorDomain(new AuthorId(ThreadLocalRandom.current().nextLong()), "mock", "mockName", LocalDateTime.now());
+        return new AuthorDomain(new AuthorDomainId(ThreadLocalRandom.current().nextLong()), "mock", "mockName", LocalDateTime.now());
     }
     public static ChatRoom mockChatRoom() {
         return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(), mockAuthor());
@@ -35,7 +35,7 @@ public class ChatTestUtility {
         return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(participant1), mockAuthor(participant2));
     }
 
-    public static ChatRoom mockChatRoomPlain(AuthorId participant1, AuthorId participant2) {
+    public static ChatRoom mockChatRoomPlain(AuthorDomainId participant1, AuthorDomainId participant2) {
         return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(participant1.getValue()), mockAuthor(participant2.getValue()));
     }
     public static ChatRoom mockChatRoomPlain(AuthorDomain participant1, AuthorDomain participant2) {
@@ -46,7 +46,7 @@ public class ChatTestUtility {
         return new ChatMessage(
                 new ChatMessageId(UUID.randomUUID()),
                 new ChatRoomId(UUID.randomUUID()),
-                new AuthorId(senderId),
+                new AuthorDomainId(senderId),
                 message,
                 OffsetDateTime.now());
     }

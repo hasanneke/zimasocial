@@ -2,10 +2,11 @@ package com.zima.zimasocial.context.social.author.value;
 
 import java.util.Objects;
 
-public class AuthorId {
+public class AuthorDomainId {
+
     private final Long value;
 
-    public AuthorId(Long id) {
+    public AuthorDomainId(Long id) {
         this.value = id;
     }
 
@@ -17,7 +18,7 @@ public class AuthorId {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AuthorId authorId = (AuthorId) o;
+        AuthorDomainId authorId = (AuthorDomainId) o;
         return Objects.equals(value, authorId.value);
     }
 

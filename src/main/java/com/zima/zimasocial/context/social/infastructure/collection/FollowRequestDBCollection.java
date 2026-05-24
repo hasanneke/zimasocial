@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.infastructure.collection;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zima.zimasocial.context.social.authorrelation.FollowRequestCollection;
 import com.zima.zimasocial.entity.FollowRequestEntity;
@@ -36,17 +36,17 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
     }
 
     @Override
-    public List<FollowRequest> findAllByFollowedAuthorIdAndUpdatedAtIsNull(AuthorId id) {
+    public List<FollowRequest> findAllByFollowedAuthorIdAndUpdatedAtIsNull(AuthorDomainId id) {
         return followRequestDAOJpa.findByFollowedIdAndUpdatedAtIsNull(id.getValue()).stream().map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest).toList();
     }
 
     @Override
-    public Integer countByFollowedAuthorId(AuthorId id) {
+    public Integer countByFollowedAuthorId(AuthorDomainId id) {
         return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getValue());
     }
 
     @Override
-    public Optional<FollowRequest> findFirstByFollowedAuthorIdOrderByCreatedAtDesc(AuthorId id) {
+    public Optional<FollowRequest> findFirstByFollowedAuthorIdOrderByCreatedAtDesc(AuthorDomainId id) {
         Optional<FollowRequestEntity> followRequest = followRequestDAOJpa.findFirstByFollowedIdOrderByCreatedAtDesc(id.getValue());
         if (followRequest.isPresent()){
             return followRequest.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
@@ -55,13 +55,13 @@ public class FollowRequestDBCollection implements FollowRequestCollection {
     }
 
     @Override
-    public Optional<FollowRequest> findByFollowedIdAndFollowerId(AuthorId followedId, AuthorId followerId) {
+    public Optional<FollowRequest> findByFollowedIdAndFollowerId(AuthorDomainId followedId, AuthorDomainId followerId) {
         Optional<FollowRequestEntity> followRequestEntity = followRequestDAOJpa.findByFollowedIdAndFollowerId(followedId.getValue(), followerId.getValue());
         return followRequestEntity.map(followRequestDBAdapter::convertFollowRequestEntityToFollowRequest);
     }
 
     @Override
-    public Integer countByFollowedAuthorIdAndIsApprovedFalse(AuthorId id) {
+    public Integer countByFollowedAuthorIdAndIsApprovedFalse(AuthorDomainId id) {
         return followRequestDAOJpa.countByFollowedIdAndIsAcceptedFalse(id.getValue());
     }
 }

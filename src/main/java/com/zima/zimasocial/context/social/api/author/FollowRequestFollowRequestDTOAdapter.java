@@ -1,16 +1,16 @@
 package com.zima.zimasocial.context.social.api.author;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FollowRequestFollowRequestDTOAdapter {
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     private final AuthorAuthorViewAdapter authorViewAdapter;
 
-    public FollowRequestFollowRequestDTOAdapter(AuthorRepository authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
+    public FollowRequestFollowRequestDTOAdapter(AuthorRepositoryDomain authorRepository, AuthorAuthorViewAdapter authorViewAdapter) {
         this.authorRepository = authorRepository;
         this.authorViewAdapter = authorViewAdapter;
     }

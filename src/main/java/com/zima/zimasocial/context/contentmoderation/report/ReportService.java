@@ -6,7 +6,7 @@ import com.zima.zimasocial.context.contentmoderation.report.exception.ReportAlre
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final ContentRepository contentRepository;
-    private final AuthorRepository authorRepository;
+    private final AuthorRepositoryDomain authorRepository;
     @Autowired
-    public ReportService(ReportRepository reportRepository, ContentRepository contentRepository, AuthorRepository authorRepository) {
+    public ReportService(ReportRepository reportRepository, ContentRepository contentRepository, AuthorRepositoryDomain authorRepository) {
         this.reportRepository = reportRepository;
         this.contentRepository = contentRepository;
         this.authorRepository = authorRepository;

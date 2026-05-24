@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.author;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
 import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
 import com.zima.zimasocial.context.social.authorrelation.FollowRequestAlreadyProcessed;
@@ -20,16 +20,16 @@ public class FollowRequestTest {
     @Test
     void testApprove_WhenAccepted_SetIsAcceptedTrueAndUpdateUpdatedAt() {
         try(MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class)){
-            FollowRequest followRequest = new FollowRequest(UuidCreator.getTimeOrdered(), new AuthorId(0L),new AuthorId(1L), false, LocalDateTime.now());
+            FollowRequest followRequest = new FollowRequest(UuidCreator.getTimeOrdered(), new AuthorDomainId(0L),new AuthorDomainId(1L), false, LocalDateTime.now());
             followRequest.accept();
             Assertions.assertTrue(followRequest.getIsAccepted());
             Assertions.assertNotNull(followRequest.getUpdatedAt());
-            mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AuthorFollowRequestAcceptedEvent( new AuthorId(0L),new AuthorId(1L))));
+            mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AuthorFollowRequestAcceptedEvent( new AuthorDomainId(0L),new AuthorDomainId(1L))));
         }
     }
     @Test
     void testApprove_WhenUpdatedAtNotNull_ThrowFollowRequestAlreadyProcessed() {
-        FollowRequest followRequest = new FollowRequest(UuidCreator.getTimeOrdered(), new AuthorId(0L),new AuthorId(0L), false, LocalDateTime.now(), LocalDateTime.now());
+        FollowRequest followRequest = new FollowRequest(UuidCreator.getTimeOrdered(), new AuthorDomainId(0L),new AuthorDomainId(0L), false, LocalDateTime.now(), LocalDateTime.now());
         Assertions.assertThrows(FollowRequestAlreadyProcessed.class, followRequest::accept);
     }
 }

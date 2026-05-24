@@ -1,14 +1,14 @@
 package com.zima.zimasocial.context.social.authorrelation.values;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import lombok.Getter;
 
 @Getter
 public final class FollowRelation extends AuthorRelation {
-    private final AuthorId followerId;
-    private final AuthorId followedId;
+    private final AuthorDomainId followerId;
+    private final AuthorDomainId followedId;
 
-    public FollowRelation(AuthorId followerId, AuthorId followedId) {
+    public FollowRelation(AuthorDomainId followerId, AuthorDomainId followedId) {
         this.followerId = followerId;
         this.followedId = followedId;
     }

@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.repository;
 
 import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.views.post.PostDTO;
 import org.springframework.data.domain.Page;
@@ -17,14 +17,14 @@ PostDomainRepository {
     Page<PostDomain> findAll(Pageable page, String slug, PostCategory type);
     List<PostDTO> findFeed(FeedFilter feedFilter);
     List<PostDTO> findAuthorsPosts(FeedFilter feedFilter);
-    void makeInvisiblePostsOfAuthor(AuthorId authorId);
-    void makePostsVisibleOfAuthor(AuthorId authorId);
-    Page<PostDomain> findFollowingsPosts(Pageable page, AuthorId authorId);
+    void makeInvisiblePostsOfAuthor(AuthorDomainId authorId);
+    void makePostsVisibleOfAuthor(AuthorDomainId authorId);
+    Page<PostDomain> findFollowingsPosts(Pageable page, AuthorDomainId authorId);
     List<PostDomain> findTodaysPosts();
     PostDomain save(PostDomain post);
     void delete(PostDomain post);
     Long nextSequence();
-    List<PostDomain> findAllByAuthorId(AuthorId authorId);
-    List<PostDomain> findAllInvisiblePostsByAuthorId(AuthorId authorId);
+    List<PostDomain> findAllByAuthorId(AuthorDomainId authorId);
+    List<PostDomain> findAllInvisiblePostsByAuthorId(AuthorDomainId authorId);
     List<PostDomain> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.playlist.listener;
 
 import com.zima.zimasocial.context.account.event.AccountCreatedEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.playlist.application.PlayListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -14,6 +14,6 @@ public class PlaylistEventListener {
 
     @EventListener
     public void handleNewAccountCreated(AccountCreatedEvent accountCreatedEvent) {
-        playListService.createDefaultPlaylistsForAuthor(new AuthorId(accountCreatedEvent.accountId()));
+        playListService.createDefaultPlaylistsForAuthor(new AuthorDomainId(accountCreatedEvent.accountId()));
     }
 }

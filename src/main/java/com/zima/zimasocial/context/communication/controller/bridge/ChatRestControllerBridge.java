@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.communication.RecipientNotFoundException;
 import com.zima.zimasocial.context.communication.controller.views.ChatMessageView;
 import com.zima.zimasocial.context.communication.controller.views.ChatRoomView;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.chat.application.ChatServiceApplication;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class ChatRestControllerBridge {
-    private final AuthorRepository recipientRepository;
+    private final AuthorRepositoryDomain recipientRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatServiceApplication chatServiceApplication;
     private final ChatRoomRepository chatRoomRepository;

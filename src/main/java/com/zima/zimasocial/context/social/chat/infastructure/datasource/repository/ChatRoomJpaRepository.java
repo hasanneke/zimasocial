@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.chat.infastructure.datasource.repository;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
 import com.zima.zimasocial.context.social.chat.infastructure.datasource.dao.ChatRoomJpaDao;
@@ -39,13 +39,13 @@ public class ChatRoomJpaRepository implements ChatRoomRepository {
     }
 
     @Override
-    public Optional<ChatRoom> findByParticipantsBetween(AuthorId participant1, AuthorId participant2) {
+    public Optional<ChatRoom> findByParticipantsBetween(AuthorDomainId participant1, AuthorDomainId participant2) {
         return chatRoomJpaDao.findBetween(participant1.getValue(), participant2.getValue())
                 .map(ChatRoomJpaEntity::toDomain);
     }
 
     @Override
-    public Page<ChatRoom> findByParticipantIn(AuthorId recipientId, PageRequest pageRequest) {
+    public Page<ChatRoom> findByParticipantIn(AuthorDomainId recipientId, PageRequest pageRequest) {
         UserEntity user = userJpaRepository.findById(recipientId.getValue()).orElseThrow(UserNotFoundException::new);
         return chatRoomJpaDao
                 .findByParticipant1IdOrParticipant2IdAndLastMessageIsNotNullOrderByLastMessageCreatedAtDesc(user.getId(), pageRequest).map(ChatRoomJpaEntity::toDomain);

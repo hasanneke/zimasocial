@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.chat.infastructure.datasource.entity;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import com.zima.zimasocial.context.social.chat.entity.ChatMessageId;
 import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
@@ -40,6 +40,6 @@ public class ChatMessageJpaEntity {
     private OffsetDateTime createdAt;
 
     public ChatMessage toDomain() {
-        return new ChatMessage(new ChatMessageId(id), new ChatRoomId(chatRoomId), new AuthorId(senderId), content, createdAt);
+        return new ChatMessage(new ChatMessageId(id), new ChatRoomId(chatRoomId), new AuthorDomainId(senderId), content, createdAt);
     }
 }

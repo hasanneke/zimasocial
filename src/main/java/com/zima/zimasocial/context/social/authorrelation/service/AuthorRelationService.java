@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.authorrelation.service;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthorRelationService {
     private final AuthorRelationCollection authorRelationCollection;
-    public boolean isAuthorFollowed(AuthorId followerId, AuthorId followedId) {
+    public boolean isAuthorFollowed(AuthorDomainId followerId, AuthorDomainId followedId) {
         return authorRelationCollection.findFollowRelationBetween(followerId, followedId).isPresent();
     }
 }
