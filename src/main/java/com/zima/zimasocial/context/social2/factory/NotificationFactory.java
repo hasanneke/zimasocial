@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 public class NotificationFactory {
     public NotificationEntity buildLikeNotification(Like like, Long recipientId) {
         return NotificationEntity.builder()
-                .postId(like.getPostId())
+                .postId(like.getPostId().getValue())
                 .type(NotificationType.POST_LIKED)
-                .targetId(like.getPostId())
+                .targetId(like.getPostId().getValue())
                 .targetCollection(TargetCollection.post)
                 .receiverUserId(recipientId)
                 .isPushed(false)
