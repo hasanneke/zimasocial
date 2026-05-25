@@ -8,18 +8,18 @@ import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.entity.PostJpaEntity;
-import com.zima.zimasocial.entity.todayspost.TodaysPost;
+import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.entity.userRelation.Relation;
 import com.zima.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zima.zimasocial.repository.PostJpaRepository;
-import com.zima.zimasocial.repository.TodaysPostRepository;
+import com.zima.zimasocial.repository.TodaysPostRepositoryDomain;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.repository.UserRelationJpaRepository;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.service.users.exception.UserNotFoundException;
 import com.zima.zimasocial.utility.CurrentUser;
-import com.zima.zimasocial.views.post.PostDTO;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ import java.util.Optional;
 public class PostDBRepository implements PostDomainRepository {
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userRepository;
-    private final TodaysPostRepository todaysPostRepository;
+    private final TodaysPostRepositoryDomain todaysPostRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
     private final EntityManager entityManager;
     private final String basePostSelectSQL = """
@@ -114,7 +114,7 @@ public class PostDBRepository implements PostDomainRepository {
 
     @Override
     public List<PostDomain> findTodaysPosts() {
-        List<TodaysPost> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
+        List<TodaysPostDomain> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
         return todaysPosts.stream().map((e)-> e.getPost().rehydrate()).toList();
     }
 

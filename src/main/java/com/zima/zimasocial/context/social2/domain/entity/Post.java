@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -56,6 +57,12 @@ public class Post {
     @JsonIgnore
     private Set<Comment> comments = new HashSet<>();
 
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Author author;
+
+    @Column(name = "last_punished_at")
+    private LocalDateTime lastPunishedAt;
 
     public Post(PostId id,
                 PostContent content,
@@ -125,6 +132,25 @@ public class Post {
     }
     public void makeVisible() {
         this.isVisible = true;
+    }
+
+    public void punishScore() {
+        if(!isPunishable()) return;
+        long hoursPassedSinceLastPunishment = ChronoUnit.HOURS.between(lastPunishedAt == null ? createdAt : lastPunishedAt, LocalDateTime.now());
+        if(hoursPassedSinceLastPunishment == 0) return;
+        for (long i = 0; i < hoursPassedSinceLastPunishment; i++) {
+            punish();
+        }
+        this.lastPunishedAt = LocalDateTime.now();
+    }
+
+    private boolean isPunishable() {
+        long passedHoursFromCreation = ChronoUnit.HOURS.between(createdAt, LocalDateTime.now());
+        return passedHoursFromCreation < 72;
+    }
+
+    private void punish() {
+        stats.updateScoreBy(-(int) (stats.getScore() * 0.04));
     }
 
     @Override

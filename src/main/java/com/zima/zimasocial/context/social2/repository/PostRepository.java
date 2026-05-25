@@ -6,6 +6,7 @@ import com.zima.zimasocial.context.social2.domain.value.PostId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, PostId> {
@@ -21,4 +22,14 @@ public interface PostRepository extends JpaRepository<Post, PostId> {
     void deleteAllByAuthorId(AuthorId authorId);
 
     List<Post> findAllByIsVisibleFalseAndAuthorId(AuthorId authorId);
+
+    @Query("""
+        Select post FROM Post post
+        JOIN Author author ON author.id = post.authorId 
+        WHERE post.createdAt BETWEEN :start AND :end
+        AND author.isPrivate = false
+    """)
+    List<Post> findAllByCreatedAtBetweenQuery(LocalDateTime start, LocalDateTime end);
+
+    List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

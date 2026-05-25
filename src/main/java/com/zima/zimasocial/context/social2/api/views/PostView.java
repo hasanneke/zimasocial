@@ -1,4 +1,4 @@
-package com.zima.zimasocial.views.post;
+package com.zima.zimasocial.context.social2.api.views;
 
 import com.zima.zimasocial.context.social.api.author.AuthorView;
 import com.zima.zimasocial.entity.MediaType;

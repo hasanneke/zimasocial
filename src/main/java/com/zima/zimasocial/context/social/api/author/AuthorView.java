@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.api.author;
 
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
-import com.zima.zimasocial.views.post.PostDTO;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -39,4 +39,7 @@ public class PostStats {
         likeCount -= 1;
     }
 
+    public Double baseScore() {
+        return commentCount * 3.5 + likeCount * 2;
+    }
 }

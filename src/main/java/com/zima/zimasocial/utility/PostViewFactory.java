@@ -9,7 +9,7 @@ import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.LikeJpaRepository;
 import com.zima.zimasocial.repository.ReportJpaRepository;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

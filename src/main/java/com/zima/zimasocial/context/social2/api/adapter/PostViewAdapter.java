@@ -11,15 +11,15 @@ import com.zima.zimasocial.context.social2.repository.LikeRepository;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.utility.CurrentUser;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component("POST")
+@Component
 @RequiredArgsConstructor
-public class PostViewAdapterV2 {
+public class PostViewAdapter {
     private final LikeRepository likeRepository;
     private final ReportRepository reportRepository;
     private final AuthorRepository authorRepository;

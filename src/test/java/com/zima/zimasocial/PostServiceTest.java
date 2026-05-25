@@ -12,7 +12,7 @@
 //import com.zima.zimasocial.service.posts.Payload.PostPayload;
 //import com.zima.zimasocial.service.posts.PostService;
 //import com.zima.zimasocial.service.posts.PostServiceImpl;
-//import com.zima.zimasocial.views.post.PostView;
+//import com.zima.zimasocial.context.social2.api.views.PostView;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;

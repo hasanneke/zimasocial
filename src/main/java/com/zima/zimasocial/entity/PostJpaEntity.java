@@ -5,9 +5,9 @@ import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
-import com.zima.zimasocial.entity.todayspost.TodaysPost;
+import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.views.post.PostDTO;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -99,7 +99,7 @@ public class PostJpaEntity {
 
     @OneToMany(mappedBy = "post")
     @JsonIgnore
-    private Set<TodaysPost> todaysPosts =  new HashSet<>();
+    private Set<TodaysPostDomain> todaysPosts =  new HashSet<>();
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp

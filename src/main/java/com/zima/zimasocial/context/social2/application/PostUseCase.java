@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social2.application;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.views.comment.CommentView;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 
 import java.util.UUID;
 

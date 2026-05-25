@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.post.repository;
 import com.zima.zimasocial.context.social.api.post.PostCategory;
 import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
-import com.zima.zimasocial.views.post.PostDTO;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

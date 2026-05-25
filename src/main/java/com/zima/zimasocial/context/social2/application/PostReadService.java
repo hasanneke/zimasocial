@@ -2,7 +2,6 @@ package com.zima.zimasocial.context.social2.application;
 
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.context.social.api.post.PostViewAdapter;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
@@ -12,17 +11,18 @@ import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
 import com.zima.zimasocial.context.social2.api.PostController;
-import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapterV2;
+import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
 import com.zima.zimasocial.context.social2.repository.PostRepository;
+import com.zima.zimasocial.context.social2.repository.TodaysPostRepository;
 import com.zima.zimasocial.repository.LikeJpaRepository;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.views.comment.CommentView;
-import com.zima.zimasocial.views.post.PostDTO;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +34,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -43,13 +44,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class PostReadService implements PostReadUseCase{
     private final AuthorRepositoryDomain authorRepository;
     private final AuthorRelationService authorRelationService;
-    private final PostDomainRepository postDomainRepository;
+    private final TodaysPostRepository todaysPostRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeJpaRepository likeJpaRepository;
     private final CommentViewAdapter commentViewAdapter;
-    private final PostViewAdapter postViewAdapter;
-    private final PostViewAdapterV2 postViewAdapterv2;
+    private final PostViewAdapter postViewAdapterv2;
+    private final PostDomainRepository postDomainRepository;
+
     @Override
     public List<PostView> getFeed(FeedFilterPlain filterPlain) {
         AuthorDomain author = authorRepository.getAuthenticatedAuthor();
@@ -135,6 +137,7 @@ public class PostReadService implements PostReadUseCase{
     }
 
     public List<PostView> getTodaysPosts() {
-        return postDomainRepository.findTodaysPosts().stream().map(postViewAdapter::populated).toList();
+        return todaysPostRepository.findAllByDate(LocalDate.now().minusDays(1))
+                .stream().map((e)->postViewAdapterv2.toView(e.getPost())).toList();
     }
 }

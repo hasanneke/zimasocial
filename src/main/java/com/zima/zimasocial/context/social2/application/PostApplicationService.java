@@ -9,7 +9,7 @@ import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.media.MediaNotFoundException;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
-import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapterV2;
+import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
 import com.zima.zimasocial.context.social2.domain.entity.*;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.context.social2.domain.value.MediaId;
@@ -24,7 +24,7 @@ import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import com.zima.zimasocial.utility.CurrentUser;
 import com.zima.zimasocial.views.comment.CommentView;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +44,7 @@ public class PostApplicationService implements PostUseCase{
     private final CommentViewAdapter commentViewAdapter;
     private final AuthorRepository authorRepository;
     private final MediaRepository mediaRepository;
-    private final PostViewAdapterV2 postViewAdapter;
+    private final PostViewAdapter postViewAdapter;
     @Override
     @Transactional
     public PostView createPost(CreatePost createPost) {

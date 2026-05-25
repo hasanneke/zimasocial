@@ -19,7 +19,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "todays_post")
 @SQLRestriction(value = "IS_DELETED IS FALSE")
-public class TodaysPost {
+public class TodaysPostDomain {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -54,7 +54,7 @@ public class TodaysPost {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TodaysPost that = (TodaysPost) o;
+        TodaysPostDomain that = (TodaysPostDomain) o;
         return Objects.equals(id, that.id);
     }
 

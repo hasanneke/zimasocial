@@ -10,7 +10,7 @@ import com.zima.zimasocial.context.social2.application.PostReadService;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
 import com.zima.zimasocial.service.posts.Payload.PostPayload;
 import com.zima.zimasocial.views.comment.CommentView;
-import com.zima.zimasocial.views.post.PostView;
+import com.zima.zimasocial.context.social2.api.views.PostView;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
