@@ -2,7 +2,6 @@ package com.zima.zimasocial.context.social2.application;
 
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.context.social.api.post.PostController;
 import com.zima.zimasocial.context.social.api.post.PostViewAdapter;
 import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
@@ -10,11 +9,15 @@ import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundExcepti
 import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social2.api.PostController;
+import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapterV2;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
+import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
+import com.zima.zimasocial.context.social2.repository.PostRepository;
 import com.zima.zimasocial.repository.LikeJpaRepository;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.views.comment.CommentView;
@@ -40,11 +43,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class PostReadService implements PostReadUseCase{
     private final AuthorRepositoryDomain authorRepository;
     private final AuthorRelationService authorRelationService;
-    private final PostDomainRepository postRepository;
+    private final PostDomainRepository postDomainRepository;
+    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeJpaRepository likeJpaRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final PostViewAdapter postViewAdapter;
+    private final PostViewAdapterV2 postViewAdapterv2;
     @Override
     public List<PostView> getFeed(FeedFilterPlain filterPlain) {
         AuthorDomain author = authorRepository.getAuthenticatedAuthor();
@@ -65,13 +70,13 @@ public class PostReadService implements PostReadUseCase{
         feedFilter.setCategory(filterPlain.getCategory());
         feedFilter.setSortType(filterPlain.getSortType());
 
-        List<PostDTO> postDTOS = postRepository.findFeed(feedFilter);
+        List<PostDTO> postDTOS = postDomainRepository.findFeed(feedFilter);
         return postDTOS.stream().map(PostView::new).toList();
     }
 
     public PostView getPost(Long postId) {
-        PostDomain post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        return postViewAdapter.populated(post);
+        Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
+        return postViewAdapterv2.toView(post);
     }
     @Override
     public Page<LikeDTO> getAllPostLikes(Long postId, Pageable pageable) {
@@ -109,7 +114,7 @@ public class PostReadService implements PostReadUseCase{
     }
 
     public PagedModel<CommentView> getComments(int page, int size, Long postId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByPostIdAndParentIdIsNull(postId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        Page<Comment> commentPage = commentRepository.findByPostIdAndParentIdIsNull(new PostId(postId), PageRequest.of(page, size, Sort.by("createdAt").descending()));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
                 commentViewAdapter.populatedV2(commentPage.getContent()),
@@ -130,6 +135,6 @@ public class PostReadService implements PostReadUseCase{
     }
 
     public List<PostView> getTodaysPosts() {
-        return postRepository.findTodaysPosts().stream().map(postViewAdapter::populated).toList();
+        return postDomainRepository.findTodaysPosts().stream().map(postViewAdapter::populated).toList();
     }
 }

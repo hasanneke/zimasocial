@@ -3,11 +3,10 @@ package com.zima.zimasocial.context.social.listener;
 import com.zima.zimasocial.context.account.event.AccountActivatedEvent;
 import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.event.AccountDisabledEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
-import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
-import com.zima.zimasocial.context.social.post.application.PostService;
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
-import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social2.application.PostApplicationService;
+import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -17,31 +16,27 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AccountEventListener {
-    private final PostDomainRepository postRepository;
-    private final CommentDomainRepository commentRepository;
-    private final PostService postService;
+    private final PostRepository postRepository;
+    private final PostApplicationService postService;
 
     @EventListener
     public void handleAccountDisabledEvent(AccountDisabledEvent accountDisabledEvent) {
-        List<PostDomain> allPostsOfAuthor = postRepository.findAllByAuthorId(new AuthorDomainId(accountDisabledEvent.accountId().getValue()));
-        for (PostDomain post : allPostsOfAuthor) {
+        List<Post> allPostsOfAuthor = postRepository.findAllByAuthorId(new AuthorId(accountDisabledEvent.accountId().getValue()));
+        for (Post post : allPostsOfAuthor) {
             postService.makePostInvisible(post);
         }
     }
 
     @EventListener
     public void handleAccountActivatedEvent(AccountActivatedEvent accountActivatedEvent) {
-        List<PostDomain> allPostsOfAuthor = postRepository.findAllInvisiblePostsByAuthorId(new AuthorDomainId(accountActivatedEvent.accountId().getValue()));
-        for (PostDomain post : allPostsOfAuthor) {
+        List<Post> allPostsOfAuthor = postRepository.findAllByIsVisibleFalseAndAuthorId(new AuthorId(accountActivatedEvent.accountId().getValue()));
+        for (Post post : allPostsOfAuthor) {
             postService.makePostVisible(post);
         }
     }
 
     @EventListener
     public void handleAccountDeleted(AccountDeletedEvent accountDeletedEvent) {
-        List<PostDomain> allPostsOfAuthor = postRepository.findAllByAuthorId(new AuthorDomainId(accountDeletedEvent.accountId().getValue()));
-        for (PostDomain post : allPostsOfAuthor) {
-            postService.delete(post.getPostId());
-        }
+        postRepository.deleteAllByAuthorId(new AuthorId(accountDeletedEvent.accountId().getValue()));
     }
 }

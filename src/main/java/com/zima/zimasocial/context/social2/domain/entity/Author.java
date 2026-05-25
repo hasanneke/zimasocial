@@ -46,6 +46,7 @@ public class Author {
     @Column(name = "following_count")
     private int followingCount = 0;
 
+
     @Column(name = "avatar_file_name")
     private String avatarFileName;
 

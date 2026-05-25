@@ -2,10 +2,12 @@ package com.zima.zimasocial.context.social2.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "post")
 @Getter
+@NoArgsConstructor
 public class Post {
     @EmbeddedId
     @AttributeOverride(
@@ -32,7 +35,7 @@ public class Post {
     private PostContent content;
 
     @Embedded
-    private PostMedia media;
+    private MediaId mediaId;
 
     @Embedded
     private PostStats stats;
@@ -52,6 +55,23 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Comment> comments = new HashSet<>();
+
+
+    public Post(PostId id,
+                PostContent content,
+                AuthorId authorId,
+                MediaId mediaId) {
+        this.id = id;
+        this.content = content;
+        this.mediaId = mediaId;
+        this.authorId = authorId;
+        this.createdAt = LocalDateTime.now();
+        this.stats = PostStats.builder()
+                .likeCount(0)
+                .commentCount(0)
+                .score(100)
+                .build();
+    }
 
     public Like like(AuthorId likerId) {
         stats.incrementLike();

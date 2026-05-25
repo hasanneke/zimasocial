@@ -1,17 +1,19 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.entity.MediaType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
-import java.util.UUID;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class PostMedia {
-    @Column(name = "media_id")
-    private UUID mediaId;
+    @Embedded
+    private MediaId mediaId;
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private MediaType type;

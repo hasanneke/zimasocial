@@ -13,7 +13,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByAuthorIdAndPostIdAndParentIdIsNull(AuthorId authorId, PostId postId);
     @Query("SELECT comment FROM Comment comment JOIN FETCH comment.author author WHERE comment.postId = :postId AND comment.parentId IS NULL ORDER BY comment.createdAt")
-    Page<Comment> findByPostIdAndParentIdIsNull(Long postId, Pageable pageable);
+    Page<Comment> findByPostIdAndParentIdIsNull(PostId postId, Pageable pageable);
     @Query("SELECT comment FROM Comment comment JOIN FETCH comment.author WHERE comment.parentId = :parentId ORDER BY comment.createdAt")
     Page<Comment> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable);
     void deleteAllByPostId(PostId postId);

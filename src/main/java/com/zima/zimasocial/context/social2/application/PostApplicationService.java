@@ -7,17 +7,14 @@ import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
+import com.zima.zimasocial.context.social.media.MediaNotFoundException;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
-import com.zima.zimasocial.context.social2.domain.entity.Author;
-import com.zima.zimasocial.context.social2.domain.entity.Comment;
-import com.zima.zimasocial.context.social2.domain.entity.Like;
-import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapterV2;
+import com.zima.zimasocial.context.social2.domain.entity.*;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
-import com.zima.zimasocial.context.social2.repository.AuthorRepository;
-import com.zima.zimasocial.context.social2.repository.CommentRepository;
-import com.zima.zimasocial.context.social2.repository.LikeRepository;
-import com.zima.zimasocial.context.social2.repository.PostRepository;
+import com.zima.zimasocial.context.social2.repository.*;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.exception.ConflictException;
 import com.zima.zimasocial.exception.DataNotFoundException;
@@ -46,10 +43,21 @@ public class PostApplicationService implements PostUseCase{
     private final CommentRepository commentRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final AuthorRepository authorRepository;
-
+    private final MediaRepository mediaRepository;
+    private final PostViewAdapterV2 postViewAdapter;
     @Override
+    @Transactional
     public PostView createPost(CreatePost createPost) {
-        return null;
+        Author author = authorRepository.findById(CurrentUser.getCurrentUserId()).orElseThrow(AuthorNotFoundException::new);
+        MediaId mediaId = null;
+        if(createPost.mediaId() != null){
+            Media media = mediaRepository.findById(new MediaId(UUID.fromString(createPost.mediaId()))).orElseThrow(MediaNotFoundException::new);
+            mediaId = media.getId();
+        }
+        PostContent postContent = new PostContent(createPost.content(), createPost.type());
+        Post post = new Post(postRepository.getNextSequence(), postContent, author.getId(), mediaId);
+        postRepository.save(post);
+        return postViewAdapter.toView(post);
     }
 
     @Transactional
@@ -58,7 +66,7 @@ public class PostApplicationService implements PostUseCase{
         AuthorId authorId = CurrentUser.getCurrentUserId();
         Author author = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
-        Optional<Like> existingLike = likeRepository.findByAuthorIdAndPostIdAndType(author.getId(), postId, LikeType.post);
+        Optional<Like> existingLike = likeRepository.findByAuthorIdAndPostIdAndType(author.getId(), post.getId(), LikeType.post);
         if(existingLike.isPresent()){
             throw new ConflictException("Post is already liked");
         }
@@ -82,7 +90,7 @@ public class PostApplicationService implements PostUseCase{
         AuthorId authorId = CurrentUser.getCurrentUserId();
         Author liker = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
-        Optional<Like> like = likeRepository.findByAuthorIdAndPostIdAndType(liker.getId(), postId, LikeType.post);
+        Optional<Like> like = likeRepository.findByAuthorIdAndPostIdAndType(liker.getId(), post.getId(), LikeType.post);
         if(like.isEmpty()){
             throw new ConflictException("Post is not liked");
         }

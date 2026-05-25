@@ -1,8 +1,10 @@
-package com.zima.zimasocial.context.social.api.post;
+package com.zima.zimasocial.context.social2.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
+import com.zima.zimasocial.context.social.api.post.PostCategory;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
+import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social2.application.PostApplicationService;
 import com.zima.zimasocial.context.social2.application.PostReadService;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
@@ -29,14 +31,17 @@ import java.util.List;
 @Tag(name = "New Posts Controller", description = "APIs for managing posts")
 @Validated
 @RequiredArgsConstructor
-public class PostControllerV2 {
+public class PostController {
     private final PostApplicationService postService;
     private final PostReadService postReadService;
-    private final PostControllerBridge postControllerBridge;
 
     @PostMapping
     public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) throws JsonProcessingException {
-        return ResponseEntity.ok(postControllerBridge.createPost(payload));
+        return ResponseEntity.ok(postService.createPost(CreatePost.builder()
+                .type(payload.getType())
+                .mediaId(payload.getMediaId())
+                .content(payload.getContent())
+                .build()));
     }
 
     @GetMapping("/feed")
