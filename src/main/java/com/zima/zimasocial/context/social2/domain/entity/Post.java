@@ -2,6 +2,7 @@ package com.zima.zimasocial.context.social2.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,8 +18,12 @@ import java.util.UUID;
 @Table(name = "post")
 @Getter
 public class Post {
-    @Id
-    private Long id;
+    @EmbeddedId
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "id", updatable = false)
+    )
+    private PostId id;
 
     @Embedded
     private AuthorId authorId;

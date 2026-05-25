@@ -3,6 +3,7 @@ package com.zima.zimasocial.context.social2.domain.entity;
 import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.CommentEntity;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.shared.StaticEventPublisher;
@@ -28,8 +29,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "post_id")
-    private Long postId;
+    @Embedded
+    private PostId postId;
 
     @JoinColumn(name = "post_id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -86,7 +87,7 @@ public class Comment {
 
     public Like like(AuthorId likerId) {
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId, this.getId(), new AuthorDomainId(authorId.getValue()), new AuthorDomainId(likerId.getValue())));
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId.getValue(), this.getId(), new AuthorDomainId(authorId.getValue()), new AuthorDomainId(likerId.getValue())));
         return Like.builder()
                 .postId(postId)
                 .commentId(id)

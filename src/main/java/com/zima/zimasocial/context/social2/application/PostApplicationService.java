@@ -13,6 +13,7 @@ import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.entity.Like;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.context.social2.repository.AuthorRepository;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
 import com.zima.zimasocial.context.social2.repository.LikeRepository;
@@ -56,7 +57,7 @@ public class PostApplicationService implements PostUseCase{
     public void likePost(Long postId) {
         AuthorId authorId = CurrentUser.getCurrentUserId();
         Author author = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
         Optional<Like> existingLike = likeRepository.findByAuthorIdAndPostIdAndType(author.getId(), postId, LikeType.post);
         if(existingLike.isPresent()){
             throw new ConflictException("Post is already liked");
@@ -66,7 +67,7 @@ public class PostApplicationService implements PostUseCase{
         postRepository.save(post);
         if(!post.getAuthorId().equals(like.getAuthorId())){
             PostLikedNotification postLikedNotification = PostLikedNotification.builder()
-                    .postId(post.getId())
+                    .postId(post.getId().getValue())
                     .actorId(new RecipientId(like.getAuthorId().getValue()))
                     .recipientId(new RecipientId(post.getAuthorId().getValue()))
                     .createdAt(OffsetDateTime.now())
@@ -80,7 +81,7 @@ public class PostApplicationService implements PostUseCase{
     public void unlikePost(Long postId) {
         AuthorId authorId = CurrentUser.getCurrentUserId();
         Author liker = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
         Optional<Like> like = likeRepository.findByAuthorIdAndPostIdAndType(liker.getId(), postId, LikeType.post);
         if(like.isEmpty()){
             throw new ConflictException("Post is not liked");
@@ -93,7 +94,7 @@ public class PostApplicationService implements PostUseCase{
     @Transactional
     @Override
     public void deletePost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
         AuthorId authorId = CurrentUser.getCurrentUserId();
         Author attempter = authorRepository.findById(authorId).orElseThrow(AuthorNotFoundException::new);
         if(!post.getAuthorId().equals(attempter.getId())) {
@@ -107,14 +108,14 @@ public class PostApplicationService implements PostUseCase{
     public CommentView comment(Long postId, String content, UUID mediaId) {
         AuthorId userId = CurrentUser.getCurrentUserId();
         Author commenter = authorRepository.findById(userId).orElseThrow(AuthorNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        List<Comment> previousComments = commentRepository.findByAuthorIdAndPostIdAndParentIdIsNull(commenter.getId(), postId);
+        Post post = postRepository.findById(new PostId(postId)).orElseThrow(PostNotFoundException::new);
+        List<Comment> previousComments = commentRepository.findByAuthorIdAndPostIdAndParentIdIsNull(commenter.getId(), post.getId());
         Comment comment = post.comment(commenter.getId(), content, mediaId, previousComments.isEmpty());
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
         if(!commenter.getId().equals(post.getAuthorId())){
             PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
-                    .postId(post.getId())
+                    .postId(post.getId().getValue())
                     .actorId(new RecipientId(commenter.getId().getValue()))
                     .recipientId(new RecipientId(post.getAuthorId().getValue()))
                     .createdAt(OffsetDateTime.now())
@@ -180,7 +181,7 @@ public class PostApplicationService implements PostUseCase{
         Comment reply = parent.reply(author.getId(), content, mediaId);
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getId(), parent.getAuthorId().getValue(), author.getId().getValue(), parent.getPostId()));
+        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parentId, savedReply.getId(), parent.getAuthorId().getValue(), author.getId().getValue(), parent.getPostId().getValue()));
         return commentViewAdapter.populatedV2(savedReply);
     }
     @Transactional
