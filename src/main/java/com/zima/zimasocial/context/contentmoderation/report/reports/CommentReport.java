@@ -1,12 +1,12 @@
 package com.zima.zimasocial.context.contentmoderation.report.reports;
 
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.report.ReportReason;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
 
-public record CommentReport(Long commentId, ReportReason reason, AuthorDomainId reporterAuthorId, AuthorDomainId reportedAuthorId,
+public record CommentReport(Long commentId, ReportReason reason, AuthorId reporterAuthorId, AuthorId reportedAuthorId,
                             String description) {
     public CommentReport {
         Assert.notNull(commentId, "Comment id cannot be null");

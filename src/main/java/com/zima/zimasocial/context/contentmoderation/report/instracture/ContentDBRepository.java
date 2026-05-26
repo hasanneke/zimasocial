@@ -6,19 +6,20 @@ import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social.comment.CommentDomain;
 import com.zima.zimasocial.context.social.comment.CommentDomainRepository;
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
-import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social2.repository.PostRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public class ContentDBRepository implements ContentRepository {
-    private final PostDomainRepository postRepository;
+    private final PostRepository postRepository;
     private final CommentDomainRepository commentRepository;
     private final AuthorRepositoryDomain authorRepository;
 
-    public ContentDBRepository(PostDomainRepository postRepository, CommentDomainRepository commentRepository, AuthorRepositoryDomain authorRepository) {
+    public ContentDBRepository(PostRepository postRepository, CommentDomainRepository commentRepository, AuthorRepositoryDomain authorRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.authorRepository = authorRepository;
@@ -26,8 +27,8 @@ public class ContentDBRepository implements ContentRepository {
 
     @Override
     public Optional<PostContent> getPost(Long id) {
-        Optional<PostDomain> post = postRepository.findById(id);
-        return post.map(value -> new PostContent(value.getPostId(), value.getAuthorId()));
+        Optional<Post> post = postRepository.findById(new PostId(id));
+        return post.map(value -> new PostContent(value.getId().getValue(), value.getAuthorId()));
     }
 
     @Override

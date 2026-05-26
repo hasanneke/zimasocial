@@ -6,6 +6,7 @@ import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDoma
 import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.like.LikeDomainRepository;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.views.comment.CommentView;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public class CommentViewAdapter {
         Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getId());
         commentView.setIsLiked(like.isPresent());
 
-        boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), authenticatedAuthor.getId(), ResourceType.comment);
+        boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);
         commentView.setIsReported(isCommentReported);
         return commentView;
     }
@@ -70,7 +71,7 @@ public class CommentViewAdapter {
         Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getId(), authenticatedAuthor.getId());
         commentView.setIsLiked(like.isPresent());
 
-        boolean isCommentReported = reportRepository.checkReportExists(comment.getId(), authenticatedAuthor.getId(), ResourceType.comment);
+        boolean isCommentReported = reportRepository.checkReportExists(comment.getId(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);
         commentView.setIsReported(isCommentReported);
         return commentView;
     }

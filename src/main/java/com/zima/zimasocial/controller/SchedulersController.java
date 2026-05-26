@@ -1,6 +1,6 @@
 package com.zima.zimasocial.controller;
 
-import com.zima.zimasocial.calculators.todayspost.TodaysPostGenerator;
+import com.zima.zimasocial.context.social2.domain.service.todayspost.TodaysPostGenerator;
 import com.zima.zimasocial.context.social2.domain.service.PostScorePunisherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -9,12 +9,44 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @Table(name = "users")
 @Entity
 @Getter
 @SQLRestriction(value = "IS_DELETED IS FALSE AND IS_DISABLED IS FALSE AND IS_BANNED IS FALSE")
 public class Author {
+    protected Author() {
+        // JPA only
+    }
+    private Author(AuthorId id, String slug, String email, String name, String familyName) {
+        if (id == null) throw new IllegalArgumentException("Author id cannot be null");
+        if (slug == null || slug.isBlank()) throw new IllegalArgumentException("Slug cannot be blank");
+        if (email == null || email.isBlank()) throw new IllegalArgumentException("Email cannot be blank");
+        if (name == null || name.isBlank()) throw new IllegalArgumentException("Name cannot be blank");
+
+        this.id = id;
+        this.slug = slug;
+        this.email = email;
+        this.name = name;
+        this.familyName = familyName;
+        this.isPrivate = false;
+        this.followerCount = 0;
+        this.followingCount = 0;
+        this.isDisabled = false;
+        this.isBanned = false;
+    }
+
+    public static Author create(
+            AuthorId id,
+            String slug,
+            String email,
+            String name,
+            String familyName
+    ) {
+        return new Author(id, slug, email, name, familyName);
+    }
+
     @EmbeddedId
     @AttributeOverride(
             name = "value",
@@ -63,4 +95,20 @@ public class Author {
 
     @Column(name = "is_banned")
     private Boolean isBanned = false;
+
+    public void makePrivate()  {
+        this.isPrivate = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(id, author.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

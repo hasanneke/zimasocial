@@ -1,4 +1,4 @@
-package com.zima.zimasocial.calculators.todayspost;
+package com.zima.zimasocial.context.social2.domain.service.todayspost;
 
 import com.zima.zimasocial.context.social2.domain.entity.TodaysPost;
 

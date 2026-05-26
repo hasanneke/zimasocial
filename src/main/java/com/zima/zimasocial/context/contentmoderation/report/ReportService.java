@@ -5,8 +5,9 @@ import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
 import com.zima.zimasocial.context.contentmoderation.report.exception.ReportAlreadyMadeException;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.repository.AuthorRepository;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
@@ -19,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final ContentRepository contentRepository;
-    private final AuthorRepositoryDomain authorRepository;
+    private final AuthorRepository authorRepository;
     @Autowired
-    public ReportService(ReportRepository reportRepository, ContentRepository contentRepository, AuthorRepositoryDomain authorRepository) {
+    public ReportService(ReportRepository reportRepository, ContentRepository contentRepository, AuthorRepository authorRepository) {
         this.reportRepository = reportRepository;
         this.contentRepository = contentRepository;
         this.authorRepository = authorRepository;
@@ -29,7 +30,7 @@ public class ReportService {
 
     @Transactional
     public void reportPost(Long postId, ReportReason reason, String description) {
-        AuthorDomain authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
         boolean reportExists = reportRepository.checkReportExists(postId, authenticatedUser.getId(), ResourceType.post);
         if(reportExists){
             throw new ReportAlreadyMadeException();
@@ -39,12 +40,12 @@ public class ReportService {
     }
     @Transactional
     public void reportComment(Long commentId, ReportReason reason, String description) {
-        AuthorDomain authenticatedUser = authorRepository.getAuthenticatedAuthor();
+        Author authenticatedUser = authorRepository.getAuthenticatedAuthor();
         boolean reportExists = reportRepository.checkReportExists(commentId, authenticatedUser.getId(), ResourceType.comment);
         if(reportExists){
             throw new ReportAlreadyMadeException();
         }
         CommentContent comment = contentRepository.getComment(commentId).orElseThrow(CommentNotFoundException::new);
-        reportRepository.save(new CommentReport(comment.commentId(), reason, authenticatedUser.getId(), comment.authorId(), description));
+        reportRepository.save(new CommentReport(comment.commentId(), reason, authenticatedUser.getId(), new AuthorId(comment.authorId().getValue()), description));
     }
 }
