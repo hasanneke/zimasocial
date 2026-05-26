@@ -1,8 +1,8 @@
 package com.zima.zimasocial.context.social.post.application;
 
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
-import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.domain.service.PostScorePunisherService;
+import com.zima.zimasocial.context.social2.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PostScorePunisherServiceTest {
     @Mock
-    private PostDomainRepository postRepository;
+    private PostRepository postRepository;
     @InjectMocks
     private PostScorePunisherService postScorePunisherService;
 
@@ -26,14 +26,14 @@ class PostScorePunisherServiceTest {
     void punishPosts() {
         LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
         LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
-        PostDomain post1 = mock(PostDomain.class);
-        PostDomain post2 =  mock(PostDomain.class);
-        PostDomain post24 = mock(PostDomain.class);
-        PostDomain post72 =  mock(PostDomain.class);
-        List<PostDomain> posts = List.of(post1, post2, post24, post72);
+        Post post1 = mock(Post.class);
+        Post post2 =  mock(Post.class);
+        Post post24 = mock(Post.class);
+        Post post72 =  mock(Post.class);
+        List<Post> posts = List.of(post1, post2, post24, post72);
         when(postRepository.findAllByCreatedAtBetween(start, end)).thenReturn(posts);
         postScorePunisherService.punishPosts();
-        for (PostDomain post : posts) {
+        for (Post post : posts) {
             verify(post).punishScore();
             verify(postRepository).save(post);
         }

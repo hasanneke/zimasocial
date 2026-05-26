@@ -28,7 +28,8 @@ public class PostStats {
         commentCount += 1;
     }
 
-    public void decrementComment() {
+    public void decrementCommentCount() {
+        if(commentCount <= 0) return;
         commentCount -= 1;
     }
     public void updateScoreBy(Integer value) {
@@ -36,6 +37,7 @@ public class PostStats {
     }
 
     public void decrementLike() {
+        if(likeCount <= 0) return;
         likeCount -= 1;
     }
 

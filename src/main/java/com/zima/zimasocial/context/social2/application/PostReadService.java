@@ -9,7 +9,7 @@ import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDoma
 import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
 import com.zima.zimasocial.context.social2.api.PostController;
 import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
@@ -50,7 +50,7 @@ public class PostReadService implements PostReadUseCase{
     private final LikeJpaRepository likeJpaRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final PostViewAdapter postViewAdapterv2;
-    private final PostDomainRepository postDomainRepository;
+    private final PostCustomRepository postCustomRepository;
 
     @Override
     public List<PostView> getFeed(FeedFilterPlain filterPlain) {
@@ -72,7 +72,7 @@ public class PostReadService implements PostReadUseCase{
         feedFilter.setCategory(filterPlain.getCategory());
         feedFilter.setSortType(filterPlain.getSortType());
 
-        List<PostDTO> postDTOS = postDomainRepository.findFeed(feedFilter);
+        List<PostDTO> postDTOS = postCustomRepository.findFeed(feedFilter);
         return postDTOS.stream().map(PostView::new).toList();
     }
 

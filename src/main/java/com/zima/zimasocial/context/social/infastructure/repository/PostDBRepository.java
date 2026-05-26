@@ -1,25 +1,21 @@
 package com.zima.zimasocial.context.social.infastructure.repository;
 
 import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.context.social.post.repository.PostDomainRepository;
+import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import com.zima.zimasocial.entity.MediaType;
 import com.zima.zimasocial.entity.PostJpaEntity;
-import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.entity.userRelation.Relation;
 import com.zima.zimasocial.entity.userRelation.UserRelationEntity;
 import com.zima.zimasocial.repository.PostJpaRepository;
-import com.zima.zimasocial.repository.TodaysPostRepositoryDomain;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.repository.UserRelationJpaRepository;
-import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.service.users.exception.UserNotFoundException;
 import com.zima.zimasocial.utility.CurrentUser;
-import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -27,21 +23,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class PostDBRepository implements PostDomainRepository {
+public class PostDBRepository implements PostCustomRepository {
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userRepository;
-    private final TodaysPostRepositoryDomain todaysPostRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
     private final EntityManager entityManager;
     private final String basePostSelectSQL = """
@@ -71,11 +62,6 @@ public class PostDBRepository implements PostDomainRepository {
                      	EXISTS (SELECT 1 FROM report			  WHERE resource_id = Post.id AND reporter_id = :user_id AND resource_type = 'post') isReported
                     FROM post Post
     """;
-    @Override
-    public Optional<PostDomain> findById(Long postId) {
-        PostJpaEntity post = postJpaRepository.findByIdAndIsVisibleTrue(postId).orElseThrow(PostNotFoundException::new);
-        return Optional.ofNullable(post.rehydrate());
-    }
 
     @Override
     public Page<PostDomain> findAll(Pageable page, String slug, PostCategory category) {
@@ -106,67 +92,6 @@ public class PostDBRepository implements PostDomainRepository {
         specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
         Page<PostJpaEntity> postEntityPage = postJpaRepository.findAll(specification, page);
         return postEntityPage.map(PostJpaEntity::rehydrate);
-    }
-    @Override
-    public Page<PostDomain> findFollowingsPosts(Pageable page, AuthorDomainId authorId) {
-        return postJpaRepository.findFollowingsPosts(page, authorId.getValue()).map(PostJpaEntity::rehydrate);
-    }
-
-    @Override
-    public List<PostDomain> findTodaysPosts() {
-        List<TodaysPostDomain> todaysPosts = todaysPostRepository.findTodaysPostByDate(LocalDate.now().minusDays(1));
-        return todaysPosts.stream().map((e)-> e.getPost().rehydrate()).toList();
-    }
-
-    @Override
-    public void delete(PostDomain post) {
-        postJpaRepository.deleteById(post.getPostId());
-    }
-
-    @Override
-    public Long nextSequence() {
-        return postJpaRepository.getNextSequence();
-    }
-
-    @Override
-    public List<PostDomain> findAllByAuthorId(AuthorDomainId authorId) {
-        return postJpaRepository.findAllByUserId(authorId.getValue()).stream().map(PostJpaEntity::rehydrate).toList();
-    }
-
-    @Override
-    public List<PostDomain> findAllInvisiblePostsByAuthorId(AuthorDomainId authorId) {
-        return postJpaRepository.
-                findAllInvisiblePostsByUserId(authorId.getValue()).
-                stream().map(PostJpaEntity::rehydrate).toList();
-    }
-
-    @Override
-    public List<PostDomain> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
-        return postJpaRepository.findAllByCreatedAtBetween(start, end).stream().map(PostJpaEntity::rehydrate).toList();
-    }
-
-    @Override
-    @Transactional
-    public PostDomain save(PostDomain post) {
-        PostJpaEntity postJpaEntity = postJpaRepository.findById(post.getPostId()).orElse(new PostJpaEntity());
-        postJpaEntity.merge(post);
-        UserEntity user = userRepository.findById(post.getAuthorId().getValue()).orElseThrow(UserNotFoundException::new);
-        postJpaEntity.setUser(user);
-        PostJpaEntity savedPost = postJpaRepository.save(postJpaEntity);
-        return savedPost.rehydrate();
-    }
-    @Override
-    public void makeInvisiblePostsOfAuthor(AuthorDomainId authorId) {
-        List<PostJpaEntity> postJpaEntityList = postJpaRepository.findAllByUserId(authorId.getValue());
-        postJpaEntityList.forEach(e->e.setIsVisible(false));
-        postJpaRepository.saveAll(postJpaEntityList);
-    }
-
-    @Override
-    public void makePostsVisibleOfAuthor(AuthorDomainId authorId) {
-        List<PostJpaEntity> postJpaEntityList = postJpaRepository.findAllInvisiblePostsByUserId(authorId.getValue());
-        postJpaEntityList.forEach(e->e.setIsVisible(true));
-        postJpaRepository.saveAll(postJpaEntityList);
     }
 
     @Override

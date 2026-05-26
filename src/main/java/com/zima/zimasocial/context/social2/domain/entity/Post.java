@@ -7,7 +7,6 @@ import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,7 +19,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "post")
 @Getter
-@NoArgsConstructor
 public class Post {
     @EmbeddedId
     @AttributeOverride(
@@ -64,10 +62,13 @@ public class Post {
     @Column(name = "last_punished_at")
     private LocalDateTime lastPunishedAt;
 
+    protected Post() {}
+
     public Post(PostId id,
                 PostContent content,
                 AuthorId authorId,
                 MediaId mediaId) {
+
         this.id = id;
         this.content = content;
         this.mediaId = mediaId;
@@ -78,6 +79,15 @@ public class Post {
                 .commentCount(0)
                 .score(100)
                 .build();
+    }
+
+    public static Post create(
+            PostId id,
+            PostContent content,
+            AuthorId authorId,
+            MediaId mediaId
+    ) {
+        return new Post(id, content, authorId, mediaId);
     }
 
     public Like like(AuthorId likerId) {
@@ -121,7 +131,7 @@ public class Post {
     }
 
     public void removeComment(AuthorId commenterId, boolean hasNoPreviousComments) {
-        stats.decrementComment();
+        stats.decrementCommentCount();
         if(!commenterId.equals(authorId) && hasNoPreviousComments){
             stats.updateScoreBy(-5);
         }

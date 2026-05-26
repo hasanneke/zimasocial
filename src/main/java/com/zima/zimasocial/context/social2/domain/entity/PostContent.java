@@ -5,15 +5,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 
 @Embeddable
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 public class PostContent {
+
+    protected PostContent() {}
+
+    public PostContent(String text, MediaType type) {
+        Assert.notNull(type, "Type cannot be null");
+        if(type == MediaType.any){
+            Assert.notNull(text, "Text cannot be null");
+        }
+    }
+
     @Column(name = "content")
     private String text;
 
