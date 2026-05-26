@@ -1,4 +1,4 @@
-package com.zima.zimasocial.views.comment;
+package com.zima.zimasocial.context.social2.api.views;
 import com.zima.zimasocial.context.social.api.author.AuthorView;
 import lombok.*;
 

@@ -1,6 +1,7 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
 import jakarta.persistence.*;
@@ -30,8 +31,8 @@ public class Like {
     @Embedded
     private PostId postId;
 
-    @Column(name = "comment_id")
-    private Long commentId;
+    @Embedded
+    private CommentId commentId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "like_type")

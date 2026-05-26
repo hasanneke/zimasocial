@@ -8,7 +8,7 @@ import com.zima.zimasocial.context.social.like.LikeDomainRepository;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.entity.report.ResourceType;
-import com.zima.zimasocial.views.comment.CommentView;
+import com.zima.zimasocial.context.social2.api.views.CommentView;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,31 +28,7 @@ public class CommentViewAdapter {
         this.authorViewAdapter = authorViewAdapter;
     }
 
-    public CommentView populated(CommentDomain comment) {
-        AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
-        // Create domain instance
-        CommentView commentView = new CommentView();
-        // UnProxy Proxies
-        AuthorDomain author = authorRepository.findById(comment.getAuthorId()).orElse(null);
-        // Set domain values
-        commentView.setContent(comment.getContent());
-        commentView.setId(comment.getCommentId());
-        commentView.setAuthor(authorViewAdapter.authorViewFromAuthor(author));
-        commentView.setUpdatedAt(comment.getUpdatedAt());
-        commentView.setCreatedAt(comment.getCreatedAt());
-        commentView.setLikeCount(comment.getLikeCount());
-        commentView.setReplyCount(comment.getReplyCount());
-        commentView.setMediaId(comment.getMediaId());
-
-        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getCommentId(), authenticatedAuthor.getId());
-        commentView.setIsLiked(like.isPresent());
-
-        boolean isCommentReported = reportRepository.checkReportExists(comment.getCommentId(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);
-        commentView.setIsReported(isCommentReported);
-        return commentView;
-    }
-
-    public CommentView populatedV2(Comment comment) {
+    public CommentView populated(Comment comment) {
         AuthorDomain authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         // Create domain instance
         CommentView commentView = new CommentView();
@@ -60,27 +36,22 @@ public class CommentViewAdapter {
         AuthorDomain author = authorRepository.findById(new AuthorDomainId(comment.getAuthorId().getValue())).orElse(null);
         // Set domain values
         commentView.setContent(comment.getContent());
-        commentView.setId(comment.getId());
+        commentView.setId(comment.getId().getValue());
         commentView.setAuthor(authorViewAdapter.authorViewFromAuthor(author));
         commentView.setUpdatedAt(comment.getUpdatedAt());
         commentView.setCreatedAt(comment.getCreatedAt());
         commentView.setLikeCount(comment.getLikeCount());
         commentView.setReplyCount(comment.getReplyCount());
-        commentView.setMediaId(comment.getMediaId());
-
-        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getId(), authenticatedAuthor.getId());
+        if(comment.getMediaId() != null) commentView.setMediaId(comment.getMediaId().getValue());
+        Optional<CommentLike> like = likeRepository.findByCommentIdAndAuthorId(comment.getId().getValue(), authenticatedAuthor.getId());
         commentView.setIsLiked(like.isPresent());
 
-        boolean isCommentReported = reportRepository.checkReportExists(comment.getId(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);
+        boolean isCommentReported = reportRepository.checkReportExists(comment.getId().getValue(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);
         commentView.setIsReported(isCommentReported);
         return commentView;
     }
 
-    public List<CommentView> populated(List<CommentDomain> comments) {
+    public List<CommentView> populated(List<Comment> comments) {
         return comments.stream().map(this::populated).toList();
-    }
-
-    public List<CommentView> populatedV2(List<Comment> comments) {
-        return comments.stream().map(this::populatedV2).toList();
     }
 }

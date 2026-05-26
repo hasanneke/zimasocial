@@ -1,6 +1,6 @@
-package com.zima.zimasocial.context.social.post.infastructure;
+package com.zima.zimasocial.context.social2.batch;
 
-import com.zima.zimasocial.context.social2.domain.service.PostScorePunisherService;
+import com.zima.zimasocial.context.social2.application.PostScorePunisherService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

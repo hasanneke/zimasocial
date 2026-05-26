@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social2.application;
 
 import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.views.comment.CommentView;
+import com.zima.zimasocial.context.social2.api.views.CommentView;
 import com.zima.zimasocial.context.social2.api.views.PostView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

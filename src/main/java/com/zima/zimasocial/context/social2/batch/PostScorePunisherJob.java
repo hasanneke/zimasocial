@@ -1,4 +1,4 @@
-package com.zima.zimasocial.context.social.post.infastructure;
+package com.zima.zimasocial.context.social2.batch;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

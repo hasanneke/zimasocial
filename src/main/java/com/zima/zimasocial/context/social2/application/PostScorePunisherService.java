@@ -1,4 +1,4 @@
-package com.zima.zimasocial.context.social2.domain.service;
+package com.zima.zimasocial.context.social2.application;
 
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.repository.PostRepository;
@@ -18,15 +18,15 @@ public class PostScorePunisherService {
     private final PostRepository postRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     public void punishPosts() {
-        logger.info("--- Punishing post started ----");
+        logger.debug("--- Punishing post started ----");
         LocalDateTime start = LocalDate.now().minusDays(3).atStartOfDay();
         LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
         List<Post> posts = postRepository.findAllByCreatedAtBetween(start, end);
-        logger.info("--- %d posts will be punished ----".formatted(posts.size()));
+        logger.debug("--- %d posts will be punished ----".formatted(posts.size()));
         for (Post post : posts) {
             post.punishScore();
             postRepository.save(post);
         }
-        logger.info("--- %d posts are successfully punished ----".formatted(posts.size()));
+        logger.debug("--- %d posts are successfully punished ----".formatted(posts.size()));
     }
 }

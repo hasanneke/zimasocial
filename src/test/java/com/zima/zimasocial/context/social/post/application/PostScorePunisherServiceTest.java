@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.application;
 
 import com.zima.zimasocial.context.social2.domain.entity.Post;
-import com.zima.zimasocial.context.social2.domain.service.PostScorePunisherService;
+import com.zima.zimasocial.context.social2.application.PostScorePunisherService;
 import com.zima.zimasocial.context.social2.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

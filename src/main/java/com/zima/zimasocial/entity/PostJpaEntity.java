@@ -1,13 +1,9 @@
 package com.zima.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
-import com.zima.zimasocial.context.social.post.value.MediaId;
-import com.zima.zimasocial.context.social.post.value.PostContent;
+import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -93,9 +89,6 @@ public class PostJpaEntity {
     @Column(name = "last_punished_at")
     private LocalDateTime lastPunishedAt;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<CommentEntity> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "post")
     @JsonIgnore
@@ -128,36 +121,5 @@ public class PostJpaEntity {
         return Objects.hash(id);
     }
 
-    public void merge(PostDomain post) {
-        this.id = post.getPostId();
-        this.content = post.getContent().content();
-        this.type = post.getContent().type();
-        this.mediaId = post.getContent().mediaId() != null ? post.getContent().mediaId().value() : null;
-        this.likeCount = post.getLikeCount();
-        this.commentCount = post.getCommentCount();
-        this.userId = post.getAuthorId().getValue();
-        this.isVisible = post.getIsVisible();
-        this.score = post.getScore();
-        this.lastPunishedAt = post.getLastPunishedAt();
-        this.updatedAt = post.getUpdatedAt();
-    }
-
-    public PostDomain rehydrate() {
-        return PostDomain.reconstitute(
-                id,
-                new AuthorDomainId(userId),
-                new PostContent(content, type, mediaId != null ? new MediaId(mediaId) : null),
-                likeCount,
-                commentCount,
-                score,
-                isVisible,
-                createdAt,
-                updatedAt,
-                lastPunishedAt);
-    }
-
-    public Double baseScore() {
-        return commentCount * 3.5 + likeCount * 2;
-    }
 }
 

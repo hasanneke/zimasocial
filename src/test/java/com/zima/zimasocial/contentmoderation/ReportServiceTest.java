@@ -9,7 +9,6 @@ import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
 import com.zima.zimasocial.context.contentmoderation.report.exception.ReportAlreadyMadeException;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.context.social2.domain.entity.Author;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.context.social2.repository.AuthorRepository;
@@ -42,7 +41,7 @@ public class ReportServiceTest {
     private Author testAuthor = AuthorFixture.validAuthor();
     private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
     private PostContent dummyPostContent = new PostContent(0L,new AuthorId(0L));
-    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorDomainId(0L));
+    private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorId(0L));
     @Test
     void testReportPost_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);

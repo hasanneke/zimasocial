@@ -7,11 +7,11 @@ import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEv
 import com.zima.zimasocial.context.social.author.value.AuthorFollowedEvent;
 import com.zima.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
 import com.zima.zimasocial.context.social.chat.event.ChatMessageSentEvent;
-import com.zima.zimasocial.context.social.comment.CommentLikedEvent;
-import com.zima.zimasocial.context.social.comment.CommentRepliedEvent;
-import com.zima.zimasocial.context.social.post.event.PostCommentedEvent;
-import com.zima.zimasocial.context.social.post.event.PostLikedEvent;
-import com.zima.zimasocial.context.social.post.event.PostSharedEvent;
+import com.zima.zimasocial.context.social2.event.CommentLikedEvent;
+import com.zima.zimasocial.context.social2.event.CommentRepliedEvent;
+import com.zima.zimasocial.context.social2.event.PostCommentedEvent;
+import com.zima.zimasocial.context.social2.event.PostLikedEvent;
+import com.zima.zimasocial.context.social2.event.PostSharedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -30,12 +30,12 @@ public class NotificationEventListener {
                 .builder()
                 .postId(postSharedEvent.postId())
                 .actorId(new RecipientId(postSharedEvent.postOwnerId().getValue()))
-                .type(postSharedEvent.postContent().type())
+                .type(postSharedEvent.postContent().getType())
                 .createdAt(OffsetDateTime.now())
-                .content(postSharedEvent.postContent().content() != null ? postSharedEvent
+                .content(postSharedEvent.postContent().getText() != null ? postSharedEvent
                         .postContent()
-                        .content()
-                        .substring(0, Math.min(postSharedEvent.postContent().content().length(), 100)) : null)
+                        .getText()
+                        .substring(0, Math.min(postSharedEvent.postContent().getText().length(), 100)) : null)
                 .build();
         notificationManager.throttled().sendNotification(postSharedNotification);
     }
@@ -46,7 +46,7 @@ public class NotificationEventListener {
             return;
         }
         PostLikedNotification postLikedNotification = PostLikedNotification.builder()
-                .postId(postLikedEvent.postId())
+                .postId(postLikedEvent.postId().getValue())
                 .actorId(new RecipientId(postLikedEvent.actorId().getValue()))
                 .recipientId(new RecipientId(postLikedEvent.postOwnerId().getValue()))
                 .createdAt(OffsetDateTime.now())
@@ -91,8 +91,8 @@ public class NotificationEventListener {
         }
         CommentRepliedNotification commentRepliedNotification = CommentRepliedNotification.builder()
                 .commentId(commentRepliedEvent.parentCommentId())
-                .actorId(new RecipientId(commentRepliedEvent.replyerId()))
-                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId()))
+                .actorId(new RecipientId(commentRepliedEvent.replyerId().getValue()))
+                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
                 .postId(commentRepliedEvent.postId())
                 .createdAt(OffsetDateTime.now())
                 .build();

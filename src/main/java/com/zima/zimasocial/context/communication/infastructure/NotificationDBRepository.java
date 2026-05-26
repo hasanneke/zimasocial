@@ -83,13 +83,13 @@ public class NotificationDBRepository implements NotificationRepository {
                 return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.NEW_MESSAGE).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case CommentLikedNotification commentLikedNotification -> {
-                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_LIKED, commentLikedNotification.getCommentId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_LIKED, commentLikedNotification.getCommentId().getValue()).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case CommentRepliedNotification commentRepliedNotification -> {
-                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_REPLIED, commentRepliedNotification.getReplyId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.COMMENT_REPLIED, commentRepliedNotification.getReplyId().getValue()).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case PostCommentedNotification postCommentedNotification -> {
-                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_COMMENTED, postCommentedNotification.getPostId()).map(NotificationDBRepositoryAdapter::convertToNotification);
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_COMMENTED, postCommentedNotification.getPostId().getValue()).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case PostLikedNotification postLikedNotification -> {
                 return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.POST_LIKED, postLikedNotification.getPostId()).map(NotificationDBRepositoryAdapter::convertToNotification);

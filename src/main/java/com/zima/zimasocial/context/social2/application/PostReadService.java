@@ -14,13 +14,14 @@ import com.zima.zimasocial.context.social2.api.PostController;
 import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
 import com.zima.zimasocial.context.social2.repository.PostRepository;
 import com.zima.zimasocial.context.social2.repository.TodaysPostRepository;
 import com.zima.zimasocial.repository.LikeJpaRepository;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
-import com.zima.zimasocial.views.comment.CommentView;
+import com.zima.zimasocial.context.social2.api.views.CommentView;
 import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import com.zima.zimasocial.context.social2.api.views.PostView;
 import lombok.RequiredArgsConstructor;
@@ -94,10 +95,10 @@ public class PostReadService implements PostReadUseCase{
 
     @Override
     public PagedModel<CommentView> getCommentReplies(int page, int size, Long commentId) throws NoSuchMethodException {
-        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAt(commentId, PageRequest.of(page, size));
+        Page<Comment> commentPage = commentRepository.findByParentIdOrderByCreatedAt(new CommentId(commentId), PageRequest.of(page, size));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
-                commentViewAdapter.populatedV2(commentPage.getContent()),
+                commentViewAdapter.populated(commentPage.getContent()),
                 new PagedModel.PageMetadata(commentPage.getSize(),
                         commentPage.getNumber(),
                         commentPage.getTotalElements(),
@@ -119,7 +120,7 @@ public class PostReadService implements PostReadUseCase{
         Page<Comment> commentPage = commentRepository.findByPostIdAndParentIdIsNull(new PostId(postId), PageRequest.of(page, size, Sort.by("createdAt").descending()));
 
         PagedModel<CommentView> pagedModel = PagedModel.of(
-                commentViewAdapter.populatedV2(commentPage.getContent()),
+                commentViewAdapter.populated(commentPage.getContent()),
                 new PagedModel.PageMetadata(commentPage.getSize(),
                         commentPage.getNumber(),
                         commentPage.getTotalElements(),

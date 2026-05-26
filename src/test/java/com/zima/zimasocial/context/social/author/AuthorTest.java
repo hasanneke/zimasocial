@@ -21,11 +21,12 @@ public class AuthorTest {
     private ApplicationEventPublisher applicationEventPublisher;
     @InjectMocks
     private StaticEventPublisher staticEventPublisher;
+
     @Test
     void requestToFollow_WhenUserSendFollowRequestToSelf_ThrowCircularFollowException() {
         AuthorDomain followerAuthor = new AuthorDomain(new AuthorDomainId(0L), "", "", LocalDateTime.now());
         AuthorDomain followedAuthor = new AuthorDomain(new AuthorDomainId(0L), "", "", LocalDateTime.now());
-        Assertions.assertThrows(CircularFollowException.class, ()->followedAuthor.requestToFollow(followerAuthor.getId(), UuidCreator.getTimeOrdered()));
+        Assertions.assertThrows(CircularFollowException.class, ()-> followedAuthor.requestToFollow(followerAuthor.getId(), UuidCreator.getTimeOrdered()));
     }
 
     @Test

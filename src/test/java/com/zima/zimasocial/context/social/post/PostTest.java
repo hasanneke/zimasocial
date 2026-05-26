@@ -4,6 +4,7 @@ import com.zima.zimasocial.AuthorFixture;
 import com.zima.zimasocial.PostFixture;
 import com.zima.zimasocial.context.social2.domain.entity.Author;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @ExtendWith(MockitoExtension.class)
 class PostTest {
@@ -50,7 +52,7 @@ class PostTest {
     @Test
     void testComment_WhenOtherAuthorComments_IncreaseScoreAndCommentCount() {
         Post post = PostFixture.validPost();
-        post.comment(post.getAuthorId(), "", null, true);
+        post.comment(new CommentId(new Random().nextLong()),post.getAuthorId(), "", null, true);
         Assertions.assertEquals(105, post.getStats().getScore());
         Assertions.assertEquals(1, post.getStats().getCommentCount());
     }
@@ -66,7 +68,7 @@ class PostTest {
     @Test
     void testComment_WhenAuthorSelfComments_ScoreNotChangedAndCommentCountIncreased() {
         Post post = PostFixture.validPost();
-        post.comment(post.getAuthorId(), "", null, false);
+        post.comment(new CommentId(new Random().nextLong()),post.getAuthorId(), "", null, false);
         Assertions.assertEquals(100, post.getStats().getScore());
         Assertions.assertEquals(1, post.getStats().getCommentCount());
     }

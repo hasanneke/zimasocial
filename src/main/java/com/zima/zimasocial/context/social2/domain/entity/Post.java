@@ -2,19 +2,21 @@ package com.zima.zimasocial.context.social2.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
+import com.zima.zimasocial.entity.MediaType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "post")
@@ -68,7 +70,12 @@ public class Post {
                 PostContent content,
                 AuthorId authorId,
                 MediaId mediaId) {
-
+        Assert.notNull(id, "Id cannot be null");
+        Assert.notNull(content, "content cannot be null");
+        Assert.notNull(authorId, "AuthorId cannot be null");
+        if(content.getType() != MediaType.any){
+            Assert.notNull(mediaId, "MediaId cannot be null if type is not MediaType.any");
+        }
         this.id = id;
         this.content = content;
         this.mediaId = mediaId;
@@ -109,9 +116,11 @@ public class Post {
         }
     }
 
-    public Comment comment(AuthorId commenterId,
+    public Comment comment(
+            CommentId commentId,
+            AuthorId commenterId,
                            String content,
-                           UUID mediaId,
+                           MediaId mediaId,
                            boolean hasNoPreviousComments) {
         if(hasNoPreviousComments){
             stats.updateScoreBy(5);
@@ -119,6 +128,7 @@ public class Post {
         stats.incrementComment();
         return Comment
                 .builder()
+                .id(commentId)
                 .authorId(commenterId)
                 .postId(id)
                 .content(content)

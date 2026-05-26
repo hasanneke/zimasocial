@@ -19,12 +19,14 @@ public class PostContent {
         if(type == MediaType.any){
             Assert.notNull(text, "Text cannot be null");
         }
+        this.text = text;
+        this.type = type;
     }
 
     @Column(name = "content")
     private String text;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private MediaType type;
 }

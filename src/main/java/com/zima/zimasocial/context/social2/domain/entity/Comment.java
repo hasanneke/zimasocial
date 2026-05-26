@@ -1,33 +1,34 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
-import com.zima.zimasocial.context.social.comment.CommentLikedEvent;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
-import com.zima.zimasocial.entity.CommentEntity;
+import com.zima.zimasocial.context.social2.event.CommentLikedEvent;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "comment")
 @Builder
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "id", updatable = false)
+    )
+    private CommentId id;
 
     @Embedded
     private PostId postId;
@@ -49,15 +50,19 @@ public class Comment {
     @Column(name = "reply_count")
     private int replyCount = 0;
 
-    @Column(name = "parent_id")
-    private Long parentId;
+    @Embedded
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "parent_id", updatable = false)
+    )
+    private CommentId parentId;
 
     @ManyToOne
     @JoinColumn(name = "parent_id", insertable = false, updatable = false)
-    private CommentEntity parent;
+    private Comment parent;
 
-    @Column(name = "media_id")
-    private UUID mediaId;
+    @Embedded
+    private MediaId mediaId;
 
     @Column(name = "content")
     private String content;
@@ -70,7 +75,22 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Comment reply(AuthorId replierAuthorId, String comment, UUID mediaId){
+    protected Comment() {}
+
+    public Comment(CommentId id, AuthorId authorId, PostId postId, String content, MediaId mediaId) {
+        Assert.notNull(id, "Id cannot be null");
+        Assert.notNull(id, "AuthorId cannot be null");
+        Assert.notNull(id, "PostId cannot be null");
+        Assert.notNull(id, "Content cannot be null");
+        this.id = id;
+        this.authorId = authorId;
+        this.postId = postId;
+        this.content = content;
+        this.mediaId = mediaId;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Comment reply(AuthorId replierAuthorId, String comment, MediaId mediaId){
         replyCount += 1;
         return Comment.builder()
                 .postId(postId)
@@ -87,7 +107,7 @@ public class Comment {
 
     public Like like(AuthorId likerId) {
         likeCount += 1;
-        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.postId.getValue(), this.getId(), new AuthorDomainId(authorId.getValue()), new AuthorDomainId(likerId.getValue())));
+        StaticEventPublisher.publishEvent(new CommentLikedEvent(this.getPostId(), this.getId(), authorId, likerId));
         return Like.builder()
                 .postId(postId)
                 .commentId(id)

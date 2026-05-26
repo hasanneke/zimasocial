@@ -1,27 +1,15 @@
-package com.zima.zimasocial.context.social.infastructure.repository;
+package com.zima.zimasocial.context.social2.infastructure;
 
 import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.post.entity.PostDomain;
 import com.zima.zimasocial.context.social.post.repository.FeedFilter;
 import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.context.social2.api.views.PostDTO;
-import com.zima.zimasocial.entity.MediaType;
-import com.zima.zimasocial.entity.PostJpaEntity;
-import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.entity.userRelation.UserRelationEntity;
-import com.zima.zimasocial.repository.PostJpaRepository;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.repository.UserRelationJpaRepository;
-import com.zima.zimasocial.service.users.exception.UserNotFoundException;
-import com.zima.zimasocial.utility.CurrentUser;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -31,7 +19,6 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 public class PostDBRepository implements PostCustomRepository {
-    private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userRepository;
     private final UserRelationJpaRepository userRelationJpaRepository;
     private final EntityManager entityManager;
@@ -64,37 +51,6 @@ public class PostDBRepository implements PostCustomRepository {
     """;
 
     @Override
-    public Page<PostDomain> findAll(Pageable page, String slug, PostCategory category) {
-        UserEntity currentUser = CurrentUser.getCurrentUserProfile();
-        Specification<PostJpaEntity> specification = Specification.where(null);
-        if(slug != null){
-            UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
-            specification = specification.and(PostSpecification.authorId(user.getId()));
-        }
-        // Study Specification Pattern
-        MediaType type = switch (category) {
-                case all -> MediaType.any;
-                case music -> MediaType.music;
-                case movie -> MediaType.movie;
-                case book -> MediaType.book;
-                case tv ->  MediaType.tv;
-                case followings -> null;
-        };
-        if(type != MediaType.any){
-            specification = specification.and(PostSpecification.type(type));
-        }
-        List<UserRelationEntity> blockRelations = userRelationJpaRepository.findAllBlockRelations(currentUser.getId());
-        List<UserRelationEntity> followRelations = userRelationJpaRepository.findByActorIdAndRelation(currentUser.getId(), Relation.followed);
-        List<Long> followedAuthors = followRelations.stream().map(UserRelationEntity::getReceiverId).toList();
-
-        specification = specification.and(PostSpecification.notBlocked(currentUser.getId(), blockRelations));
-        specification = specification.and(PostSpecification.isVisible());
-        specification = specification.and(PostSpecification.isAuthorPublicOrAuthorFollowed(currentUser.getId(), followedAuthors));
-        Page<PostJpaEntity> postEntityPage = postJpaRepository.findAll(specification, page);
-        return postEntityPage.map(PostJpaEntity::rehydrate);
-    }
-
-    @Override
     public List<PostDTO> findFeed(FeedFilter feedFilter) {
         if(feedFilter.getCategory() == PostCategory.followings){
             return findFollowingsFeed(feedFilter);
@@ -102,23 +58,6 @@ public class PostDBRepository implements PostCustomRepository {
             return findAuthorsFeed(feedFilter);
         }
         return findHomeFeed(feedFilter);
-    }
-
-    @Override
-    public List<PostDTO> findAuthorsPosts(FeedFilter feedFilter) {
-        StringBuilder baseSQLStringBuilder = new StringBuilder(
-                basePostSelectSQL + """
-                    INNER JOIN users Users ON Users.id = Post.user_id
-                    WHERE Post.user_id = :owner_author_id
-                    ORDER BY Post.id DESC LIMIT :size
-                """
-        );
-        Query query = entityManager.createNativeQuery(baseSQLStringBuilder.toString(), "post_dto_mapping");
-        query.setParameter("user_id", feedFilter.getReaderAuthorId().getValue());
-        query.setParameter("owner_author_id", feedFilter.getOwnerAuthorId().getValue());
-        query.setParameter("size", feedFilter.getSize());
-
-        return query.getResultList();
     }
 
     private List<PostDTO> findHomeFeed(FeedFilter filter) {
