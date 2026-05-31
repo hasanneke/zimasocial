@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zima.zimasocial.context.social.api.dto.MediaDTO;
 import com.zima.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.infastructure.MediaItem;
-import com.zima.zimasocial.context.social.post.value.MediaId;
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class MediaService {
     }
 
     public JsonNode getMedia(MediaId mediaId) throws JsonProcessingException {
-        MediaItem mediaItem = mediaItemJpaRepository.findDistinctById(mediaId.value());
+        MediaItem mediaItem = mediaItemJpaRepository.findDistinctById(mediaId.getValue());
         return objectMapper.readTree(mediaItem.getContent());
     }
 

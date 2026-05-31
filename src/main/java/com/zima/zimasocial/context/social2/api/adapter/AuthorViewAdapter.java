@@ -2,16 +2,15 @@ package com.zima.zimasocial.context.social2.api.adapter;
 
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
-import com.zima.zimasocial.context.social.api.author.AuthorView;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
-import com.zima.zimasocial.context.social.authorrelation.AuthorRelationCollection;
-import com.zima.zimasocial.context.social.authorrelation.FollowRequestCollection;
-import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
-import com.zima.zimasocial.context.social.authorrelation.values.BlockRelation;
-import com.zima.zimasocial.context.social.authorrelation.values.FollowRelation;
+import com.zima.zimasocial.context.social2.exception.AuthorNotFoundException;
+import com.zima.zimasocial.context.social2.api.views.AuthorView;
 import com.zima.zimasocial.context.social2.domain.entity.Author;
+import com.zima.zimasocial.context.social2.domain.entity.AuthorRelation;
+import com.zima.zimasocial.context.social2.domain.entity.FollowRequest;
+import com.zima.zimasocial.context.social2.repository.AuthorRelationRepository;
 import com.zima.zimasocial.context.social2.repository.AuthorRepository;
+import com.zima.zimasocial.context.social2.repository.FollowRequestRepository;
+import com.zima.zimasocial.entity.userRelation.Relation;
 import com.zima.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,25 +22,35 @@ import java.util.Optional;
 public class AuthorViewAdapter {
     private final AuthorRepository authorRepository;
     private final AccountRepository accountRepository;
-    private final AuthorRelationCollection authorRelationRepository;
-    private final FollowRequestCollection followRequestCollection;
-    public AuthorView toView(Author author) {
-        AuthorView authorView = new AuthorView();
+    private final AuthorRelationRepository authorRelationRepository;
+    private final FollowRequestRepository followRequestRepository;
+    public AuthorView toRichView(Author author) {
+        AuthorView authorView = toView(author);
         Author authenticatedUser = authorRepository.findById(CurrentUser.getCurrentUserId()).orElseThrow(AuthorNotFoundException::new);
         Account account = accountRepository.getAuthenticatedAccount();
-        Optional<FollowRelation> followRelation =
+        Optional<AuthorRelation> followRelation =
                 authorRelationRepository
-                        .findFollowRelationBetween(new AuthorDomainId(authenticatedUser.getId().getValue()), new AuthorDomainId(author.getId().getValue()));
-        Optional<FollowRelation> followMeRelation =
+                        .findByActorAndReceiverAndRelation(authenticatedUser, author, Relation.followed);
+        Optional<AuthorRelation> followMeRelation =
                 authorRelationRepository
-                        .findFollowRelationBetween(new AuthorDomainId(author.getId().getValue()), new AuthorDomainId(authenticatedUser.getId().getValue()));
-        Optional<BlockRelation> blockRelation =
-                authorRelationRepository.findBlockRelationBetween(new AuthorDomainId(authenticatedUser.getId().getValue()), new AuthorDomainId(author.getId().getValue()));
+                        .findByActorAndReceiverAndRelation(authenticatedUser,author,Relation.followed);
+        Optional<AuthorRelation> blockRelation =
+                authorRelationRepository.findByActorAndReceiverAndRelation(authenticatedUser, author, Relation.blocked);
         Optional<FollowRequest> followRequestReceived =
-                followRequestCollection.findByFollowedIdAndFollowerId(new AuthorDomainId(authenticatedUser.getId().getValue()), new AuthorDomainId(author.getId().getValue()));
+                followRequestRepository.findByFollowerIdAndFollowedId(author.getId(), authenticatedUser.getId());
         Optional<FollowRequest> followRequestSent =
-                followRequestCollection.findByFollowedIdAndFollowerId(new AuthorDomainId(author.getId().getValue()), new AuthorDomainId(authenticatedUser.getId().getValue()));
+                followRequestRepository.findByFollowerIdAndFollowedId(authenticatedUser.getId(), author.getId());
+        authorView.setFollowed(followRelation.isPresent());
+        authorView.setFollowingMe(followMeRelation.isPresent());
+        authorView.setFollowRequestSent(followRequestSent.isPresent());
+        authorView.setFollowRequestReceived(followRequestReceived.isPresent());
+        authorView.setIsBlocked(blockRelation.isPresent());
+        authorView.setTermsOfUseAccepted(account.getTermsOfUseAccepted());
+        return authorView;
+    }
 
+    public AuthorView toView(Author author) {
+        AuthorView authorView = new AuthorView();
         authorView.setId(author.getId().getValue());
         authorView.setSlug(author.getSlug());
         authorView.setName(author.getName());
@@ -50,13 +59,7 @@ public class AuthorViewAdapter {
         authorView.setBio(author.getBio());
         authorView.setFollowerCount(author.getFollowerCount());
         authorView.setFollowingCount(author.getFollowingCount());
-        authorView.setFollowed(followRelation.isPresent());
-        authorView.setFollowingMe(followMeRelation.isPresent());
-        authorView.setFollowRequestSent(followRequestSent.isPresent());
-        authorView.setFollowRequestReceived(followRequestReceived.isPresent());
-        authorView.setIsPrivate(author.isPrivate());
-        authorView.setIsBlocked(blockRelation.isPresent());
-        authorView.setTermsOfUseAccepted(account.getTermsOfUseAccepted());
+        authorView.setIsPrivate(author.getIsPrivate());
         return authorView;
     }
 }

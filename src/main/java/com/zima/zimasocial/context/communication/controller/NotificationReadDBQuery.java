@@ -1,14 +1,12 @@
 package com.zima.zimasocial.context.communication.controller;
 
-import com.zima.zimasocial.context.social.api.author.AuthorAuthorViewAdapter;
-import com.zima.zimasocial.context.social.infastructure.adapter.AuthorUserEntityAdapter;
+import com.zima.zimasocial.context.social2.api.adapter.AuthorViewAdapter;
 import com.zima.zimasocial.entity.NotificationEntity;
 import com.zima.zimasocial.entity.NotificationType;
 import com.zima.zimasocial.repository.NotificationJpaRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
 import com.zima.zimasocial.views.notification.NotificationView2;
-import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -16,18 +14,10 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class NotificationReadDBQuery implements NotificationQuery {
     private final NotificationJpaRepository notificationJpaRepository;
-    private final AuthorAuthorViewAdapter authorViewAdapter;
-    private final AuthorUserEntityAdapter authorUserEntityAdapter;
-    private final EntityManager entityManager;
-    @Autowired
-    public NotificationReadDBQuery(NotificationJpaRepository notificationJpaRepository, AuthorAuthorViewAdapter authorViewAdapter, AuthorUserEntityAdapter authorUserEntityAdapter, EntityManager entityManager) {
-        this.notificationJpaRepository = notificationJpaRepository;
-        this.authorViewAdapter = authorViewAdapter;
-        this.authorUserEntityAdapter = authorUserEntityAdapter;
-        this.entityManager = entityManager;
-    }
+    private final AuthorViewAdapter authorViewAdapter;
 
     @Override
     public Page<NotificationView> findByRecipientId(Long recipientId, Pageable pageable) {
@@ -42,7 +32,7 @@ public class NotificationReadDBQuery implements NotificationQuery {
                 .targetCollection(e.getTargetCollection())
                 .postId(e.getPostId())
                 .createdAt(e.getCreatedAt())
-                .actor(authorViewAdapter.authorViewFromAuthor(authorUserEntityAdapter.convertUserEntityToAuthor(e.getActor()), false))
+                .actor(authorViewAdapter.toRichView(e.getActor()))
                 .build());
     }
 

@@ -1,6 +1,7 @@
 package com.zima.zimasocial.entity;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
 import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -60,7 +61,7 @@ public class NotificationEntity {
 
     @ManyToOne
     @JoinColumn(name = "sender_user_id", insertable = false, updatable = false)
-    private UserEntity actor;
+    private Author actor;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "target_collection")
@@ -205,7 +206,7 @@ public class NotificationEntity {
                 .receiverUserId(chatMessageSentNotification.getRecipientId().getValue())
                 .actorId(chatMessageSentNotification.getActorId().getValue())
                 .isPushed(chatMessageSentNotification.isPushed())
-                .chatId(chatMessageSentNotification.getChatRoomId().value())
+                .chatId(chatMessageSentNotification.getChatRoomId().getValue())
                 .build();
     }
     public void merge(Notification notification){

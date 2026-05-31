@@ -3,28 +3,24 @@ package com.zima.zimasocial.context.contentmoderation.report.instracture;
 import com.zima.zimasocial.context.contentmoderation.report.ContentRepository;
 import com.zima.zimasocial.context.contentmoderation.report.content.CommentContent;
 import com.zima.zimasocial.context.contentmoderation.report.content.PostContent;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 import com.zima.zimasocial.context.social2.domain.entity.Comment;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social2.repository.AuthorRepository;
 import com.zima.zimasocial.context.social2.repository.CommentRepository;
 import com.zima.zimasocial.context.social2.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class ContentDBRepository implements ContentRepository {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final AuthorRepositoryDomain authorRepository;
-
-    public ContentDBRepository(PostRepository postRepository, CommentRepository commentRepository, AuthorRepositoryDomain authorRepository) {
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
-        this.authorRepository = authorRepository;
-    }
+    private final AuthorRepository authorRepository;
 
     @Override
     public Optional<PostContent> getPost(Long id) {

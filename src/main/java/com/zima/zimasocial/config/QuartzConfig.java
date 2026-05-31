@@ -3,7 +3,7 @@ package com.zima.zimasocial.config;
 import com.zima.zimasocial.batch.pushnotifications.PushNotificationsJob;
 import com.zima.zimasocial.batch.spotifytokenrequester.SpotifyTokenRequesterJob;
 import com.zima.zimasocial.batch.todaysposts.TodaysPostJob;
-import com.zima.zimasocial.context.social2.batch.PostScorePunisherJob;
+import com.zima.zimasocial.context.social2.application.batch.PostScorePunisherJob;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

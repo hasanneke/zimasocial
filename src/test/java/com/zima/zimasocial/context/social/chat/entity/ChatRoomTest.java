@@ -1,44 +1,40 @@
 package com.zima.zimasocial.context.social.chat.entity;
 
+import com.github.f4b6a3.uuid.UuidCreator;
+import com.zima.zimasocial.AuthorFixture;
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.chat.exception.AuthorIsNotInRoom;
-import com.zima.zimasocial.shared.StaticEventPublisher;
+import com.zima.zimasocial.context.social2.chat.entity.ChatMessage;
+import com.zima.zimasocial.context.social2.chat.entity.ChatRoom;
+import com.zima.zimasocial.context.social2.chat.exception.AuthorIsNotInRoom;
+import com.zima.zimasocial.context.social2.chat.value.ChatMessageId;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatRoomTest {
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-    @InjectMocks
-    private StaticEventPublisher staticEventPublisher;
     @Test
     public void testSendMessage_WhenSenderIsNotInRoom_ThrowRecipientOrSenderIsNotInChatRoom() {
         ChatRoom chatRoom = ChatTestUtility.mockChatRoom(0L, 1L);
         // Sender is not in room
-        AuthorDomain sender = ChatTestUtility.mockAuthor(5L);
-        AuthorDomain receiver = ChatTestUtility.mockAuthor(0L);
+        Author sender = AuthorFixture.validAuthor();
+        Author receiver = AuthorFixture.validAuthor();
         Assertions.assertThrows(AuthorIsNotInRoom.class,
-                () -> chatRoom.sendMessage("", sender, receiver, ChatTestUtility.mockChatMessageId()));
+                () -> chatRoom.sendMessage(new ChatMessageId(UuidCreator.getTimeOrdered()) ,"", sender, receiver));
     }
 
     @Test
     public void testSendMessage_WhenSuccess_ReturnChatMessage() {
-        ChatRoom chatRoom = ChatTestUtility.mockChatRoom(0L, 1L);
+        Author sender = AuthorFixture.validAuthor();
+        Author receiver = AuthorFixture.validAuthor();
+
+        ChatRoom chatRoom = ChatTestUtility.mockChatRoom(sender.getId().getValue(), 1L);
         // Sender is not in room
-        AuthorDomain sender = ChatTestUtility.mockAuthor(0L);
-        AuthorDomain receiver = ChatTestUtility.mockAuthor(1L);
-        ChatMessageId mockChatMessageId = ChatTestUtility.mockChatMessageId();
-        ChatMessage chatMessage = chatRoom.sendMessage("Message", sender, receiver, mockChatMessageId);
-        Assertions.assertNotNull(chatMessage.message());
-        Assertions.assertEquals(chatMessage.senderId(), sender.getId());
-        Assertions.assertEquals(chatMessage.id(), mockChatMessageId);
+        ChatMessage chatMessage = chatRoom.sendMessage(new ChatMessageId(UuidCreator.getTimeOrdered()),"Message", sender, receiver);
+        Assertions.assertNotNull(chatMessage.getContent());
+        Assertions.assertEquals(chatMessage.getSenderId(), sender.getId());
     }
 }
 

@@ -2,10 +2,10 @@ package com.zima.zimasocial.context.communication.controller;
 
 import com.zima.zimasocial.context.communication.application.NotificationManager;
 import com.zima.zimasocial.context.communication.infastructure.DeviceTokenPayload;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
+import com.zima.zimasocial.context.social2.repository.AuthorRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
 import com.zima.zimasocial.views.notification.NotificationView2;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,17 +23,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController()
 @RequestMapping(path = "/api/v2/notifications")
+@RequiredArgsConstructor
 public class NotificationControllerBeta {
     private final NotificationQuery notificationReadRepository;
     private final NotificationManager notificationService;
-    private final AuthorRepositoryDomain authorRepository;
-
-    @Autowired
-    public NotificationControllerBeta(NotificationQuery notificationReadRepository, NotificationManager notificationService, AuthorRepositoryDomain authorRepository) {
-        this.notificationReadRepository = notificationReadRepository;
-        this.notificationService = notificationService;
-        this.authorRepository = authorRepository;
-    }
+    private final AuthorRepository authorRepository;
 
     @PostMapping("/device-tokens")
     public ResponseEntity<Void> sendDeviceToken(@RequestBody DeviceTokenPayload deviceToken) {

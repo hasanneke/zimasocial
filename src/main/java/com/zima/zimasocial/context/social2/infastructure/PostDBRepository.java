@@ -1,9 +1,5 @@
 package com.zima.zimasocial.context.social2.infastructure;
 
-import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
-import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.repository.UserRelationJpaRepository;

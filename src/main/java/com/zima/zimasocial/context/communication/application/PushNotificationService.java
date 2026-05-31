@@ -129,7 +129,7 @@ public class PushNotificationService {
                             .deviceToken(deviceToken.getToken())
                             .linkToSource(linkToApp)
                             .type("chat")
-                            .resourceId(chatMessageSentNotification.getChatRoomId().value().toString())
+                            .resourceId(chatMessageSentNotification.getChatRoomId().getValue().toString())
                             .build();
                 }
                 case PostSharedNotification postSharedNotification -> {

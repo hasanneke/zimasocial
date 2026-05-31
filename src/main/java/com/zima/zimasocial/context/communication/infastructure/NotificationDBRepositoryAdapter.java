@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.communication.infastructure;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
+import com.zima.zimasocial.context.social2.chat.value.ChatRoomId;
 import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.NotificationEntity;

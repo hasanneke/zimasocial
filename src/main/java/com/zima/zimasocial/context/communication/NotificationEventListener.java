@@ -3,15 +3,15 @@ package com.zima.zimasocial.context.communication;
 import com.zima.zimasocial.context.communication.application.NotificationManager;
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.social.author.value.AuthorFollowRequestSentEvent;
-import com.zima.zimasocial.context.social.author.value.AuthorFollowedEvent;
-import com.zima.zimasocial.context.social.authorrelation.values.AuthorFollowRequestAcceptedEvent;
-import com.zima.zimasocial.context.social.chat.event.ChatMessageSentEvent;
-import com.zima.zimasocial.context.social2.event.CommentLikedEvent;
-import com.zima.zimasocial.context.social2.event.CommentRepliedEvent;
-import com.zima.zimasocial.context.social2.event.PostCommentedEvent;
-import com.zima.zimasocial.context.social2.event.PostLikedEvent;
-import com.zima.zimasocial.context.social2.event.PostSharedEvent;
+import com.zima.zimasocial.context.social2.domain.event.AuthorFollowRequestSentEvent;
+import com.zima.zimasocial.context.social2.domain.event.AuthorFollowedEvent;
+import com.zima.zimasocial.context.social2.domain.event.AuthorFollowRequestAcceptedEvent;
+import com.zima.zimasocial.context.social2.domain.event.ChatMessageSentEvent;
+import com.zima.zimasocial.context.social2.domain.event.CommentLikedEvent;
+import com.zima.zimasocial.context.social2.domain.event.CommentRepliedEvent;
+import com.zima.zimasocial.context.social2.domain.event.PostCommentedEvent;
+import com.zima.zimasocial.context.social2.domain.event.PostLikedEvent;
+import com.zima.zimasocial.context.social2.domain.event.PostSharedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -136,12 +136,12 @@ public class NotificationEventListener {
     public void handleChatMessageSentEvent(ChatMessageSentEvent chatMessageSentEvent) {
         ChatMessageSentNotification chatMessageSentNotification = ChatMessageSentNotification
                 .builder()
-                .chatRoomId(chatMessageSentEvent.message().chatRoomId())
+                .chatRoomId(chatMessageSentEvent.message().getChatRoomId())
                 .actorId(new RecipientId(chatMessageSentEvent.sender().getId().getValue()))
                 .recipientId(new RecipientId(chatMessageSentEvent.receiver().getId().getValue()))
                 .createdAt(OffsetDateTime.now())
-                .message(chatMessageSentEvent.message().message())
-                .chatRoomId(chatMessageSentEvent.message().chatRoomId())
+                .message(chatMessageSentEvent.message().getContent())
+                .chatRoomId(chatMessageSentEvent.message().getChatRoomId())
                 .build();
         notificationManager.sendNotification(chatMessageSentNotification);
     }

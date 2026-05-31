@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller.views;
 
-import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
+import com.zima.zimasocial.context.social2.chat.entity.ChatMessage;
 import lombok.Getter;
 
 import java.time.OffsetDateTime;
@@ -14,9 +14,9 @@ public class ChatMessageView {
     private final OffsetDateTime sentAt;
 
     public ChatMessageView(ChatMessage chatMessage) {
-        this.id = chatMessage.id().value();
-        this.message = chatMessage.message();
-        this.senderId = chatMessage.senderId().getValue();
-        this.sentAt = chatMessage.sentAt();
+        this.id = chatMessage.getId().getValue();
+        this.message = chatMessage.getContent();
+        this.senderId = chatMessage.getSenderId().getValue();
+        this.sentAt = chatMessage.getSentAt();
     }
 }

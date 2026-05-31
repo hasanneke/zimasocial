@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social2.application;
 
-import com.zima.zimasocial.context.social.post.value.CreatePost;
+import com.zima.zimasocial.context.social2.domain.value.CreatePost;
 import com.zima.zimasocial.context.social2.domain.entity.Post;
 import com.zima.zimasocial.context.social2.api.views.CommentView;
 import com.zima.zimasocial.context.social2.api.views.PostView;

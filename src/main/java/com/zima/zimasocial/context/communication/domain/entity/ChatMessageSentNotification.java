@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.domain.entity;
 
-import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
+import com.zima.zimasocial.context.social2.chat.value.ChatRoomId;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

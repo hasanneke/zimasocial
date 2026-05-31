@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.zima.zimasocial.context.social.api.dto.MediaDTO;
 import com.zima.zimasocial.context.social.media.MediaService;
-import com.zima.zimasocial.context.social.post.value.MediaId;
+import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

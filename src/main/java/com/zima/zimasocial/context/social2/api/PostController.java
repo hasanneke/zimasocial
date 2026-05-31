@@ -1,10 +1,10 @@
 package com.zima.zimasocial.context.social2.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.zima.zimasocial.context.social.api.FeedFilterPlain;
-import com.zima.zimasocial.context.social.api.post.PostCategory;
-import com.zima.zimasocial.context.social.post.repository.PostSortType;
-import com.zima.zimasocial.context.social.post.value.CreatePost;
+import com.zima.zimasocial.context.social2.infastructure.FeedFilterPlain;
+import com.zima.zimasocial.context.social2.infastructure.PostCategory;
+import com.zima.zimasocial.context.social2.infastructure.PostSortType;
+import com.zima.zimasocial.context.social2.domain.value.CreatePost;
 import com.zima.zimasocial.context.social2.application.PostApplicationService;
 import com.zima.zimasocial.context.social2.application.PostReadService;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;

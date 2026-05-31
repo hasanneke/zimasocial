@@ -4,7 +4,7 @@ import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.context.social2.domain.value.CommentId;
 import com.zima.zimasocial.context.social2.domain.value.MediaId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
-import com.zima.zimasocial.context.social2.event.CommentLikedEvent;
+import com.zima.zimasocial.context.social2.domain.event.CommentLikedEvent;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;

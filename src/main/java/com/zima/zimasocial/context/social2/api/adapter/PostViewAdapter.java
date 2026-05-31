@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social2.api.adapter;
 
 import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
+import com.zima.zimasocial.context.social2.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social2.api.views.PostView;
 import com.zima.zimasocial.context.social2.domain.entity.Author;
 import com.zima.zimasocial.context.social2.domain.entity.Like;
@@ -31,7 +31,7 @@ public class PostViewAdapter {
         Optional<Like> like = likeRepository.findByAuthorIdAndPostIdAndType(viewerAuthor.getId(), post.getId(), LikeType.post);
         Author author = authorRepository.findById(post.getAuthorId()).orElseThrow(AuthorNotFoundException::new);
 
-        postView.setUser(authorViewAdapter.toView(author));
+        postView.setUser(authorViewAdapter.toRichView(author));
         postView.setLiked(like.isPresent());
         postView.setIsReported(postReported);
         postView.setId( post.getId().getValue() );

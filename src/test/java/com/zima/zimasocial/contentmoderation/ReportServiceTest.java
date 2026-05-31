@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +43,10 @@ public class ReportServiceTest {
     private ReportRequest testRequest = new ReportRequest(0L, ReportReason.SPAM, "");
     private PostContent dummyPostContent = new PostContent(0L,new AuthorId(0L));
     private CommentContent dummyCommentContent = new CommentContent(0L,0L, 0L, new AuthorId(0L));
+
+    public ReportServiceTest() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    }
+
     @Test
     void testReportPost_ThrowReportAlreadyMadeException_WhenReportExists() {
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(testAuthor);

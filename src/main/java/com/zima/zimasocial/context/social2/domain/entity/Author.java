@@ -1,14 +1,23 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
+import com.github.f4b6a3.uuid.UuidCreator;
+import com.zima.zimasocial.context.account.exception.*;
+import com.zima.zimasocial.context.social2.exception.SlugCannotBeChangedException;
+import com.zima.zimasocial.context.social2.domain.event.AuthorFollowRequestSentEvent;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.exception.ConflictException;
+import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Table(name = "users")
@@ -18,33 +27,6 @@ import java.util.Objects;
 public class Author {
     protected Author() {
         // JPA only
-    }
-    private Author(AuthorId id, String slug, String email, String name, String familyName) {
-        if (id == null) throw new IllegalArgumentException("Author id cannot be null");
-        if (slug == null || slug.isBlank()) throw new IllegalArgumentException("Slug cannot be blank");
-        if (email == null || email.isBlank()) throw new IllegalArgumentException("Email cannot be blank");
-        if (name == null || name.isBlank()) throw new IllegalArgumentException("Name cannot be blank");
-
-        this.id = id;
-        this.slug = slug;
-        this.email = email;
-        this.name = name;
-        this.familyName = familyName;
-        this.isPrivate = false;
-        this.followerCount = 0;
-        this.followingCount = 0;
-        this.isDisabled = false;
-        this.isBanned = false;
-    }
-
-    public static Author create(
-            AuthorId id,
-            String slug,
-            String email,
-            String name,
-            String familyName
-    ) {
-        return new Author(id, slug, email, name, familyName);
     }
 
     @EmbeddedId
@@ -67,20 +49,19 @@ public class Author {
     private String familyName;
 
     @Column(name = "is_private")
-    private boolean isPrivate = false;
+    private Boolean isPrivate = false;
 
     @Column(name = "bio")
     private String bio;
+
+    @Column(name = "avatar_file_name")
+    private String avatarFileName;
 
     @Column(name = "follower_count")
     private int followerCount = 0;
 
     @Column(name = "following_count")
     private int followingCount = 0;
-
-
-    @Column(name = "avatar_file_name")
-    private String avatarFileName;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -96,8 +77,88 @@ public class Author {
     @Column(name = "is_banned")
     private Boolean isBanned = false;
 
+    @Column(name = "last_slug_changed_at")
+    private LocalDate lastSlugChangedAt;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
     public void makePrivate()  {
         this.isPrivate = true;
+    }
+
+    public FollowRequest requestToFollow(AuthorId followerAuthorId) {
+        if(followerAuthorId.equals(this.id)){
+            throw new CircularFollowException();
+        }
+        StaticEventPublisher.publishEvent(new AuthorFollowRequestSentEvent(followerAuthorId, this.getId()));
+        return new FollowRequest(UuidCreator.getTimeOrdered(), followerAuthorId, id);
+    }
+
+    public AuthorRelation follow(AuthorId followerId) {
+        if(this.id.equals(followerId)){
+            throw new CircularFollowException();
+        }
+        incrementFollowerCount();
+        return new AuthorRelation(id, followerId, Relation.followed);
+    }
+
+    public void unfollow(AuthorId unfollowerId){
+        if(this.id.equals(unfollowerId)){
+            throw new CircularUnfollowException();
+        }
+        decrementFollowingCount();
+    }
+
+    public AuthorRelation block(AuthorId blocker) {
+        if(this.id.equals(blocker)){
+            throw new ConflictException();
+        }
+        return new AuthorRelation(blocker, id, Relation.blocked);
+    }
+
+    public void updateBio(String bio){
+        if(bio.length() > 128) {
+            throw new CharachterLengthExceededException(128);
+        }
+        this.bio = bio;
+    }
+    public void updateName(String name) {
+        if(name.length() > 32){
+            throw new NameLengthExceededException();
+        }
+        this.name = name;
+    }
+
+    public void updateSlug(String slug){
+        if(lastSlugChangedAt != null && ChronoUnit.DAYS.between(lastSlugChangedAt, LocalDateTime.now()) < 7){
+            throw new SlugCannotBeChangedException("Last slug change hasn't passed 7 days");
+        }
+        if(name.length() > 16){
+            throw new SlugLengthExceededException();
+        }
+        this.lastSlugChangedAt = LocalDate.now();
+        this.slug = slug;
+    }
+    public void attachFileName(String fileName) {
+        this.avatarFileName = fileName;
+    }
+
+    public void removeProfilePhoto() {
+        avatarFileName = null;
+    }
+
+    public void incrementFollowingCount(){
+        followingCount = getFollowingCount() + 1;
+    }
+    public void decrementFollowingCount(){
+        followingCount = getFollowingCount() - 1;
+    }
+    public void incrementFollowerCount(){
+        followerCount = getFollowerCount() + 1;
+    }
+    public void decrementFollowerCount(){
+        followerCount = getFollowerCount() - 1;
     }
 
     @Override

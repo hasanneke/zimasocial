@@ -1,29 +1,25 @@
 package com.zima.zimasocial.context.social2.application;
 
-import com.zima.zimasocial.context.social.api.FeedFilterPlain;
-import com.zima.zimasocial.context.social.api.dto.LikeDTO;
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
-import com.zima.zimasocial.context.social.authorrelation.service.AuthorRelationService;
-import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zima.zimasocial.context.social.post.repository.FeedFilter;
-import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
 import com.zima.zimasocial.context.social2.api.PostController;
+import com.zima.zimasocial.context.social2.api.adapter.CommentViewAdapter;
 import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
-import com.zima.zimasocial.context.social2.domain.entity.Comment;
-import com.zima.zimasocial.context.social2.domain.entity.Post;
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
-import com.zima.zimasocial.context.social2.repository.CommentRepository;
-import com.zima.zimasocial.context.social2.repository.PostRepository;
-import com.zima.zimasocial.context.social2.repository.TodaysPostRepository;
-import com.zima.zimasocial.repository.LikeJpaRepository;
-import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import com.zima.zimasocial.context.social2.api.views.CommentView;
+import com.zima.zimasocial.context.social2.api.views.LikeView;
 import com.zima.zimasocial.context.social2.api.views.PostDTO;
 import com.zima.zimasocial.context.social2.api.views.PostView;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
+import com.zima.zimasocial.context.social2.domain.entity.Comment;
+import com.zima.zimasocial.context.social2.domain.entity.Post;
+import com.zima.zimasocial.context.social2.domain.service.AuthorRelationService;
+import com.zima.zimasocial.context.social2.domain.value.CommentId;
+import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social2.exception.AuthorNotFollowedException;
+import com.zima.zimasocial.context.social2.exception.AuthorNotFoundException;
+import com.zima.zimasocial.context.social2.infastructure.FeedFilter;
+import com.zima.zimasocial.context.social2.infastructure.FeedFilterPlain;
+import com.zima.zimasocial.context.social2.infastructure.PostCustomRepository;
+import com.zima.zimasocial.context.social2.repository.*;
+import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,22 +39,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Service
 @RequiredArgsConstructor
 public class PostReadService implements PostReadUseCase{
-    private final AuthorRepositoryDomain authorRepository;
+    private final AuthorRepository authorRepository;
     private final AuthorRelationService authorRelationService;
     private final TodaysPostRepository todaysPostRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final LikeJpaRepository likeJpaRepository;
+    private final LikeRepository likeRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final PostViewAdapter postViewAdapterv2;
     private final PostCustomRepository postCustomRepository;
 
     @Override
     public List<PostView> getFeed(FeedFilterPlain filterPlain) {
-        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
+        Author author = authorRepository.getAuthenticatedAuthor();
         FeedFilter feedFilter = new FeedFilter();
         if(filterPlain.getSlug() != null){
-            AuthorDomain ownerAuthor = authorRepository.findBySlugAndIsDisabledFalseAndNotBeingBlocked(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
+            Author ownerAuthor = authorRepository.findBySlug(filterPlain.getSlug()).orElseThrow(AuthorNotFoundException::new);
             if(ownerAuthor.equals(author) || !ownerAuthor.getIsPrivate() || authorRelationService.isAuthorFollowed(author.getId(), ownerAuthor.getId())){
                 feedFilter.setOwnerAuthorId(ownerAuthor.getId());
             }else{
@@ -82,15 +78,15 @@ public class PostReadService implements PostReadUseCase{
         return postViewAdapterv2.toView(post);
     }
     @Override
-    public Page<LikeDTO> getAllPostLikes(Long postId, Pageable pageable) {
-        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
-        return likeJpaRepository.findAllLikes(postId, author.getId().getValue(), pageable);
+    public Page<LikeView> getAllPostLikes(Long postId, Pageable pageable) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        return likeRepository.findAllLikes(postId, author.getId(), pageable);
     }
 
     @Override
-    public Page<LikeDTO> getAllCommentLikes(Long commentId, Pageable pageable) {
-        AuthorDomain author = authorRepository.getAuthenticatedAuthor();
-        return likeJpaRepository.findAllLikes(commentId, author.getId().getValue(), pageable);
+    public Page<LikeView> getAllCommentLikes(Long commentId, Pageable pageable) {
+        Author author = authorRepository.getAuthenticatedAuthor();
+        return likeRepository.findAllLikes(commentId, author.getId(), pageable);
     }
 
     @Override

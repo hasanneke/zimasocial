@@ -11,13 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.Random;
 
 @ExtendWith(MockitoExtension.class)
 class PostTest {
     @Test
-    void testLike_WhenOtherAuthorLikes_IncrementLikeCountAndIncreaseScore() {
+    void testLike_WhenOtherAuthorLikes_IncrementLikeCountAndIncreaseScore() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Post post = PostFixture.validPost();
         Author author = AuthorFixture.validAuthor();
         post.like(author.getId());
@@ -26,7 +27,7 @@ class PostTest {
     }
 
     @Test
-    void testLike_WhenOtherAuthorUnlikes_DecrementLikeCountAndDecrementScore() {
+    void testLike_WhenOtherAuthorUnlikes_DecrementLikeCountAndDecrementScore() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Post post = PostFixture.validPost();
         Author author = AuthorFixture.validAuthor();
         post.unlike(author.getId());
@@ -58,7 +59,7 @@ class PostTest {
     }
 
     @Test
-    void testComment_WhenOtherAuthorRemovesComment_DecreaseScoreAndCommentCount() {
+    void testComment_WhenOtherAuthorRemovesComment_DecreaseScoreAndCommentCount() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Post post = PostFixture.validPost();
         Author author = AuthorFixture.validAuthor();
         post.removeComment(author.getId(), true);

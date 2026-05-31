@@ -10,10 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface MediaItemJpaRepository extends JpaRepository<MediaItem, UUID> {
-    Optional<MediaItem> findByResourceIdAndProvider(String resourceId, String provider);
     @Query("SELECT mediaItem.id FROM MediaItem mediaItem WHERE mediaItem.resourceId = :resourceId AND mediaItem.provider = :provider")
     Optional<UUID> findIdByResourceIdAndProvider(String resourceId, String provider);
-    @Query("SELECT mediaItem.id FROM MediaItem mediaItem WHERE mediaItem.id = :id")
-    Optional<UUID> findIdById(UUID id);
     MediaItem findDistinctById(UUID id);
 }

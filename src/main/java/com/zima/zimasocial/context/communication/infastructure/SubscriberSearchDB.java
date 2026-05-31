@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.communication.infastructure;
 import com.zima.zimasocial.context.communication.domain.SubscriberSearch;
 import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.social.author.application.AuthorService;
+
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.entity.userRelation.Relation;
 import com.zima.zimasocial.entity.userRelation.UserRelationEntity;
@@ -19,7 +19,6 @@ import java.util.List;
 public class SubscriberSearchDB implements SubscriberSearch {
     private final UserRelationJpaRepository userRelationJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final AuthorService authorService;
 
     @Override
     public List<Recipient> findSubscribers(RecipientId parent) {

@@ -1,21 +1,16 @@
 package com.zima.zimasocial.context.social2.application;
 
-import com.zima.zimasocial.context.communication.application.NotificationManager;
-import com.zima.zimasocial.context.communication.domain.entity.PostCommentedNotification;
-import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social2.event.CommentRepliedEvent;
-import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
+import com.zima.zimasocial.context.social2.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.media.MediaNotFoundException;
-import com.zima.zimasocial.context.social2.event.PostCommentedEvent;
-import com.zima.zimasocial.context.social2.event.PostLikedEvent;
-import com.zima.zimasocial.context.social.post.value.CreatePost;
+import com.zima.zimasocial.context.social2.api.adapter.CommentViewAdapter;
 import com.zima.zimasocial.context.social2.api.adapter.PostViewAdapter;
+import com.zima.zimasocial.context.social2.api.views.CommentView;
 import com.zima.zimasocial.context.social2.api.views.PostView;
 import com.zima.zimasocial.context.social2.domain.entity.*;
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.MediaId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social2.domain.value.*;
+import com.zima.zimasocial.context.social2.domain.event.CommentRepliedEvent;
+import com.zima.zimasocial.context.social2.domain.event.PostCommentedEvent;
+import com.zima.zimasocial.context.social2.domain.event.PostLikedEvent;
 import com.zima.zimasocial.context.social2.repository.*;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.exception.ConflictException;
@@ -23,14 +18,12 @@ import com.zima.zimasocial.exception.DataNotFoundException;
 import com.zima.zimasocial.exception.UnauthorizedException;
 import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
 import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
-import com.zima.zimasocial.shared.StaticEventPublisher;
 import com.zima.zimasocial.utility.CurrentUser;
-import com.zima.zimasocial.context.social2.api.views.CommentView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,12 +33,12 @@ import java.util.UUID;
 public class PostApplicationService implements PostUseCase{
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
-    private final NotificationManager notificationManager;
     private final CommentRepository commentRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final AuthorRepository authorRepository;
     private final MediaRepository mediaRepository;
     private final PostViewAdapter postViewAdapter;
+    private final ApplicationEventPublisher applicationEventPublisher;
     @Override
     @Transactional
     public PostView createPost(CreatePost createPost) {
@@ -72,7 +65,7 @@ public class PostApplicationService implements PostUseCase{
         Like like = post.like(author.getId());
         likeRepository.save(like);
         postRepository.save(post);
-        StaticEventPublisher.publishEvent(new PostLikedEvent(post.getId(), post.getAuthorId(), author.getId()));
+        applicationEventPublisher.publishEvent(new PostLikedEvent(post.getId(), post.getAuthorId(), author.getId()));
     }
 
     @Transactional
@@ -109,16 +102,7 @@ public class PostApplicationService implements PostUseCase{
         Comment comment = post.comment(commentRepository.getNextId(), commenter.getId(), content, new MediaId(mediaId), previousComments.isEmpty());
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
-        if(!commenter.getId().equals(post.getAuthorId())){
-            PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
-                    .postId(post.getId())
-                    .actorId(new RecipientId(commenter.getId().getValue()))
-                    .recipientId(new RecipientId(post.getAuthorId().getValue()))
-                    .createdAt(OffsetDateTime.now())
-                    .build();
-            notificationManager.sendNotification(postCommentedNotification);
-        }
-        StaticEventPublisher.publishEvent(new PostCommentedEvent(post.getId(), savedComment.getId(), commenter.getId(), commenter.getId()));
+        applicationEventPublisher.publishEvent(new PostCommentedEvent(post.getId(), savedComment.getId(), commenter.getId(), commenter.getId()));
         return commentViewAdapter.populated(savedComment);
     }
 
@@ -177,7 +161,7 @@ public class PostApplicationService implements PostUseCase{
         Comment reply = parent.reply(author.getId(), content, new MediaId(mediaId));
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        StaticEventPublisher.publishEvent(new CommentRepliedEvent(parent.getId(), savedReply.getId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
+        applicationEventPublisher.publishEvent(new CommentRepliedEvent(parent.getId(), savedReply.getId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
         return commentViewAdapter.populated(savedReply);
     }
     @Transactional

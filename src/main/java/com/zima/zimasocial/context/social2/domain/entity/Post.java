@@ -1,10 +1,7 @@
 package com.zima.zimasocial.context.social2.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zima.zimasocial.context.social2.domain.value.AuthorId;
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.MediaId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social2.domain.value.*;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.entity.MediaType;
 import jakarta.persistence.*;

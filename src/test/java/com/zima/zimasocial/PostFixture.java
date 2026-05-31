@@ -1,7 +1,7 @@
 package com.zima.zimasocial;
 
 import com.zima.zimasocial.context.social2.domain.entity.Post;
-import com.zima.zimasocial.context.social2.domain.entity.PostContent;
+import com.zima.zimasocial.context.social2.domain.value.PostContent;
 import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 import com.zima.zimasocial.context.social2.domain.value.PostId;
 import com.zima.zimasocial.entity.MediaType;

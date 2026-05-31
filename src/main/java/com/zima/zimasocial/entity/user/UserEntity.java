@@ -6,8 +6,6 @@ import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
 import com.zima.zimasocial.context.communication.domain.entity.Recipient;
 import com.zima.zimasocial.context.contentmoderation.user.User;
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 import com.zima.zimasocial.entity.UserDeviceToken;
 import com.zima.zimasocial.entity.UserRole;
 import jakarta.persistence.*;
@@ -173,17 +171,6 @@ public class UserEntity implements Serializable {
         this.termsOfUseAccepted = account.getTermsOfUseAccepted();
     }
 
-    public void margeAuthor(AuthorDomain author){
-        this.name = author.getName();
-        this.familyName = author.getFamilyName();
-        this.slug = author.getSlug();
-        this.bio = author.getBio();
-        this.avatarFileName = author.getAvatarFileName();
-        this.followerCount = author.getFollowersCount();
-        this.followingCount = author.getFollowingCount();
-        this.lastSlugChangedAt = author.getLastSlugChangedAt();
-    }
-
     public void mergeUser(User user){
         this.trustScore = user.getTrustScore();
         this.isDisabled = user.getIsBanned();
@@ -196,7 +183,4 @@ public class UserEntity implements Serializable {
         return name + " " + familyName;
     }
 
-    public AuthorDomain toDomain() {
-        return new AuthorDomain(new AuthorDomainId(this.getId()), this.getSlug(), this.getName(),  this.getBio(), this.getFamilyName(), this.getAvatarFileName(), this.isPrivate(), this.getEmail(), this.getFollowerCount(), this.getFollowingCount(), this.getCreatedAt(), this.getLastSlugChangedAt());
-    }
 }

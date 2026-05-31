@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller.views;
 
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
 import lombok.Getter;
 
 @Getter
@@ -9,7 +9,7 @@ public class RecipientView {
     private final String fullName;
     private final String avatarUrl;
 
-    public RecipientView(AuthorDomain author) {
+    public RecipientView(Author author) {
         this.slug = author.getSlug();
         this.fullName = author.getName();
         this.avatarUrl = author.getAvatarFileName();

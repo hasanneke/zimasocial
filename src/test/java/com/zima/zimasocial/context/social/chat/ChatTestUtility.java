@@ -1,16 +1,13 @@
 package com.zima.zimasocial.context.social.chat;
 
-import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
-import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
-import com.zima.zimasocial.context.social.chat.entity.ChatMessageId;
-import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
-import com.zima.zimasocial.context.social.chat.entity.ChatRoomId;
+import com.zima.zimasocial.AuthorFixture;
+import com.zima.zimasocial.context.social2.chat.entity.ChatRoom;
+import com.zima.zimasocial.context.social2.chat.value.ChatMessageId;
+import com.zima.zimasocial.context.social2.chat.value.ChatRoomId;
+import com.zima.zimasocial.context.social2.domain.entity.Author;
+import com.zima.zimasocial.context.social2.domain.value.AuthorId;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ChatTestUtility {
     public static ChatMessageId mockChatMessageId() {
@@ -19,35 +16,15 @@ public class ChatTestUtility {
     public static ChatRoomId mockChatRoomId() {
         return new ChatRoomId(UUID.randomUUID());
     }
-    public static AuthorDomain mockAuthor(Long authorId) {
-        return new AuthorDomain(new AuthorDomainId(authorId), "mock", "mockName", LocalDateTime.now());
-    }
-    public static AuthorDomainId mockAuthorId() {
-        return new AuthorDomainId(ThreadLocalRandom.current().nextLong());
-    }
-    public static AuthorDomain mockAuthor() {
-        return new AuthorDomain(new AuthorDomainId(ThreadLocalRandom.current().nextLong()), "mock", "mockName", LocalDateTime.now());
-    }
-    public static ChatRoom mockChatRoom() {
-        return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(), mockAuthor());
-    }
+
     public static ChatRoom mockChatRoom(Long participant1, Long participant2) {
-        return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(participant1), mockAuthor(participant2));
+        return new ChatRoom(new ChatRoomId(UUID.randomUUID()), AuthorFixture.validAuthor(new AuthorId(participant1)).getId(), AuthorFixture.validAuthor(new AuthorId(participant2)).getId());
     }
 
-    public static ChatRoom mockChatRoomPlain(AuthorDomainId participant1, AuthorDomainId participant2) {
-        return new ChatRoom(new ChatRoomId(UUID.randomUUID()), mockAuthor(participant1.getValue()), mockAuthor(participant2.getValue()));
-    }
-    public static ChatRoom mockChatRoomPlain(AuthorDomain participant1, AuthorDomain participant2) {
-        return new ChatRoom(new ChatRoomId(UUID.randomUUID()), participant1, participant2);
-    }
-
-    public static ChatMessage mockMessage(Long senderId, Long receiverId, String message) {
-        return new ChatMessage(
-                new ChatMessageId(UUID.randomUUID()),
-                new ChatRoomId(UUID.randomUUID()),
-                new AuthorDomainId(senderId),
-                message,
-                OffsetDateTime.now());
+    public static ChatRoom mockChatRoom(Author participant1, Author participant2) {
+        ChatRoom room = new ChatRoom(new ChatRoomId(UUID.randomUUID()), participant1.getId(), participant2.getId());
+        room.setParticipant1(participant1);
+        room.setParticipant2(participant2);
+        return room;
     }
 }
