@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.media.infastructure;
 
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
 import com.zima.zimasocial.entity.MediaType;
@@ -32,12 +32,12 @@ public class TMDBMovieSearcher implements MediaSearcher {
         this.baseUrl = baseUrl;
     }
 
-    public MediaItem get(String id) {
+    public Media get(String id) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
         HttpEntity entity = new HttpEntity<>(headers);
-        MediaItem mediaItem = new MediaItem();
-        mediaItem.setProvider("tdmb");
+        Media media = new Media();
+        media.setProvider("tdmb");
 
         URI uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(String.format("%s/movie/%s", baseUrl, Integer.parseInt(id)))
                 .queryParam("language", "tr-TR")
@@ -50,10 +50,10 @@ public class TMDBMovieSearcher implements MediaSearcher {
                 entity,
                 String.class
         );
-        mediaItem.setResourceUrl(String.format("%s/movie/%s", baseUrl, id));
-        mediaItem.setResourceId(id);
-        mediaItem.setType(MediaType.movie);
-        mediaItem.setContent(result.getBody());
-        return mediaItem;
+        media.setResourceUrl(String.format("%s/movie/%s", baseUrl, id));
+        media.setResourceId(id);
+        media.setType(MediaType.movie);
+        media.setContent(result.getBody());
+        return media;
     }
 }

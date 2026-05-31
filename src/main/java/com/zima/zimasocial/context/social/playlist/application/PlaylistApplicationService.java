@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.exception.MediaNotFoundException;
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistItemDTO;
 import com.zima.zimasocial.context.social.playlist.exception.PlaylistNotFoundException;
@@ -67,10 +67,10 @@ public class PlaylistApplicationService {
     }
     @Transactional
     public void addItem(PlayListId playlistId, PlayListItemPayload payload) {
-        MediaItem mediaItem = mediaItemJpaRepository.findById(payload.getMediaId()).orElseThrow(MediaNotFoundException::new);
+        Media media = mediaItemJpaRepository.findById(new MediaId(payload.getMediaId())).orElseThrow(MediaNotFoundException::new);
         Author modifier = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistJpaRepository.findById(playlistId.value()).orElseThrow(PlaylistNotFoundException::new);
-        playlist.addItem(mediaItem, modifier.getId());
+        playlist.addItem(media, modifier.getId());
         playlistJpaRepository.save(playlist);
     }
     @Transactional
@@ -101,8 +101,8 @@ public class PlaylistApplicationService {
         Playlist playlist = playlistJpaRepository.findById(playListId.value()).orElseThrow(PlaylistNotFoundException::new);
         List<PlaylistItemDTO> dtoList = new ArrayList<>();
         for (PlaylistItem playListItem : playlist.getItems()) {
-            MediaItem mediaItem = mediaItemJpaRepository.findDistinctById(playListItem.getMediaItemId().getValue());
-            PlaylistItemDTO playlistItemDTO = new PlaylistItemDTO(mediaItem);
+            Media media = mediaItemJpaRepository.findDistinctById(playListItem.getMediaItemId());
+            PlaylistItemDTO playlistItemDTO = new PlaylistItemDTO(media);
             dtoList.add(playlistItemDTO);
         }
         return dtoList;

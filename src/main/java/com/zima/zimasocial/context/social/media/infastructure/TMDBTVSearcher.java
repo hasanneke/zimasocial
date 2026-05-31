@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.media.infastructure;
 
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
 import com.zima.zimasocial.entity.MediaType;
@@ -30,12 +30,12 @@ public class TMDBTVSearcher implements MediaSearcher {
         this.baseUrl = baseUrl;
     }
 
-    public MediaItem get(String tvId) {
+    public Media get(String tvId) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
         HttpEntity entity = new HttpEntity<>(headers);
-        MediaItem mediaItem = new MediaItem();
-        mediaItem.setProvider("tdmb");
+        Media media = new Media();
+        media.setProvider("tdmb");
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(String.format("%s/tv/%s", baseUrl, tvId)).queryParam("language", "tr");
         ResponseEntity<String> result = restTemplate.exchange(
@@ -44,10 +44,10 @@ public class TMDBTVSearcher implements MediaSearcher {
                 entity,
                 String.class
         );
-        mediaItem.setResourceUrl(String.format("%s/tv/%s", baseUrl, tvId));
-        mediaItem.setResourceId(tvId);
-        mediaItem.setType(MediaType.tv);
-        mediaItem.setContent(result.getBody());
-        return mediaItem;
+        media.setResourceUrl(String.format("%s/tv/%s", baseUrl, tvId));
+        media.setResourceId(tvId);
+        media.setType(MediaType.tv);
+        media.setContent(result.getBody());
+        return media;
     }
 }

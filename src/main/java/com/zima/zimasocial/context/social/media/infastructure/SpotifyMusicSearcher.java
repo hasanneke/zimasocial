@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.media.infastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.entity.MediaType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class SpotifyMusicSearcher implements MediaSearcher {
     }
 
     @Override
-    public MediaItem get(String id) throws JsonProcessingException {
+    public Media get(String id) throws JsonProcessingException {
         String url = "https://api.spotify.com/v1/tracks/%s".formatted(id);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer %s".formatted(accessToken));
@@ -44,13 +44,13 @@ public class SpotifyMusicSearcher implements MediaSearcher {
                 request,
                 String.class
         );
-        MediaItem mediaItem = new MediaItem();
-        mediaItem.setProvider("spotify");
-        mediaItem.setType(MediaType.music);
-        mediaItem.setResourceUrl(url);
-        mediaItem.setResourceId(id);
-        mediaItem.setContent(response.getBody());
-        return mediaItem;
+        Media media = new Media();
+        media.setProvider("spotify");
+        media.setType(MediaType.music);
+        media.setResourceUrl(url);
+        media.setResourceId(id);
+        media.setContent(response.getBody());
+        return media;
     }
     public void updateAccessToken(String accessToken) {
         this.accessToken = accessToken;

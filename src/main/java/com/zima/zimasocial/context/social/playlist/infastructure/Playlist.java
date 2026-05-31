@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.playlist.infastructure;
 
 import com.zima.zimasocial.context.account.exception.CharachterLengthExceededException;
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.playlist.values.PlayListId;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.media.value.MediaId;
@@ -69,18 +69,18 @@ public class Playlist {
         return playlist;
     }
 
-    public void addItem(MediaItem mediaItem, AuthorId modifier) {
+    public void addItem(Media media, AuthorId modifier) {
         verifyOwnership(modifier);
-        if(!mediaItem.getType().equals(type)){
+        if(!media.getType().equals(type)){
             throw new BadRequestException("Selected media cannot be added to this playlist");
         }
-        if(items.stream().anyMatch(e->e.getMediaItemId().equals(mediaItem.getId()))){
+        if(items.stream().anyMatch(e->e.getMediaItemId().equals(media.getId()))){
             throw new ConflictException("Listede mevcut tekrar eklenemez.");
         }
         if(items.size() >= 100){
             throw new ConflictException("Katalog 100 den fazla medya bulunduramaz");
         }
-        items.add(new PlaylistItem(new MediaId(mediaItem.getId())));
+        items.add(new PlaylistItem(new MediaId(media.getId().getValue())));
     }
 
     public void removeItem(MediaId mediaId, AuthorId authorId) {

@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.media.infastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
 import com.zima.zimasocial.entity.MediaType;
@@ -33,7 +33,7 @@ public class GoogleBookSearcher implements MediaSearcher {
 
     @Override
     @Transactional
-    public MediaItem get(String id) throws JsonProcessingException {
+    public Media get(String id) throws JsonProcessingException {
         String url = String.format("%s/books/v1/volumes/%s", baseUrl, id);
         URI uri = UriComponentsBuilder.fromHttpUrl(String.format("%s/books/v1/volumes/%s", baseUrl, id))
                 .queryParam("language", "tr-TR")
@@ -46,12 +46,12 @@ public class GoogleBookSearcher implements MediaSearcher {
                         HttpMethod.GET,
                         new HttpEntity<>(new HttpHeaders()),
                         String.class);
-        MediaItem mediaItem = new MediaItem();
-        mediaItem.setProvider("googleBooks");
-        mediaItem.setType(MediaType.book);
-        mediaItem.setResourceUrl(url);
-        mediaItem.setResourceId(id);
-        mediaItem.setContent(response.getBody());
-        return mediaItem;
+        Media media = new Media();
+        media.setProvider("googleBooks");
+        media.setType(MediaType.book);
+        media.setResourceUrl(url);
+        media.setResourceId(id);
+        media.setContent(response.getBody());
+        return media;
     }
 }

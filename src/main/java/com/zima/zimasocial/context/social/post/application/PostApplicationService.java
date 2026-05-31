@@ -3,10 +3,10 @@ package com.zima.zimasocial.context.social.post.application;
 import com.zima.zimasocial.context.social.author.abstracted.PostUseCase;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
-import com.zima.zimasocial.context.social.media.exception.MediaNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.media.entity.Media;
-import com.zima.zimasocial.context.social.media.repository.MediaRepository;
+import com.zima.zimasocial.context.social.media.exception.MediaNotFoundException;
+import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.value.MediaId;
 import com.zima.zimasocial.context.social.post.api.adapter.CommentViewAdapter;
 import com.zima.zimasocial.context.social.post.api.adapter.PostViewAdapter;
@@ -49,7 +49,7 @@ public class PostApplicationService implements PostUseCase {
     private final CommentRepository commentRepository;
     private final CommentViewAdapter commentViewAdapter;
     private final AuthorRepository authorRepository;
-    private final MediaRepository mediaRepository;
+    private final MediaItemJpaRepository mediaRepository;
     private final PostViewAdapter postViewAdapter;
     private final ApplicationEventPublisher applicationEventPublisher;
     @Override
