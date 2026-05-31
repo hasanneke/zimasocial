@@ -62,6 +62,4 @@ public class DBImageStore implements ImageService {
     private String generateFileName(MultipartFile file) {
         return UUID.randomUUID() + "_" + Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
     }
-
-
 }

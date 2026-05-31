@@ -1,7 +1,7 @@
 package com.zima.zimasocial;
 
-import com.zima.zimasocial.context.social2.domain.entity.Author;
-import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.lang.reflect.Constructor;

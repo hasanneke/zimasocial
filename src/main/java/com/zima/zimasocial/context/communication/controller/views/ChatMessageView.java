@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller.views;
 
-import com.zima.zimasocial.context.social2.chat.entity.ChatMessage;
+import com.zima.zimasocial.context.social.chat.entity.ChatMessage;
 import lombok.Getter;
 
 import java.time.OffsetDateTime;

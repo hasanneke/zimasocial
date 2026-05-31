@@ -2,9 +2,9 @@ package com.zima.zimasocial.context.communication.infastructure;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.social2.chat.value.ChatRoomId;
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social.chat.value.ChatRoomId;
+import com.zima.zimasocial.context.social.post.value.CommentId;
+import com.zima.zimasocial.context.social.post.value.PostId;
 import com.zima.zimasocial.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {

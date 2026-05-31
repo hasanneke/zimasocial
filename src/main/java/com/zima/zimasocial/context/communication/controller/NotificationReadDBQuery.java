@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller;
 
-import com.zima.zimasocial.context.social2.api.adapter.AuthorViewAdapter;
+import com.zima.zimasocial.context.social.author.api.adapter.AuthorViewAdapter;
 import com.zima.zimasocial.entity.NotificationEntity;
 import com.zima.zimasocial.entity.NotificationType;
 import com.zima.zimasocial.repository.NotificationJpaRepository;

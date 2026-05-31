@@ -1,7 +1,7 @@
 package com.zima.zimasocial.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zima.zimasocial.context.social2.api.views.PostDTO;
+import com.zima.zimasocial.context.social.post.api.views.PostDTO;
 import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;

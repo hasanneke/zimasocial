@@ -1,9 +1,9 @@
 //package com.zima.zimasocial.calculators.todayspost;
 //
 //import com.zima.zimasocial.calculators.PostScoreCalculator;
-//import com.zima.zimasocial.context.social2.domain.entity.TodaysPost;
-//import com.zima.zimasocial.context.social2.repository.PostRepository;
-//import com.zima.zimasocial.context.social2.repository.TodaysPostRepository;
+//import com.zima.zimasocial.context.social2.post.domain.TodaysPost;
+//import com.zima.zimasocial.context.social2.post.repository.PostRepository;
+//import com.zima.zimasocial.context.social2.post.repository.TodaysPostRepository;
 //import com.zima.zimasocial.entity.MediaType;
 //import com.zima.zimasocial.entity.PostJpaEntity;
 //import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;

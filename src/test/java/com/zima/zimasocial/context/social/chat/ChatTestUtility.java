@@ -1,11 +1,11 @@
 package com.zima.zimasocial.context.social.chat;
 
 import com.zima.zimasocial.AuthorFixture;
-import com.zima.zimasocial.context.social2.chat.entity.ChatRoom;
-import com.zima.zimasocial.context.social2.chat.value.ChatMessageId;
-import com.zima.zimasocial.context.social2.chat.value.ChatRoomId;
-import com.zima.zimasocial.context.social2.domain.entity.Author;
-import com.zima.zimasocial.context.social2.domain.value.AuthorId;
+import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
+import com.zima.zimasocial.context.social.chat.value.ChatMessageId;
+import com.zima.zimasocial.context.social.chat.value.ChatRoomId;
+import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
 
 import java.util.UUID;
 

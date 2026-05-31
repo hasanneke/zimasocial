@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.account.infastructure.controller;
 
-import com.zima.zimasocial.context.social2.api.views.AuthorView;
+import com.zima.zimasocial.context.social.author.api.view.AuthorView;
 import com.zima.zimasocial.context.account.service.AccountService;
 import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;

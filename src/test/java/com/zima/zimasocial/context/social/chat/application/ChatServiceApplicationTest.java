@@ -3,12 +3,12 @@ package com.zima.zimasocial.context.social.chat.application;
 
 import com.zima.zimasocial.AuthorFixture;
 import com.zima.zimasocial.context.social.chat.ChatTestUtility;
-import com.zima.zimasocial.context.social2.chat.entity.ChatRoom;
-import com.zima.zimasocial.context.social2.chat.repository.ChatRoomRepository;
-import com.zima.zimasocial.context.social2.chat.service.ChatService;
-import com.zima.zimasocial.context.social2.chat.service.ChatServiceApplication;
-import com.zima.zimasocial.context.social2.domain.entity.Author;
-import com.zima.zimasocial.context.social2.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.chat.entity.ChatRoom;
+import com.zima.zimasocial.context.social.chat.repository.ChatRoomRepository;
+import com.zima.zimasocial.context.social.chat.service.ChatService;
+import com.zima.zimasocial.context.social.chat.service.ChatServiceApplication;
+import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

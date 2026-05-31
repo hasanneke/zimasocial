@@ -12,17 +12,8 @@ public class SimplePagedModel<T> {
         this.totalElement = totalElement;
         this.totalPage = totalPage;
     }
-
     public Collection<T> getContent() {
         return content;
-    }
-
-    public long getTotalElement() {
-        return totalElement;
-    }
-
-    public long getTotalPage() {
-        return totalPage;
     }
 
     public static <T> SimplePagedModel<T> of(Collection<T> content, long totalElement, long totalPage) {

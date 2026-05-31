@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.communication.controller;
 
 import com.zima.zimasocial.context.communication.application.NotificationManager;
 import com.zima.zimasocial.context.communication.infastructure.DeviceTokenPayload;
-import com.zima.zimasocial.context.social2.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
 import com.zima.zimasocial.views.notification.NotificationView2;
 import lombok.RequiredArgsConstructor;

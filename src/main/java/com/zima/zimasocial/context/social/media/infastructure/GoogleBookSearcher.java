@@ -2,8 +2,9 @@ package com.zima.zimasocial.context.social.media.infastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zima.zimasocial.context.social.infastructure.repository.MediaItemJpaRepository;
-import com.zima.zimasocial.context.social.media.MediaSearcher;
+import com.zima.zimasocial.context.social.media.entity.MediaItem;
+import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
+import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
 import com.zima.zimasocial.entity.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;

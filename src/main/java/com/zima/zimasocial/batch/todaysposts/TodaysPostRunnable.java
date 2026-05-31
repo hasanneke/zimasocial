@@ -1,6 +1,6 @@
 package com.zima.zimasocial.batch.todaysposts;
 
-import com.zima.zimasocial.context.social2.application.TodaysPostGenerator;
+import com.zima.zimasocial.context.social.author.abstracted.TodaysPostGenerator;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

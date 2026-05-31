@@ -2,7 +2,8 @@ package com.zima.zimasocial.context.social.media.infastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zima.zimasocial.context.social.media.MediaSearcher;
+import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
+import com.zima.zimasocial.context.social.media.entity.MediaItem;
 import com.zima.zimasocial.entity.MediaType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,13 @@ public class SpotifyMusicSearcher implements MediaSearcher {
     private final RestTemplate restTemplate;
     @Getter
     private String accessToken;
-    private final ObjectMapper objectMapper;
+
     String baseUrl;
 
     @Autowired
     public SpotifyMusicSearcher(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper) {
         this.restTemplate = restTemplateBuilder.build();
         this.baseUrl = "https://api.spotify.com/v1/search";
-        this.objectMapper = objectMapper;
     }
 
     @Override

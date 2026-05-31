@@ -1,6 +1,6 @@
 package com.zima.zimasocial.views.notification;
 
-import com.zima.zimasocial.context.social2.api.views.AuthorView;
+import com.zima.zimasocial.context.social.author.api.view.AuthorView;
 import com.zima.zimasocial.entity.NotificationType;
 import com.zima.zimasocial.entity.TargetCollection;
 import lombok.*;

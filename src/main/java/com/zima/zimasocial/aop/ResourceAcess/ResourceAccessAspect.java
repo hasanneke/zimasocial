@@ -1,14 +1,14 @@
 package com.zima.zimasocial.aop.ResourceAcess;
 
 import com.zima.zimasocial.config.CustomUserDetails;
-import com.zima.zimasocial.context.social2.domain.entity.Author;
-import com.zima.zimasocial.context.social2.domain.entity.Comment;
-import com.zima.zimasocial.context.social2.domain.entity.Post;
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
-import com.zima.zimasocial.context.social2.repository.AuthorRepository;
-import com.zima.zimasocial.context.social2.repository.CommentRepository;
-import com.zima.zimasocial.context.social2.repository.PostRepository;
+import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.post.entity.Comment;
+import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.post.value.CommentId;
+import com.zima.zimasocial.context.social.post.value.PostId;
+import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
+import com.zima.zimasocial.context.social.post.repository.CommentRepository;
+import com.zima.zimasocial.context.social.post.repository.PostRepository;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.exception.DataNotFoundException;
 import com.zima.zimasocial.exception.UnauthorizedException;
@@ -17,8 +17,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,8 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ResourceAccessAspect {
-    private final Logger logger = LoggerFactory.getLogger(ResourceAccessAspect.class);
-
     @Autowired
     private PostRepository postRepository;
 
@@ -39,7 +35,7 @@ public class ResourceAccessAspect {
     private AuthorRepository authorRepository;
 
     @Before("@annotation(hasPostAccess)")
-    public void checkPostAccess(JoinPoint joinPoint, HasPostAccess hasPostAccess) throws Throwable {
+    public void checkPostAccess(JoinPoint joinPoint, HasPostAccess hasPostAccess) {
         Object[] args = joinPoint.getArgs();
         String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
         String targetParam = hasPostAccess.idParameterName();
@@ -55,7 +51,7 @@ public class ResourceAccessAspect {
     }
 
     @Before("@annotation(hasCommentAccess)")
-    public void checkCommentAccess(JoinPoint joinPoint, HasCommentAccess hasCommentAccess) throws Throwable {
+    public void checkCommentAccess(JoinPoint joinPoint, HasCommentAccess hasCommentAccess) {
         Object[] args = joinPoint.getArgs();
         String[] parameterNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
         String targetParam = hasCommentAccess.idParameterName();

@@ -4,12 +4,12 @@
 //import com.zima.zimasocial.TestUtil;
 //import com.zima.zimasocial.context.social.author.application.AuthorService;
 //import com.zima.zimasocial.context.social.author.entity.AuthorDomain;
-//import com.zima.zimasocial.context.social2.exception.AuthorNotFoundException;
+//import com.zima.zimasocial.context.social2.author.exception.AuthorNotFoundException;
 //import com.zima.zimasocial.context.social.author.repository.AuthorRepositoryDomain;
 //import com.zima.zimasocial.context.social.author.value.AuthorDomainId;
 //import com.zima.zimasocial.context.social.authorrelation.*;
 //import com.zima.zimasocial.context.social.authorrelation.entity.FollowRequest;
-//import com.zima.zimasocial.context.social.image.ImageService;
+//import com.zima.zimasocial.context.social2.image.ImageService;
 //import com.zima.zimasocial.shared.StaticEventPublisher;
 //import org.junit.jupiter.api.Assertions;
 //import org.junit.jupiter.api.Test;

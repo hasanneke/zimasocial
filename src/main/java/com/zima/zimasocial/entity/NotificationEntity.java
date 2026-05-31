@@ -1,7 +1,7 @@
 package com.zima.zimasocial.entity;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
-import com.zima.zimasocial.context.social2.domain.entity.Author;
+import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.entity.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.communication.domain.entity;
 
-import com.zima.zimasocial.context.social2.domain.value.CommentId;
-import com.zima.zimasocial.context.social2.domain.value.PostId;
+import com.zima.zimasocial.context.social.post.value.CommentId;
+import com.zima.zimasocial.context.social.post.value.PostId;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

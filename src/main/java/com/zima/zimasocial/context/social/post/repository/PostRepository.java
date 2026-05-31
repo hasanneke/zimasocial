@@ -1,0 +1,35 @@
+package com.zima.zimasocial.context.social.post.repository;
+
+import com.zima.zimasocial.context.social.post.entity.Post;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.post.value.PostId;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface PostRepository extends JpaRepository<Post, PostId> {
+    @Query(value = "SELECT nextval('post_sequence')", nativeQuery = true)
+    Long getNextSequenceValue();
+
+    List<Post> findAllByAuthorId(AuthorId authorId);
+
+    default PostId getNextSequence() {
+        return new PostId(getNextSequenceValue());
+    }
+
+    void deleteAllByAuthorId(AuthorId authorId);
+
+    List<Post> findAllByIsVisibleFalseAndAuthorId(AuthorId authorId);
+
+    @Query("""
+        Select post FROM Post post
+        JOIN Author author ON author.id = post.authorId 
+        WHERE post.createdAt BETWEEN :start AND :end
+        AND author.isPrivate = false
+    """)
+    List<Post> findAllByCreatedAtBetweenQuery(LocalDateTime start, LocalDateTime end);
+
+    List<Post> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+}
