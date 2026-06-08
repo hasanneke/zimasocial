@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.communication.controller;
 import com.zima.zimasocial.context.social.author.api.adapter.AuthorViewAdapter;
 import com.zima.zimasocial.entity.NotificationEntity;
 import com.zima.zimasocial.entity.NotificationType;
-import com.zima.zimasocial.repository.NotificationJpaRepository;
+import com.zima.zimasocial.context.communication.infastructure.NotificationJpaRepository;
 import com.zima.zimasocial.views.notification.NotificationView;
 import com.zima.zimasocial.views.notification.NotificationView2;
 import lombok.RequiredArgsConstructor;

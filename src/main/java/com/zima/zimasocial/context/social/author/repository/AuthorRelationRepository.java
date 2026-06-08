@@ -22,6 +22,11 @@ public interface AuthorRelationRepository extends JpaRepository<AuthorRelation, 
             JOIN FETCH authorRelation.actor WHERE authorRelation.receiverId = :receiverId AND authorRelation.relation = :relation
     """)
     Page<AuthorRelation> findAllByReceiverIdAndRelation(AuthorId receiverId, Relation relation, Pageable pageable);
+    @Query("""
+            SELECT authorRelation FROM AuthorRelation authorRelation
+            JOIN FETCH authorRelation.actor WHERE authorRelation.receiverId = :receiverId AND authorRelation.relation = :relation
+    """)
+    List<AuthorRelation> findAllByReceiverIdAndRelation(AuthorId receiverId, Relation relation);
 
     @Query("""
             SELECT authorRelation FROM AuthorRelation authorRelation

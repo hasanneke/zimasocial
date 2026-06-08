@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
@@ -17,7 +19,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void disableAccount(DisableReason reason) {
+    public void disableAccount(DisableReason reason) throws AccountNotFoundException {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.disableAccount(reason);
         accountRepository.save(account);
@@ -28,25 +30,25 @@ public class AccountService {
         accountRepository.save(account);
     }
     @Transactional
-    public void deleteAccount(DeleteReason reason) {
+    public void deleteAccount(DeleteReason reason) throws AccountNotFoundException {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.deleteAccount(reason);
         accountRepository.save(account);
     }
     @Transactional
-    public void makeAccountPublic(){
+    public void makeAccountPublic() throws AccountNotFoundException {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.makeAccountPublic();
         accountRepository.save(account);
     }
     @Transactional
-    public void makeAccountPrivate(){
+    public void makeAccountPrivate() throws AccountNotFoundException {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.makeAccountPrivate();
         accountRepository.save(account);
     }
 
-    public void acceptTermsOfUse() {
+    public void acceptTermsOfUse() throws AccountNotFoundException {
         Account account = accountRepository.findByUserId(CurrentUser.getCurrentUserProfile().getId());
         account.acceptTermsOfUse();
         accountRepository.save(account);

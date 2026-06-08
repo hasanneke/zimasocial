@@ -8,8 +8,8 @@ import com.zima.zimasocial.context.social.post.application.PostApplicationServic
 import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social.post.value.PostCategory;
 import com.zima.zimasocial.context.social.post.value.PostSortType;
-import com.zima.zimasocial.service.posts.Payload.CommentPayload;
-import com.zima.zimasocial.service.posts.Payload.PostPayload;
+import com.zima.zimasocial.context.social.post.api.payload.CommentPayload;
+import com.zima.zimasocial.context.social.post.api.payload.PostPayload;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;

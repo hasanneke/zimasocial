@@ -13,7 +13,6 @@ import com.zima.zimasocial.context.social.author.repository.AuthorRelationReposi
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.repository.FollowRequestRepository;
 import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.service.users.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +46,7 @@ public class AuthorReadService {
     }
 
     public PagedModel<AuthorView> findFollowers(String slug, int page, int size) throws NoSuchMethodException {
-        Author viewer = authorRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
+        Author viewer = authorRepository.findBySlug(slug).orElseThrow(AuthorNotFoundException::new);
         Page<AuthorView> followers =
                 authorRelationRepository
                         .findAllByReceiverIdAndRelation(viewer.getId(), Relation.followed, PageRequest.of(page, size))

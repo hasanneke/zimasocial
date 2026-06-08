@@ -4,7 +4,7 @@ import com.zima.zimasocial.entity.file.FileCode;
 import com.zima.zimasocial.entity.file.FileEntity;
 import com.zima.zimasocial.entity.file.FileType;
 import com.zima.zimasocial.repository.FileEntityRepository;
-import com.zima.zimasocial.service.imageService.exception.FileNotFoundException;
+import com.zima.zimasocial.context.social.image.exception.FileNotFoundException;
 import com.zima.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

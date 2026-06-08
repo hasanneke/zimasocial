@@ -4,10 +4,11 @@ import com.zima.zimasocial.context.contentmoderation.user.User;
 import com.zima.zimasocial.context.contentmoderation.user.UserRepository;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.UserJpaRepository;
-import com.zima.zimasocial.service.users.exception.UserNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
 
 @Repository
@@ -25,8 +26,8 @@ public class UserDBRepository implements UserRepository {
     }
 
     @Override
-    public void save(User user) {
-        UserEntity userEntity = userJpaRepository.findById(user.getAuthorId()).orElseThrow(UserNotFoundException::new);
+    public void save(User user) throws AccountNotFoundException {
+        UserEntity userEntity = userJpaRepository.findById(user.getAuthorId()).orElseThrow(AccountNotFoundException::new);
         userEntity.mergeUser(user);
         userJpaRepository.save(userEntity);
     }

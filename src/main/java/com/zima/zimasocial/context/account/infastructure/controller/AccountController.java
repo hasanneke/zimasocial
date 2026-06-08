@@ -8,35 +8,37 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 @RestController
 @RequestMapping(path = "api/v1/account")
 @RequiredArgsConstructor
 public class AccountController {
     final AccountService accountService;
     @PatchMapping("/me/make-account-public")
-    public ResponseEntity<AuthorView> makeAccountPublic() {
+    public ResponseEntity<AuthorView> makeAccountPublic() throws AccountNotFoundException {
         accountService.makeAccountPublic();
         return ResponseEntity.noContent().build();
     }
     @PatchMapping("/me/make-account-private")
-    public ResponseEntity<AuthorView> makeAccountPrivate() {
+    public ResponseEntity<AuthorView> makeAccountPrivate() throws AccountNotFoundException {
         accountService.makeAccountPrivate();
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/disable-account")
-    public ResponseEntity<Void> disableAccount(@RequestParam(name = "reason") DisableReason reason) {
+    public ResponseEntity<Void> disableAccount(@RequestParam(name = "reason") DisableReason reason) throws AccountNotFoundException {
         accountService.disableAccount(reason);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/delete-account")
-    public ResponseEntity<Void> deleteAccount(@RequestParam(name = "reason") DeleteReason reason) {
+    public ResponseEntity<Void> deleteAccount(@RequestParam(name = "reason") DeleteReason reason) throws AccountNotFoundException {
         accountService.deleteAccount(reason);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/accept-terms-of-use")
-    public ResponseEntity<Void> acceptTermsOfUse() {
+    public ResponseEntity<Void> acceptTermsOfUse() throws AccountNotFoundException {
         accountService.acceptTermsOfUse();
         return ResponseEntity.noContent().build();
     }

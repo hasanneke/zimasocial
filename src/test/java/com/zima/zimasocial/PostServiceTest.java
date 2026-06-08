@@ -9,7 +9,7 @@
 //import com.zima.zimasocial.repository.PostRepository;
 //import com.zima.zimasocial.repository.UserRepository;
 //import com.zima.zimasocial.service.notification.NotificationService;
-//import com.zima.zimasocial.service.posts.Payload.PostPayload;
+//import com.zima.zimasocial.context.social.post.api.payload.PostPayload;
 //import com.zima.zimasocial.service.posts.PostService;
 //import com.zima.zimasocial.service.posts.PostServiceImpl;
 //import com.zima.zimasocial.context.social2.post.api.views.PostView;

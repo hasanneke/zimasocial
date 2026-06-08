@@ -5,11 +5,11 @@ import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.UserJpaRepository;
-import com.zima.zimasocial.service.users.exception.UserNotFoundException;
 import com.zima.zimasocial.utility.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
 
 @Repository
@@ -53,14 +53,14 @@ public class AccountJpaRepository implements AccountRepository {
     }
 
     @Override
-    public Account findByUserId(Long userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public Account findByUserId(Long userId) throws AccountNotFoundException {
+        UserEntity user = userRepository.findById(userId).orElseThrow(AccountNotFoundException::new);
         return accountUserAdapter.convertUserEntityToAccount(user);
     }
 
     @Override
-    public Account findBySlug(String slug) {
-        UserEntity user = userRepository.findBySlug(slug).orElseThrow(UserNotFoundException::new);
+    public Account findBySlug(String slug) throws AccountNotFoundException {
+        UserEntity user = userRepository.findBySlug(slug).orElseThrow(AccountNotFoundException::new);
         return accountUserAdapter.convertUserEntityToAccount(user);
     }
 

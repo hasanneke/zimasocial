@@ -14,7 +14,7 @@ import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
-import com.zima.zimasocial.service.report.dto.ReportRequest;
+import com.zima.zimasocial.context.contentmoderation.api.payload.ReportRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -6,7 +6,7 @@ import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEnti
 import com.zima.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zima.zimasocial.entity.user.UserEntity;
 import com.zima.zimasocial.repository.UserJpaRepository;
-import com.zima.zimasocial.service.users.exception.UserNotFoundException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.login.AccountNotFoundException;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,7 +64,7 @@ public class JWTService {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
-    public TokenResponse generateToken(Long id, String email, String provider,  Account account) {
+    public TokenResponse generateToken(Long id, String email, String provider,  Account account) throws AccountNotFoundException {
         return createToken(id, email, provider, account);
     }
 
@@ -103,7 +104,7 @@ public class JWTService {
                 .build();
     }
 
-    private TokenResponse createToken(Long id, String email, String provider, Account account) {
+    private TokenResponse createToken(Long id, String email, String provider, Account account) throws AccountNotFoundException {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("id", id);
@@ -132,7 +133,7 @@ public class JWTService {
         tokenEntity.setToken(hashedRefreshToken);
         tokenEntity.setExpiresAt(refreshTokenExpirationDate);
 
-        UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findById(account.getAccountId().getValue()).orElseThrow(AccountNotFoundException::new);
         tokenEntity.setUser(user);
         tokenEntity.setUserId(user.getId());
 

@@ -1,13 +1,18 @@
 package com.zima.zimasocial.context.communication.domain.value;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 import java.util.Objects;
 
 @Getter
+@Embeddable
 public class RecipientId {
-    private final Long value;
+    @Column(name = "user_id")
+    private Long value;
 
+    protected RecipientId() {}
     public RecipientId(Long value) {
         this.value = value;
     }

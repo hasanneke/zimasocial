@@ -10,7 +10,7 @@ import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.entity.report.ReportReason;
 import com.zima.zimasocial.entity.report.ResourceType;
-import com.zima.zimasocial.service.posts.exception.CommentNotFoundException;
+import com.zima.zimasocial.context.social.post.exception.CommentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

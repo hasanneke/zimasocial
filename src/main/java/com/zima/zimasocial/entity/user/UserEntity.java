@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
-import com.zima.zimasocial.context.communication.domain.entity.Recipient;
+import com.zima.zimasocial.context.communication.domain.entity.RecipientDomain;
 import com.zima.zimasocial.context.contentmoderation.user.User;
 import com.zima.zimasocial.entity.UserDeviceToken;
 import com.zima.zimasocial.entity.UserRole;
@@ -175,7 +175,7 @@ public class UserEntity implements Serializable {
         this.trustScore = user.getTrustScore();
         this.isDisabled = user.getIsBanned();
     }
-    public void mergeRecipient(Recipient recipient) {
+    public void mergeRecipient(RecipientDomain recipient) {
         this.deviceTokens = recipient.getDeviceTokens().stream().map(UserDeviceToken::new).collect(Collectors.toSet());
     }
 

@@ -24,7 +24,7 @@ import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundExcepti
 import com.zima.zimasocial.context.social.post.value.FeedFilter;
 import com.zima.zimasocial.context.social.post.api.payload.FeedFilterPlain;
 import com.zima.zimasocial.context.social.post.repository.PostCustomRepository;
-import com.zima.zimasocial.service.posts.exception.PostNotFoundException;
+import com.zima.zimasocial.context.social.post.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

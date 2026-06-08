@@ -1,12 +1,14 @@
 package com.zima.zimasocial.controller;
 
 import com.google.auth.oauth2.TokenVerifier;
-import com.zima.zimasocial.service.auth.AuthService;
+import com.zima.zimasocial.context.account.abstracted.AuthService;
 import com.zima.zimasocial.utility.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class AuthController {
     }
 
     @GetMapping(path = "/refresh-token")
-    ResponseEntity<TokenResponse> refreshToken(@RequestParam String refreshToken) throws TokenVerifier.VerificationException {
+    ResponseEntity<TokenResponse> refreshToken(@RequestParam String refreshToken) throws TokenVerifier.VerificationException, AccountNotFoundException {
         TokenResponse tokenResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }

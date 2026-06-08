@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.contentmoderation.api;
 
 import com.zima.zimasocial.context.contentmoderation.report.ReportService;
-import com.zima.zimasocial.service.report.dto.ReportRequest;
+import com.zima.zimasocial.context.contentmoderation.api.payload.ReportRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;

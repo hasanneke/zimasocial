@@ -1,9 +1,9 @@
 package com.zima.zimasocial.context.communication.application;
 
 import com.zima.zimasocial.context.communication.domain.entity.Notification;
-import com.zima.zimasocial.context.communication.domain.entity.Recipient;
+import com.zima.zimasocial.context.communication.domain.entity.RecipientDomain;
 import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
-import com.zima.zimasocial.context.communication.domain.repository.RecipientRepository;
+import com.zima.zimasocial.context.communication.domain.repository.RecipientDomainRepository;
 import com.zima.zimasocial.context.communication.domain.service.NotificationPolicy;
 import com.zima.zimasocial.context.communication.domain.value.DeviceToken;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NotificationManager {
     private final NotificationRepository notificationRepository;
-    private final RecipientRepository recipientRepository;
+    private final RecipientDomainRepository recipientRepository;
     private final NotificationPolicy notificationPolicy;
     private final Logger logger = LoggerFactory.getLogger(NotificationManager.class.getName());
     private boolean throttled = false;
@@ -38,7 +38,7 @@ public class NotificationManager {
     }
     @Transactional
     public void saveDeviceToken(String token) {
-        Recipient recipient = recipientRepository.getAuthenticatedRecipient();
+        RecipientDomain recipient = recipientRepository.getAuthenticatedRecipient();
         recipient.addToken(new DeviceToken(token, recipient.getRecipientId()));
         recipientRepository.save(recipient);
     }

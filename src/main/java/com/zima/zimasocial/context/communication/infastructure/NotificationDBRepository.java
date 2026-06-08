@@ -7,7 +7,6 @@ import com.zima.zimasocial.entity.NotificationEntity;
 import com.zima.zimasocial.entity.NotificationType;
 import com.zima.zimasocial.entity.TargetCollection;
 import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.repository.NotificationJpaRepository;
 import com.zima.zimasocial.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

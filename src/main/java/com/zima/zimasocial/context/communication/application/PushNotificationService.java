@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.zima.zimasocial.context.communication.domain.SubscriberSearch;
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
-import com.zima.zimasocial.context.communication.domain.repository.RecipientRepository;
+import com.zima.zimasocial.context.communication.domain.repository.RecipientDomainRepository;
 import com.zima.zimasocial.context.communication.domain.service.RecipientValidator;
 import com.zima.zimasocial.context.communication.domain.value.DeviceToken;
 import com.zima.zimasocial.entity.MediaType;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class PushNotificationService {
     private final NotificationRepository notificationRepository;
-    private final RecipientRepository recipientRepository;
+    private final RecipientDomainRepository recipientRepository;
     private final PushNotificationProvider pushNotificationProvider;
     private final RecipientValidator recipientValidator;
     private final SubscriberSearch subscriberSearch;
@@ -37,18 +37,18 @@ public class PushNotificationService {
         List<Notification> notificationList = notificationRepository.findAllByIsPushedFalse();
         for (Notification notification : notificationList) {
             if(notification instanceof PostSharedNotification){
-                List<Recipient> subscribers = subscriberSearch.findSubscribers(notification.getActorId());
+                List<RecipientDomain> subscribers = subscriberSearch.findSubscribers(notification.getActorId());
                 if(subscribers.isEmpty()) markAsRead(notification);
-                for (Recipient subscriber : subscribers) {
+                for (RecipientDomain subscriber : subscribers) {
                     notification.setRecipientId(subscriber.getRecipientId());
                     push(notification, subscriber.getDeviceTokens().stream().toList());
                 }
             }else{
-                Optional<Recipient> recipient = recipientRepository.findByRecipientId(notification.getRecipientId());
+                Optional<RecipientDomain> recipient = recipientRepository.findByRecipientId(notification.getRecipientId());
                 if (recipient.isPresent()) {
                     boolean eligibleForPush = recipientValidator.canBePushed(recipient.get().getRecipientId());
                     if (eligibleForPush) {
-                        Recipient getRecipient = recipient.get();
+                        RecipientDomain getRecipient = recipient.get();
                         Set<DeviceToken> deviceTokens = getRecipient.getDeviceTokens();
                         push(notification, deviceTokens.stream().toList());
                     }
@@ -60,10 +60,10 @@ public class PushNotificationService {
 
     public void push(Notification notification, List<DeviceToken> deviceTokens) {
         Assert.notNull(notification, "Notification cannot be null");
-        Recipient recipient = recipientRepository.findByRecipientId(notification.getRecipientId()).orElse(null);
+        RecipientDomain recipient = recipientRepository.findByRecipientId(notification.getRecipientId()).orElse(null);
         if (recipient == null) return;
         for (DeviceToken deviceToken : deviceTokens) {
-            Recipient actor = recipientRepository.findByRecipientId(notification.getActorId()).orElse(null);
+            RecipientDomain actor = recipientRepository.findByRecipientId(notification.getActorId()).orElse(null);
             if (actor == null) return;
             PushNotification pushNotification = switch (notification) {
                 case AuthorFollowedNotification authorFollowedNotification -> {

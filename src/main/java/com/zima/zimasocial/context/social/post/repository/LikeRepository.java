@@ -18,7 +18,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByAuthorIdAndCommentIdAndType(AuthorId authorId, Long postId, LikeType type);
 
     @Query("""
-        SELECT new com.zima.zimasocial.context.social.api.views.LikeView(
+        SELECT new com.zima.zimasocial.context.social.post.api.views.LikeView(
                 liker.slug,
                 liker.name fullName,
                 liker.avatarFileName,
