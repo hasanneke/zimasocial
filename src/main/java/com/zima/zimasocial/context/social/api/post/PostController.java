@@ -45,13 +45,6 @@ public class PostController {
     private static final DateTimeFormatter CLIENT_TS_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
-
-    @GetMapping
-    public String punishPosts() {
-        postScorePunisherService.punishPosts();
-        return "";
-    }
-
     @PostMapping
     public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) throws JsonProcessingException {
         return ResponseEntity.ok(postControllerBridge.createPost(payload));
