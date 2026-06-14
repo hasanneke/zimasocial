@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.zima.zimasocial</groupId>
 	<artifactId>zimasocial</artifactId>
-	<version>0.1.5-SNAPSHOT</version>
+	<version>0.1.7-SNAPSHOT</version>
 	<name>zimasocial</name>
 	<description>Zima Social App</description>
 	<url/>

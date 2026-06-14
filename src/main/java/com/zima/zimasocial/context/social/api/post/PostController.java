@@ -7,7 +7,6 @@ import com.zima.zimasocial.context.social.api.FeedFilterPlain;
 import com.zima.zimasocial.context.social.api.dto.LikeDTO;
 import com.zima.zimasocial.context.social.comment.Comment;
 import com.zima.zimasocial.context.social.comment.CommentViewAdapter;
-import com.zima.zimasocial.context.social.post.application.PostScorePunisherService;
 import com.zima.zimasocial.context.social.post.application.PostService;
 import com.zima.zimasocial.context.social.post.repository.PostSortType;
 import com.zima.zimasocial.service.posts.Payload.CommentPayload;
@@ -39,7 +38,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final PostScorePunisherService postScorePunisherService;
     private final PostControllerBridge postControllerBridge;
     private final CommentViewAdapter commentViewAdapter;
     private static final DateTimeFormatter CLIENT_TS_FORMAT =
