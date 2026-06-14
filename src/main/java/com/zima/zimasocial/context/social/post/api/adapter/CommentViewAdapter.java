@@ -7,6 +7,7 @@ import com.zima.zimasocial.context.social.post.entity.Like;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.post.repository.LikeRepository;
+import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.entity.LikeType;
 import com.zima.zimasocial.entity.report.ResourceType;
 import com.zima.zimasocial.context.social.post.api.views.CommentView;
@@ -44,7 +45,7 @@ public class CommentViewAdapter {
         commentView.setLikeCount(comment.getLikeCount());
         commentView.setReplyCount(comment.getReplyCount());
         if(comment.getMediaId() != null) commentView.setMediaId(comment.getMediaId().getValue());
-        Optional<Like> like = likeRepository.findByAuthorIdAndCommentIdAndType(authenticatedAuthor.getId(), comment.getId().getValue(), LikeType.comment);
+        Optional<Like> like = likeRepository.findByAuthorIdAndCommentIdAndType(authenticatedAuthor.getId(), new CommentId(comment.getId().getValue()), LikeType.comment);
         commentView.setIsLiked(like.isPresent());
 
         boolean isCommentReported = reportRepository.checkReportExists(comment.getId().getValue(), new AuthorId(authenticatedAuthor.getId().getValue()), ResourceType.comment);

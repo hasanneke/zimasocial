@@ -141,7 +141,7 @@ public class PostApplicationService implements PostUseCase {
     public void likeComment(Long commentId) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(new CommentId(commentId)).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<Like> checkLike = likeRepository.findByAuthorIdAndCommentIdAndType(author.getId(), commentId, LikeType.comment);
+        Optional<Like> checkLike = likeRepository.findByAuthorIdAndCommentIdAndType(author.getId(), new CommentId(commentId), LikeType.comment);
         if(checkLike.isEmpty()){
             Like commentLike = comment.like(author.getId());
             commentRepository.save(comment);
@@ -156,7 +156,7 @@ public class PostApplicationService implements PostUseCase {
     public void unlikeComment(Long commentId) {
         Author authenticatedAuthor = authorRepository.getAuthenticatedAuthor();
         Comment comment = commentRepository.findById(new CommentId(commentId)).orElseThrow(()-> new DataNotFoundException("Comment not found"));
-        Optional<Like> checkLike = likeRepository.findByAuthorIdAndCommentIdAndType(authenticatedAuthor.getId(), commentId, LikeType.comment);
+        Optional<Like> checkLike = likeRepository.findByAuthorIdAndCommentIdAndType(authenticatedAuthor.getId(), new CommentId(commentId), LikeType.comment);
         if(checkLike.isPresent()){
             comment.unlike();
             commentRepository.save(comment);

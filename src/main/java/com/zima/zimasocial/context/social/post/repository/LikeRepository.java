@@ -3,6 +3,7 @@ package com.zima.zimasocial.context.social.post.repository;
 import com.zima.zimasocial.context.social.post.api.views.LikeView;
 import com.zima.zimasocial.context.social.post.entity.Like;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
+import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.context.social.post.value.PostId;
 import com.zima.zimasocial.entity.LikeType;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,7 @@ import java.util.Optional;
 public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByAuthorIdAndPostIdAndType(AuthorId authorId, PostId postId, LikeType type);
     boolean existsByAuthorIdAndPostIdAndType(AuthorId authorId, PostId postId, LikeType type);
-    Optional<Like> findByAuthorIdAndCommentIdAndType(AuthorId authorId, Long postId, LikeType type);
+    Optional<Like> findByAuthorIdAndCommentIdAndType(AuthorId authorId, CommentId commentId, LikeType type);
 
     @Query("""
         SELECT new com.zima.zimasocial.context.social.post.api.views.LikeView(
