@@ -1,15 +1,16 @@
 package com.zima.zimasocial.context.social.post.api;
 
-import com.zima.zimasocial.context.social.post.application.PostReadService;
+import com.zima.zimasocial.context.social.post.api.adapter.CommentViewAdapter;
+import com.zima.zimasocial.context.social.post.api.payload.CommentPayload;
 import com.zima.zimasocial.context.social.post.api.payload.FeedFilterPlain;
+import com.zima.zimasocial.context.social.post.api.payload.PostPayload;
 import com.zima.zimasocial.context.social.post.api.views.CommentView;
 import com.zima.zimasocial.context.social.post.api.views.PostView;
 import com.zima.zimasocial.context.social.post.application.PostApplicationService;
+import com.zima.zimasocial.context.social.post.application.PostReadService;
 import com.zima.zimasocial.context.social.post.value.CreatePost;
 import com.zima.zimasocial.context.social.post.value.PostCategory;
 import com.zima.zimasocial.context.social.post.value.PostSortType;
-import com.zima.zimasocial.context.social.post.api.payload.CommentPayload;
-import com.zima.zimasocial.context.social.post.api.payload.PostPayload;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -31,8 +33,8 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class PostController {
-    private final PostApplicationService postService;
     private final PostReadService postReadService;
+    private final PostApplicationService postService;
 
     @PostMapping
     public ResponseEntity<PostView> createPost(@Valid @RequestBody PostPayload payload) {
