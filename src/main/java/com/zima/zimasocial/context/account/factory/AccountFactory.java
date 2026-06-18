@@ -4,10 +4,9 @@ import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.entity.AccountId;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.context.account.value.AccountIdentity;
-import com.zima.zimasocial.context.account.value.PersonalInfo;
-import com.zima.zimasocial.entity.UserRole;
-import com.zima.zimasocial.repository.UserJpaRepository;
 import com.zima.zimasocial.context.account.value.OAuthTokenResult;
+import com.zima.zimasocial.context.account.value.PersonalInfo;
+import com.zima.zimasocial.context.account.value.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AccountFactory {
     private final AccountRepository accountRepository;
-    private final UserJpaRepository userRepository;
     private final Random random = new Random();
 
     public Account createOAuth2Account(OAuthTokenResult tokenResult, String provider) throws Exception {
@@ -66,7 +64,7 @@ public class AccountFactory {
     private String generateUniqueSlug(String name) {
         String slug = getTrimmedName(name);
 
-        while (userRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
+        while (accountRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
             slug = slug + random.nextInt(10000000);
         }
 

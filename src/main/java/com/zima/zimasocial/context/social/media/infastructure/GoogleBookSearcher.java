@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;

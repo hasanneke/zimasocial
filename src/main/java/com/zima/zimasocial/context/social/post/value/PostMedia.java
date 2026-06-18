@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.value;
 
 import com.zima.zimasocial.context.social.media.value.MediaId;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

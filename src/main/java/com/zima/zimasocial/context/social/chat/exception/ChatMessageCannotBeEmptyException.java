@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.chat.exception;
 
-import com.zima.zimasocial.exception.BadRequestException;
+import com.zima.zimasocial.shared.exception.BadRequestException;
 
 public class ChatMessageCannotBeEmptyException extends BadRequestException {
     public ChatMessageCannotBeEmptyException() {

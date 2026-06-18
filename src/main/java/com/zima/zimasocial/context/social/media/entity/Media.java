@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.media.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social.media.value.MediaId;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;

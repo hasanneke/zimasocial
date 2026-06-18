@@ -4,7 +4,7 @@ import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.post.value.PostId;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 
 import java.util.Random;
 

@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.author.exception;
 
-import com.zima.zimasocial.exception.ConflictException;
+import com.zima.zimasocial.shared.exception.ConflictException;
 
 public class SlugAlreadyTakenException extends ConflictException {
     public SlugAlreadyTakenException(String slug) {

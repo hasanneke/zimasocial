@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.contentmoderation.report.exception;
 
-import com.zima.zimasocial.exception.ConflictException;
+import com.zima.zimasocial.shared.exception.ConflictException;
 
 public class ReportAlreadyMadeException extends ConflictException {
     public ReportAlreadyMadeException() {

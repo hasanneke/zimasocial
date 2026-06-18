@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.media.application;
 
 import com.zima.zimasocial.context.social.media.infastructure.SpotifyMusicSearcher;
 import com.zima.zimasocial.context.social.media.infastructure.TMDBMovieSearcher;
-import com.zima.zimasocial.exception.UnauthorizedException;
+import com.zima.zimasocial.shared.exception.UnauthorizedException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;

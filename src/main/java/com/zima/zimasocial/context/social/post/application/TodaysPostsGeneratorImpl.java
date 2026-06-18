@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.post.entity.TodaysPost;
 import com.zima.zimasocial.context.social.post.repository.PostRepository;
 import com.zima.zimasocial.context.social.post.repository.TodaysPostRepository;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

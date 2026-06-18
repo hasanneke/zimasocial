@@ -2,7 +2,6 @@ package com.zima.zimasocial.context.communication.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.entity.UserDeviceToken;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -41,13 +40,15 @@ public class Recipient {
     @Column(name = "is_private")
     private Boolean isPrivate = false;
 
-    @Column(name = "is_disabled")
-    private Boolean isDisabled = false;
-
-    @Column(name = "is_banned")
-    private Boolean isBanned = false;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserDeviceToken> deviceTokens = new HashSet<>();
+
+    public void addToken(String token) {
+        UserDeviceToken deviceToken = UserDeviceToken.fromDeviceTokenAndUserId(token, id);
+        deviceTokens.add(deviceToken);
+    }
+    public void removeToken(UserDeviceToken deviceToken) {
+        this.deviceTokens.remove(deviceToken);
+    }
 }

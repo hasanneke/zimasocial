@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.playlist.api.dto;
 
 import com.zima.zimasocial.context.social.playlist.infastructure.Playlist;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.Getter;
 
 import java.util.UUID;

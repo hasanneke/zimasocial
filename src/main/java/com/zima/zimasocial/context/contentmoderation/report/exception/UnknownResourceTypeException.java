@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.contentmoderation.report.exception;
 
-import com.zima.zimasocial.exception.BadRequestException;
+import com.zima.zimasocial.shared.exception.BadRequestException;
 
 public class UnknownResourceTypeException extends BadRequestException {
     public UnknownResourceTypeException() {

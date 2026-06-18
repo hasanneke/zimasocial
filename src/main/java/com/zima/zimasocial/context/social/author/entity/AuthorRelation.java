@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.author.entity;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.context.social.author.value.Relation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;

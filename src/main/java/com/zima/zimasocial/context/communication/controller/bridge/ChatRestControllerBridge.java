@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller.bridge;
 
-import com.zima.zimasocial.context.common.SimplePagedModel;
+import com.zima.zimasocial.shared.SimplePagedModel;
 import com.zima.zimasocial.context.communication.RecipientNotFoundException;
 import com.zima.zimasocial.context.communication.controller.views.ChatMessageView;
 import com.zima.zimasocial.context.communication.controller.views.ChatRoomView;

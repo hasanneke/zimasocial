@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.contentmoderation.api.payload;
 
-import com.zima.zimasocial.entity.report.ReportReason;
+import com.zima.zimasocial.context.contentmoderation.ReportReason;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

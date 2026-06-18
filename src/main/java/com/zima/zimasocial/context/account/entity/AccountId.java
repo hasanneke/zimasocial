@@ -1,16 +1,20 @@
 package com.zima.zimasocial.context.account.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Getter
+@Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountId {
-    private final Long value;
-
-    public AccountId(Long value) {
-        this.value = value;
-    }
+    @Column(name = "user_id")
+    private Long value;
 
     @Override
     public boolean equals(Object o) {

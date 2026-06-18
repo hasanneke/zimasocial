@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.chat.exception;
 
-import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
 
 public class ChatRoomNotFoundException extends DataNotFoundException {
     public ChatRoomNotFoundException() {

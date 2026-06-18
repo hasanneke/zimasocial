@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.account.infastructure.entity;
 
-import com.zima.zimasocial.entity.user.UserEntity;
+import com.zima.zimasocial.context.account.entity.Account;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class RefreshTokenEntity {
 
     @ManyToOne()
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private UserEntity user;
+    private Account user;
 
     @Column(name = "user_id")
     private Long userId;

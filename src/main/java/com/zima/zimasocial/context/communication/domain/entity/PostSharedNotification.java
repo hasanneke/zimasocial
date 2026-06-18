@@ -1,5 +1,5 @@
 package com.zima.zimasocial.context.communication.domain.entity;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

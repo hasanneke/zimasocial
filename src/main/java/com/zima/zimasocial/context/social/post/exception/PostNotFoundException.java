@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.post.exception;
 
-import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

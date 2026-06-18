@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.author.repository;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.entity.AuthorRelation;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.context.social.author.value.Relation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

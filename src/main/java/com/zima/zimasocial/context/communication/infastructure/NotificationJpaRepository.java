@@ -1,10 +1,9 @@
 package com.zima.zimasocial.context.communication.infastructure;
 
-import com.zima.zimasocial.entity.NotificationEntity;
-import com.zima.zimasocial.entity.NotificationType;
-import com.zima.zimasocial.entity.TargetCollection;
-import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.views.notification.NotificationView2;
+import com.zima.zimasocial.context.communication.entity.NotificationEntity;
+import com.zima.zimasocial.context.communication.value.NotificationType;
+import com.zima.zimasocial.context.communication.value.TargetCollection;
+import com.zima.zimasocial.context.communication.controller.views.NotificationView2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,14 +33,14 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
                                          user.familyName,
                                          user.avatarFileName avatarUrl,
                                          CASE WHEN EXISTS (
-                                                     SELECT 1 FROM UserRelationEntity relation
+                                                     SELECT 1 FROM AuthorRelation relation
                                                      WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
-                                                     AND relation.actorId = :receiverId AND relation.receiverId = user.id.value
+                                                     AND relation.actorId = :receiverId AND relation.receiverId = user.id
                                          ) THEN true ELSE false END,
                                         CASE WHEN EXISTS (
-                                                     SELECT 1 FROM UserRelationEntity relation
+                                                     SELECT 1 FROM AuthorRelation relation
                                                      WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
-                                                     AND relation.receiverId = :receiverId AND relation.actorId = user.id.value
+                                                     AND relation.receiverId = :receiverId AND relation.actorId = user.id
                                          ) THEN true ELSE false END,
                                          CASE WHEN EXISTS (
                                                      SELECT 1 FROM FollowRequest followRequest
@@ -63,9 +62,6 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
     )
     Page<NotificationView2> findAllNotifications(Long receiverId, Set<NotificationType> notificationTypes, Pageable page);
     Page<NotificationEntity> findByReceiverUserIdAndTypeNotInOrderByCreatedAtDesc(Long receiverId, Set<NotificationType> notificationType, Pageable page);
-    Optional<NotificationEntity> findByReceiverUserAndActorAndPostIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
-    Optional<NotificationEntity> findByReceiverUserAndActorAndTargetIdAndTypeAndTargetCollection(UserEntity receiver, UserEntity sender, Long targetId, NotificationType type, TargetCollection collection);
-
     Optional<NotificationEntity> findByActorIdAndTargetIdAndTypeAndTargetCollection(Long actorId, Long targetId, NotificationType type, TargetCollection collection);
     Optional<NotificationEntity> findFirstByActorIdAndReceiverUserIdAndTypeOrderByCreatedAtDesc(Long actorId, Long receiverId, NotificationType type);
     Optional<NotificationEntity> findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(Long actorId, Long receiverId, NotificationType type, Long targetId);

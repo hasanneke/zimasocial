@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.account.abstracted;
 
 import com.google.auth.oauth2.TokenVerifier;
-import com.zima.zimasocial.utility.TokenResponse;
+import com.zima.zimasocial.context.account.value.TokenResponse;
 
 import javax.security.auth.login.AccountNotFoundException;
 

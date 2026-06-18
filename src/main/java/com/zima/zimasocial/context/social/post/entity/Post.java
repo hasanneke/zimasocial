@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.media.value.MediaId;
+import com.zima.zimasocial.context.social.post.api.views.PostDTO;
 import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.context.social.post.value.PostContent;
 import com.zima.zimasocial.context.social.post.value.PostId;
 import com.zima.zimasocial.context.social.post.value.PostStats;
-import com.zima.zimasocial.entity.LikeType;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.post.value.LikeType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,10 +21,40 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "post")
 @Getter
+@SqlResultSetMapping(name = "post_dto_mapping", classes = {
+        @ConstructorResult(
+                targetClass = PostDTO.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "content", type = String.class),
+                        @ColumnResult(name = "type", type = String.class),
+                        @ColumnResult(name = "likeCount", type = Long.class),
+                        @ColumnResult(name = "commentCount", type = Long.class),
+                        @ColumnResult(name = "isLiked", type = Boolean.class),
+                        @ColumnResult(name = "createdAt", type = LocalDateTime.class),
+                        @ColumnResult(name = "updatedAt", type = LocalDateTime.class),
+                        @ColumnResult(name = "isReported", type = Boolean.class),
+                        @ColumnResult(name = "mediaId", type = UUID.class),
+                        @ColumnResult(name = "slug", type = String.class),
+                        @ColumnResult(name = "name", type = String.class),
+                        @ColumnResult(name = "familyName", type = String.class),
+                        @ColumnResult(name = "avatarFileName", type = String.class),
+                        @ColumnResult(name = "bio", type = String.class),
+                        @ColumnResult(name = "followerCount", type = Long.class),
+                        @ColumnResult(name = "followingCount", type = Long.class),
+                        @ColumnResult(name = "isFollowed", type = Boolean.class),
+                        @ColumnResult(name = "isFollowingMe", type = Boolean.class),
+                        @ColumnResult(name = "isFollowRequestSent", type = Boolean.class),
+                        @ColumnResult(name = "isFollowRequestReceived", type = Boolean.class),
+                        @ColumnResult(name = "score", type = Long.class),
+                }
+        )
+})
 public class Post {
     @EmbeddedId
     @AttributeOverride(

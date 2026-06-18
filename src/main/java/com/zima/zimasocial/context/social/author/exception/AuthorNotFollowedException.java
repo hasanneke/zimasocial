@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.author.exception;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
 
 public class AuthorNotFollowedException extends DataNotFoundException {
     public AuthorNotFollowedException(AuthorId authorId) {

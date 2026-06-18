@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.author.exception;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.exception.ConflictException;
+import com.zima.zimasocial.shared.exception.ConflictException;
 
 public class AuthorAlreadyBlocked extends ConflictException {
     public AuthorAlreadyBlocked(AuthorId authorId) {

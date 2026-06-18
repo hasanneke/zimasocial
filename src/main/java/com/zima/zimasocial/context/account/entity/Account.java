@@ -7,34 +7,85 @@ import com.zima.zimasocial.context.account.exception.AccountIsAlreadyPrivateExce
 import com.zima.zimasocial.context.account.exception.AccountIsAlreadyPublicException;
 import com.zima.zimasocial.context.account.exception.SlugLengthExceededException;
 import com.zima.zimasocial.context.account.value.*;
-import com.zima.zimasocial.entity.UserRole;
+import com.zima.zimasocial.context.account.value.UserRole;
 import com.zima.zimasocial.shared.StaticEventPublisher;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
+@Table(name = "users")
+@Entity
 @Getter
+@SQLRestriction(value = "IS_DELETED IS FALSE")
 public class Account {
+
+    @EmbeddedId
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "id", updatable = false)
+    )
     private AccountId accountId;
+
+    @NotEmpty
+    @Email
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "auth_provider")
     private String authProvider;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "family_name")
     private String familyName;
+
+    @Column(name = "slug", unique = true, length = 65)
     private String slug;
+
+    @Column(name = "is_disabled")
     private Boolean isDisabled;
+
+    @Column(name = "disable_date")
     private LocalDate disableDate;
+
+    @Column(name = "delete_date")
     private LocalDate deleteDate;
-    private Boolean isDeleted;
-    private Boolean isPrivate;
+
+    @Column(name = "IS_DELETED", nullable = false)
+    private Boolean isDeleted = false;
+
+    @Column(name = "is_private")
+    private boolean isPrivate = false;
+
+    @Column(name = "terms_of_use_accepted")
     private Boolean termsOfUseAccepted;
+
+    @Column(name = "delete_reason")
+    @Enumerated(EnumType.STRING)
     private DeleteReason deleteReason;
+
+    @Column(name = "disable_reason")
+    @Enumerated(EnumType.STRING)
     private DisableReason disableReason;
+
+    @Column(name = "is_banned")
     private Boolean isBanned;
+
+    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
     private Set<UserRole> roles;
-    private Account() {}
+
+    protected Account() {}
 
     public static Account newAccount(AccountIdentity accountIdentity, PersonalInfo personalInfo) {
         Assert.notNull(accountIdentity.getEmail(), "User must have email address");

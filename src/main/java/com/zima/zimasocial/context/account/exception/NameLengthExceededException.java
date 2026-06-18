@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.account.exception;
 
-import com.zima.zimasocial.exception.BadRequestException;
+import com.zima.zimasocial.shared.exception.BadRequestException;
 
 public class NameLengthExceededException extends BadRequestException {
     public NameLengthExceededException(String message) {

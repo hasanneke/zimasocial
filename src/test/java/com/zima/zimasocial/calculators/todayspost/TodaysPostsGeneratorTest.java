@@ -4,7 +4,7 @@
 //import com.zima.zimasocial.context.social2.post.domain.TodaysPost;
 //import com.zima.zimasocial.context.social2.post.repository.PostRepository;
 //import com.zima.zimasocial.context.social2.post.repository.TodaysPostRepository;
-//import com.zima.zimasocial.entity.MediaType;
+//import com.zima.zimasocial.context.social.media.value.MediaType;
 //import com.zima.zimasocial.entity.PostJpaEntity;
 //import com.zima.zimasocial.entity.todayspost.TodaysPostDomain;
 //import com.zima.zimasocial.entity.user.UserEntity;

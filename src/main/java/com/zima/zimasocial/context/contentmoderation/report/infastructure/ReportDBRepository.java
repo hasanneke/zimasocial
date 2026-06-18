@@ -4,10 +4,10 @@ import com.zima.zimasocial.context.contentmoderation.report.ReportRepository;
 import com.zima.zimasocial.context.contentmoderation.report.reports.CommentReport;
 import com.zima.zimasocial.context.contentmoderation.report.reports.PostReport;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.report.ReportEntity;
-import com.zima.zimasocial.entity.report.ReportId;
-import com.zima.zimasocial.entity.report.ResourceType;
-import com.zima.zimasocial.repository.ReportJpaRepository;
+import com.zima.zimasocial.context.contentmoderation.ReportEntity;
+import com.zima.zimasocial.context.contentmoderation.ReportId;
+import com.zima.zimasocial.context.contentmoderation.ResourceType;
+import com.zima.zimasocial.context.contentmoderation.ReportJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.media.exception;
 
-import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
 
 public class MediaNotFoundException extends DataNotFoundException {
     public MediaNotFoundException() {

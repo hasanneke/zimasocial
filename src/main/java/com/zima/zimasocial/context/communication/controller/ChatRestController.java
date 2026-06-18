@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.communication.controller;
 
-import com.zima.zimasocial.context.common.SimplePagedModel;
+import com.zima.zimasocial.shared.SimplePagedModel;
 import com.zima.zimasocial.context.social.chat.service.ChatServiceApplication;
 import com.zima.zimasocial.context.social.chat.value.ChatRoomId;
 import com.zima.zimasocial.context.communication.controller.bridge.ChatRestControllerBridge;

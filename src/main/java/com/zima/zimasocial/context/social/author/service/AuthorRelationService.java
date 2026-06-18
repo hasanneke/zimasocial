@@ -2,7 +2,7 @@ package com.zima.zimasocial.context.social.author.service;
 
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRelationRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.context.social.author.value.Relation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,15 +1,26 @@
 package com.zima.zimasocial.context.account.repository;
 
 import com.zima.zimasocial.context.account.entity.Account;
+import com.zima.zimasocial.context.account.entity.AccountId;
+import com.zima.zimasocial.shared.CurrentUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
 
-public interface AccountRepository {
-    Account getAuthenticatedAccount();
-    Optional<Account> findByEmailAndAuthProvider(String email, String provider);
-    void save(Account account);
-    Account findByUserId(Long userId) throws AccountNotFoundException;
-    Account findBySlug(String slug) throws AccountNotFoundException;
+@Repository
+public interface AccountRepository extends JpaRepository<Account, AccountId> {
+    Optional<Account> findByEmailAndAuthProvider(String email, String authProvider);
+    Optional<Account> findBySlug(String slug);
+    Optional<Account> findByAccountId(AccountId accountId);
+    @Query(value = "SELECT nextval('user_sequence')")
     Long nextId();
+
+    default Account getAuthenticatedAccount() {
+        return findByAccountId(new AccountId(CurrentUser.getCurrentUserId().getValue())).orElse(null);
+    }
+
+    @Query(value = "SELECT * FROM users WHERE slug = :slug AND IS_DELETED = FALSE AND IS_DISABLED = FALSE", nativeQuery = true)
+    Optional<Account> findBySlugWithDeletedUsers(String slug);
 }

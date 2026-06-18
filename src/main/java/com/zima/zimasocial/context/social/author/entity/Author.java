@@ -1,14 +1,12 @@
 package com.zima.zimasocial.context.social.author.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.account.exception.*;
-import com.zima.zimasocial.context.social.author.exception.SlugCannotBeChangedException;
 import com.zima.zimasocial.context.social.author.event.AuthorFollowRequestSentEvent;
+import com.zima.zimasocial.context.social.author.exception.SlugCannotBeChangedException;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.entity.UserDeviceToken;
-import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.exception.ConflictException;
+import com.zima.zimasocial.context.social.author.value.Relation;
+import com.zima.zimasocial.shared.exception.ConflictException;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,9 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Table(name = "users")
 @Entity
@@ -86,10 +82,6 @@ public class Author {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<UserDeviceToken> deviceTokens = new HashSet<>();
 
     public FollowRequest requestToFollow(AuthorId followerAuthorId) {
         if(followerAuthorId.equals(this.id)){

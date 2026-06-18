@@ -6,7 +6,7 @@ import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.context.social.media.value.MediaId;
 import com.zima.zimasocial.context.social.post.value.PostId;
 import com.zima.zimasocial.context.social.post.event.CommentLikedEvent;
-import com.zima.zimasocial.entity.LikeType;
+import com.zima.zimasocial.context.social.post.value.LikeType;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

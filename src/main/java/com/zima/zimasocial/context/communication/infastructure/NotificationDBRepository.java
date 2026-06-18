@@ -1,13 +1,13 @@
 package com.zima.zimasocial.context.communication.infastructure;
 
+import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
 import com.zima.zimasocial.context.communication.domain.value.RecipientId;
-import com.zima.zimasocial.context.communication.domain.entity.*;
-import com.zima.zimasocial.entity.NotificationEntity;
-import com.zima.zimasocial.entity.NotificationType;
-import com.zima.zimasocial.entity.TargetCollection;
-import com.zima.zimasocial.entity.user.UserEntity;
-import com.zima.zimasocial.repository.UserJpaRepository;
+import com.zima.zimasocial.context.communication.entity.Recipient;
+import com.zima.zimasocial.context.communication.repository.RecipientRepository;
+import com.zima.zimasocial.context.communication.entity.NotificationEntity;
+import com.zima.zimasocial.context.communication.value.NotificationType;
+import com.zima.zimasocial.context.communication.value.TargetCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,18 +17,18 @@ import java.util.Optional;
 @Repository
 public class NotificationDBRepository implements NotificationRepository {
     private final NotificationJpaRepository notificationJpaRepository;
-    private final UserJpaRepository userJpaRepository;
+    private final RecipientRepository recipientRepository;
 
     @Autowired
-    public NotificationDBRepository(NotificationJpaRepository notificationJpaRepository, UserJpaRepository userJpaRepository) {
+    public NotificationDBRepository(NotificationJpaRepository notificationJpaRepository, RecipientRepository recipientRepository) {
         this.notificationJpaRepository = notificationJpaRepository;
-        this.userJpaRepository = userJpaRepository;
+        this.recipientRepository = recipientRepository;
     }
 
     @Override
     public void save(Notification notification) {
-        UserEntity recipient = notification.getRecipientId() != null && notification.getRecipientId().getValue() != null ? userJpaRepository.findById(notification.getRecipientId().getValue()).orElse(null) : null;
-        UserEntity actor = userJpaRepository.findById(notification.getActorId().getValue()).orElse(null);
+        Recipient recipient = notification.getRecipientId() != null && notification.getRecipientId().getValue() != null ? recipientRepository.findById(notification.getRecipientId()).orElse(null) : null;
+        Recipient actor = recipientRepository.findById(notification.getActorId()).orElse(null);
         NotificationEntity notificationEntity = notificationJpaRepository.findById(notification.getId() == null ? -1 : notification.getId()).orElse(null);
         if(notificationEntity == null){
             switch (notification){

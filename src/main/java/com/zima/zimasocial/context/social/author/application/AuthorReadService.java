@@ -12,7 +12,7 @@ import com.zima.zimasocial.context.social.author.entity.FollowRequest;
 import com.zima.zimasocial.context.social.author.repository.AuthorRelationRepository;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.repository.FollowRequestRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.context.social.author.value.Relation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

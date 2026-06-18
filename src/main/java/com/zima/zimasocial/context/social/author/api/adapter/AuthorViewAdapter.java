@@ -2,16 +2,16 @@ package com.zima.zimasocial.context.social.author.api.adapter;
 
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
-import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.api.view.AuthorView;
 import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.entity.AuthorRelation;
 import com.zima.zimasocial.context.social.author.entity.FollowRequest;
+import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRelationRepository;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.author.repository.FollowRequestRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.utility.CurrentUser;
+import com.zima.zimasocial.context.social.author.value.Relation;
+import com.zima.zimasocial.shared.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,11 +1,11 @@
 package com.zima.zimasocial.context.communication.controller;
 
 import com.zima.zimasocial.context.social.author.api.adapter.AuthorViewAdapter;
-import com.zima.zimasocial.entity.NotificationEntity;
-import com.zima.zimasocial.entity.NotificationType;
+import com.zima.zimasocial.context.communication.entity.NotificationEntity;
+import com.zima.zimasocial.context.communication.value.NotificationType;
 import com.zima.zimasocial.context.communication.infastructure.NotificationJpaRepository;
-import com.zima.zimasocial.views.notification.NotificationView;
-import com.zima.zimasocial.views.notification.NotificationView2;
+import com.zima.zimasocial.context.communication.controller.views.NotificationView;
+import com.zima.zimasocial.context.communication.controller.views.NotificationView2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

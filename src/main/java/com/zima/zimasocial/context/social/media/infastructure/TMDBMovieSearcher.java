@@ -3,7 +3,7 @@ package com.zima.zimasocial.context.social.media.infastructure;
 import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

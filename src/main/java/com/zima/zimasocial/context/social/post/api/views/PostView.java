@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.api.views;
 
 import com.zima.zimasocial.context.social.author.api.view.AuthorView;
-import com.zima.zimasocial.entity.MediaType;
+import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

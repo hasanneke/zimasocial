@@ -10,9 +10,9 @@ import com.zima.zimasocial.context.social.post.entity.Post;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.post.repository.LikeRepository;
-import com.zima.zimasocial.entity.LikeType;
-import com.zima.zimasocial.entity.report.ResourceType;
-import com.zima.zimasocial.utility.CurrentUser;
+import com.zima.zimasocial.context.social.post.value.LikeType;
+import com.zima.zimasocial.context.contentmoderation.ResourceType;
+import com.zima.zimasocial.shared.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,28 +1,27 @@
 package com.zima.zimasocial.context.account.application;
 
 import com.google.auth.oauth2.TokenVerifier;
+import com.zima.zimasocial.context.account.abstracted.AuthService;
+import com.zima.zimasocial.context.account.abstracted.OAuthTokenVerifier;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.entity.AccountId;
 import com.zima.zimasocial.context.account.event.AccountCreatedEvent;
+import com.zima.zimasocial.context.account.exception.AccountBannedException;
+import com.zima.zimasocial.context.account.factory.AccountFactory;
+import com.zima.zimasocial.context.account.infastructure.AppleTokenVerifier;
+import com.zima.zimasocial.context.account.infastructure.GoogleTokenVerifier;
 import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEntity;
 import com.zima.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.context.account.service.AccountService;
 import com.zima.zimasocial.context.account.value.AccountIdentity;
-import com.zima.zimasocial.context.account.value.PersonalInfo;
-import com.zima.zimasocial.entity.UserRole;
-import com.zima.zimasocial.exception.DataNotFoundException;
-import com.zima.zimasocial.exception.UnauthorizedException;
-import com.zima.zimasocial.repository.UserJpaRepository;
-import com.zima.zimasocial.context.account.factory.AccountFactory;
-import com.zima.zimasocial.context.account.abstracted.AuthService;
 import com.zima.zimasocial.context.account.value.OAuthTokenResult;
-import com.zima.zimasocial.context.account.abstracted.OAuthTokenVerifier;
-import com.zima.zimasocial.context.account.exception.AccountBannedException;
-import com.zima.zimasocial.context.account.infastructure.AppleTokenVerifier;
-import com.zima.zimasocial.context.account.infastructure.GoogleTokenVerifier;
-import com.zima.zimasocial.utility.JWTService;
-import com.zima.zimasocial.utility.TokenResponse;
+import com.zima.zimasocial.context.account.value.PersonalInfo;
+import com.zima.zimasocial.context.account.value.UserRole;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.UnauthorizedException;
+import com.zima.zimasocial.context.account.service.JWTService;
+import com.zima.zimasocial.context.account.value.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
-    private final UserJpaRepository userRepository;
     private final AccountFactory accountFactory;
     private final JWTService jwtService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -180,7 +178,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenEntity.setRevoked(true);
         refreshTokenRepository.save(refreshTokenEntity);
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
-        Account account = accountRepository.findByUserId(userId);
+        Account account = accountRepository.findByAccountId(new AccountId(userId)).orElseThrow(AccountNotFoundException::new);
         if(account.getIsBanned()){
             throw new UnauthorizedException();
         }
@@ -189,13 +187,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse slugLogin(String slug) throws AccountNotFoundException {
-        return createRefreshToken(accountRepository.findBySlug(slug));
+        return createRefreshToken(accountRepository.findBySlug(slug).orElseThrow(AccountNotFoundException::new));
     }
 
     private String generateUniqueSlug(String name) {
         String slug = getTrimmedName(name);
 
-        while (userRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
+        while (accountRepository.findBySlugWithDeletedUsers(slug).isPresent()) {
             slug = slug + random.nextInt(10000000);
         }
 

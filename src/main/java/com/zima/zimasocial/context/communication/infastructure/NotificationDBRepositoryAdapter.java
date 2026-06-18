@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.communication.domain.value.RecipientId;
 import com.zima.zimasocial.context.social.chat.value.ChatRoomId;
 import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.context.social.post.value.PostId;
-import com.zima.zimasocial.entity.NotificationEntity;
+import com.zima.zimasocial.context.communication.entity.NotificationEntity;
 
 public class NotificationDBRepositoryAdapter {
     public static PostLikedNotification convertNotificationEntityToPostLikedNotification(NotificationEntity notificationEntity) {

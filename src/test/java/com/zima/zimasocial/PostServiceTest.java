@@ -1,6 +1,6 @@
 //package com.zima.zimasocial;
 //
-//import com.zima.zimasocial.config.CustomUserDetails;
+//import com.zima.zimasocial.config.userdetails.CustomUserDetails;
 //import com.zima.zimasocial.entity.PostEntity;
 //import com.zima.zimasocial.entity.PostType;
 //import com.zima.zimasocial.entity.user.UserEntity;

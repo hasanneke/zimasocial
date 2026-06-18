@@ -1,6 +1,6 @@
 package com.zima.zimasocial.context.social.author.exception;
 
-import com.zima.zimasocial.exception.DataNotFoundException;
+import com.zima.zimasocial.shared.exception.DataNotFoundException;
 
 public class FollowRequestNotFoundException extends DataNotFoundException {
     public FollowRequestNotFoundException() {

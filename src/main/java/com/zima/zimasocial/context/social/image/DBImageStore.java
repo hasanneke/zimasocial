@@ -1,11 +1,11 @@
 package com.zima.zimasocial.context.social.image;
 
-import com.zima.zimasocial.entity.file.FileCode;
-import com.zima.zimasocial.entity.file.FileEntity;
-import com.zima.zimasocial.entity.file.FileType;
-import com.zima.zimasocial.repository.FileEntityRepository;
+import com.zima.zimasocial.context.file.FileCode;
+import com.zima.zimasocial.context.file.FileEntity;
+import com.zima.zimasocial.context.file.FileType;
+import com.zima.zimasocial.context.file.FileEntityRepository;
 import com.zima.zimasocial.context.social.image.exception.FileNotFoundException;
-import com.zima.zimasocial.utility.CurrentUser;
+import com.zima.zimasocial.shared.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +24,7 @@ public class DBImageStore implements ImageService {
     @Override
     public String uploadProfileImage(MultipartFile file) throws IOException {
         FileEntity fileEntity = new FileEntity();
-        fileEntity.setUserId(CurrentUser.getCurrentUserProfile().getId());
+        fileEntity.setUserId(CurrentUser.getLoggedAccount().getAccountId().getValue());
         fileEntity.setName(generateFileName(file));
         fileEntity.setData(file.getBytes());
         fileEntity.setMediaType(Arrays.stream(Objects.requireNonNull(file.getOriginalFilename()).split("\\.")).toList().getLast());

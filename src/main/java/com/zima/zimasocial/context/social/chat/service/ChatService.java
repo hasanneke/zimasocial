@@ -19,8 +19,8 @@ import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedExce
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRelationRepository;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
-import com.zima.zimasocial.exception.UnauthorizedException;
+import com.zima.zimasocial.context.social.author.value.Relation;
+import com.zima.zimasocial.shared.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

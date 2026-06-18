@@ -5,7 +5,7 @@ import com.zima.zimasocial.context.social.post.entity.Like;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.post.value.CommentId;
 import com.zima.zimasocial.context.social.post.value.PostId;
-import com.zima.zimasocial.entity.LikeType;
+import com.zima.zimasocial.context.social.post.value.LikeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -12,7 +12,7 @@ import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFollowedException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRelationRepository;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
-import com.zima.zimasocial.entity.userRelation.Relation;
+import com.zima.zimasocial.context.social.author.value.Relation;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
