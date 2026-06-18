@@ -25,12 +25,12 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
                 liker.avatarFileName,
                 CASE WHEN EXISTS (
                                  SELECT 1 FROM AuthorRelation relation
-                                 WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
+                                 WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
                                  AND relation.actorId = :readerId AND relation.receiverId = liker.id
                 )THEN true ELSE false END,
                 CASE WHEN EXISTS (
                                  SELECT 1 FROM AuthorRelation relation
-                                 WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
+                                 WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
                                  AND relation.receiverId = :readerId AND relation.actorId = liker.id
                 ) THEN true ELSE false END,
                 CASE WHEN EXISTS (

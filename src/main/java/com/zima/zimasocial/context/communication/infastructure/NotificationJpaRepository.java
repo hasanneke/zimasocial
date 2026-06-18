@@ -18,7 +18,7 @@ import java.util.Set;
 public interface NotificationJpaRepository extends JpaRepository<NotificationEntity, Long> {
     @Query(
             """
-                   SELECT new com.zima.zimasocial.views.notification.
+                   SELECT new com.zima.zimasocial.context.communication.controller.views.
                               NotificationView2(
                                          notification.id,
                                          notification.content,
@@ -34,12 +34,12 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
                                          user.avatarFileName avatarUrl,
                                          CASE WHEN EXISTS (
                                                      SELECT 1 FROM AuthorRelation relation
-                                                     WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
+                                                     WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
                                                      AND relation.actorId = :receiverId AND relation.receiverId = user.id
                                          ) THEN true ELSE false END,
                                         CASE WHEN EXISTS (
                                                      SELECT 1 FROM AuthorRelation relation
-                                                     WHERE relation.relation = com.zima.zimasocial.entity.userRelation.Relation.followed
+                                                     WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
                                                      AND relation.receiverId = :receiverId AND relation.actorId = user.id
                                          ) THEN true ELSE false END,
                                          CASE WHEN EXISTS (
