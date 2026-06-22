@@ -77,7 +77,7 @@ public class Account {
     private DisableReason disableReason;
 
     @Column(name = "is_banned")
-    private Boolean isBanned;
+    private boolean isBanned = false;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

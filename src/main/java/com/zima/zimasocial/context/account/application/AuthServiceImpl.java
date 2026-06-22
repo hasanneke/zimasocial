@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
         Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "apple");
         if(account.isPresent()){
-            if(account.get().getIsBanned()){
+            if(account.get().isBanned()){
                 throw new AccountBannedException();
             }
             if(account.get().getIsDisabled()){
@@ -74,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
         Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
         if(account.isPresent()){
-            if(account.get().getIsBanned()){
+            if(account.get().isBanned()){
                 throw new AccountBannedException();
             }
             if(account.get().getIsDisabled()){
@@ -179,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenRepository.save(refreshTokenEntity);
         Long userId = Long.parseLong(jwtService.extractId(refreshToken));
         Account account = accountRepository.findByAccountId(new AccountId(userId)).orElseThrow(AccountNotFoundException::new);
-        if(account.getIsBanned()){
+        if(account.isBanned()){
             throw new UnauthorizedException();
         }
         return createRefreshToken(account);

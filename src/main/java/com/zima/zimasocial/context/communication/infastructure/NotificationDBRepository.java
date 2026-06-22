@@ -2,12 +2,10 @@ package com.zima.zimasocial.context.communication.infastructure;
 
 import com.zima.zimasocial.context.communication.domain.entity.*;
 import com.zima.zimasocial.context.communication.domain.repository.NotificationRepository;
-import com.zima.zimasocial.context.communication.domain.value.RecipientId;
+import com.zima.zimasocial.context.communication.entity.NotificationEntity;
 import com.zima.zimasocial.context.communication.entity.Recipient;
 import com.zima.zimasocial.context.communication.repository.RecipientRepository;
-import com.zima.zimasocial.context.communication.entity.NotificationEntity;
 import com.zima.zimasocial.context.communication.value.NotificationType;
-import com.zima.zimasocial.context.communication.value.TargetCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -49,16 +47,6 @@ public class NotificationDBRepository implements NotificationRepository {
         if(notificationEntity != null){
             notificationJpaRepository.save(notificationEntity);
         }
-    }
-
-    @Override
-    public Optional<PostLikedNotification> getPostLikedNotification(RecipientId actorId, Long postId) {
-        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId.getValue(), postId, NotificationType.POST_LIKED, TargetCollection.post).map(NotificationDBRepositoryAdapter::convertNotificationEntityToPostLikedNotification);
-    }
-
-    @Override
-    public Optional<CommentLikedNotification> getCommentLikedNotification(RecipientId actorId, Long commentId) {
-        return notificationJpaRepository.findByActorIdAndTargetIdAndTypeAndTargetCollection(actorId.getValue(), commentId, NotificationType.COMMENT_LIKED, TargetCollection.comment).map(NotificationDBRepositoryAdapter::convertNotificationEntityToCommentLikedNotification);
     }
 
     @Override
