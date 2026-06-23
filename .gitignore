@@ -38,3 +38,4 @@ src/main/resources/application.yml
 src/main/resources/application-prod.yml
 src/main/resources/secrets/serviceAccountKey.json
 /src/main/resources/secrets
+src/main/resources/application-test.yml
