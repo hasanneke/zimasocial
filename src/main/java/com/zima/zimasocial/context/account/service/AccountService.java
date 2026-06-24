@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.login.AccountNotFoundException;
-
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
@@ -19,7 +17,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void disableAccount(DisableReason reason) throws AccountNotFoundException {
+    public void disableAccount(DisableReason reason) {
         Account account = accountRepository.getAuthenticatedAccount();
         account.disableAccount(reason);
         accountRepository.save(account);
@@ -30,25 +28,25 @@ public class AccountService {
         accountRepository.save(account);
     }
     @Transactional
-    public void deleteAccount(DeleteReason reason) throws AccountNotFoundException {
+    public void deleteAccount(DeleteReason reason) {
         Account account = accountRepository.getAuthenticatedAccount();
         account.deleteAccount(reason);
         accountRepository.save(account);
     }
     @Transactional
-    public void makeAccountPublic() throws AccountNotFoundException {
+    public void makeAccountPublic() {
         Account account = accountRepository.getAuthenticatedAccount();
         account.makeAccountPublic();
         accountRepository.save(account);
     }
     @Transactional
-    public void makeAccountPrivate() throws AccountNotFoundException {
+    public void makeAccountPrivate() {
         Account account = accountRepository.getAuthenticatedAccount();
         account.makeAccountPrivate();
         accountRepository.save(account);
     }
 
-    public void acceptTermsOfUse() throws AccountNotFoundException {
+    public void acceptTermsOfUse() {
         Account account = accountRepository.getAuthenticatedAccount();
         account.acceptTermsOfUse();
         accountRepository.save(account);
