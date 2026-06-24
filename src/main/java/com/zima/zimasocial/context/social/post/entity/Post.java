@@ -1,16 +1,10 @@
 package com.zima.zimasocial.context.social.post.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zima.zimasocial.context.social.author.entity.Author;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.media.value.MediaId;
-import com.zima.zimasocial.context.social.post.api.views.PostDTO;
-import com.zima.zimasocial.context.social.post.value.CommentId;
-import com.zima.zimasocial.context.social.post.value.PostContent;
-import com.zima.zimasocial.context.social.post.value.PostId;
-import com.zima.zimasocial.context.social.post.value.PostStats;
-import com.zima.zimasocial.context.social.post.value.LikeType;
 import com.zima.zimasocial.context.social.media.value.MediaType;
+import com.zima.zimasocial.context.social.post.api.views.PostDTO;
+import com.zima.zimasocial.context.social.post.value.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,8 +13,6 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -85,15 +77,6 @@ public class Post {
 
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
-
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<Comment> comments = new HashSet<>();
-
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Author author;
 
     @Column(name = "last_punished_at")
     private LocalDateTime lastPunishedAt;

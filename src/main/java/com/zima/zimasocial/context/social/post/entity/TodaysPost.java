@@ -1,7 +1,7 @@
 package com.zima.zimasocial.context.social.post.entity;
 
 
-import com.zima.zimasocial.context.social.author.entity.Author;
+import com.zima.zimasocial.context.social.author.value.AuthorId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,9 +34,12 @@ public class TodaysPost {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private Author author;
+    @Embedded
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "author_id", nullable = false, updatable = false)
+    )
+    private AuthorId authorId;
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;

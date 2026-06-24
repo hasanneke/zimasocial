@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -55,33 +56,33 @@ public class TodaysPostsGeneratorImpl implements TodaysPostGenerator {
         Post todaysBook = books.stream().findFirst().orElse(null);
         Post todaysSeries = series.stream().findFirst().orElse(null);
 
-        List<Post> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook, todaysSeries).toList().stream().filter(e->e != null).toList();
+        List<Post> selectedPosts = Stream.of(todaysMusic, todaysMovie, todaysBook, todaysSeries).toList().stream().filter(Objects::nonNull).toList();
 
         List<TodaysPost> todaysPosts = selectedPosts.stream().map(e-> TodaysPost.builder()
                         .post(e)
-                        .author(e.getAuthor())
+                        .authorId(e.getAuthorId())
                         .isDeleted(false)
                         .date(LocalDate.now().minusDays(1))
                         .build())
                 .toList();
 
         if(todaysMusic != null){
-            logger.debug(String.format("Todays music post id: %d, author: %s", todaysMusic.getId().getValue(), todaysMusic.getAuthor().getSlug()));
+            logger.debug(String.format("Todays music post id: %d, author: %s", todaysMusic.getId().getValue(), todaysMusic.getAuthorId()));
         }else{
             logger.error("Todays music not found");
         }
         if(todaysMovie != null){
-            logger.debug(String.format("Todays Movie Post id: %d, author: %s", todaysMovie.getId().getValue(), todaysMovie.getAuthor().getSlug()));
+            logger.debug(String.format("Todays Movie Post id: %d, author: %s", todaysMovie.getId().getValue(), todaysMovie.getAuthorId()));
         }else{
             logger.error("Todays movie post not found");
         }
         if(todaysBook != null){
-            logger.debug(String.format("Todays Book Post id: %d, author: %s", todaysBook.getId().getValue(), todaysBook.getAuthor().getSlug()));
+            logger.debug(String.format("Todays Book Post id: %d, author: %s", todaysBook.getId().getValue(), todaysBook.getAuthorId()));
         }else{
             logger.error("Todays book post not found");
         }
         if(todaysSeries != null){
-            logger.debug(String.format("Todays Series Post id: %d, author: %s", todaysSeries.getId().getValue(), todaysSeries.getAuthor().getSlug()));
+            logger.debug(String.format("Todays Series Post id: %d, author: %s", todaysSeries.getId().getValue(), todaysSeries.getAuthorId()));
         }else{
             logger.error("Todays series post not found");
         }        return todaysPosts;

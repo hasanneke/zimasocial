@@ -68,7 +68,7 @@ public class ResourceAccessAspect {
     private void validatePostAccess(Long postId){
         AuthorId currentUserId = CurrentUser.getCurrentUserId();
         Post post = postRepository.findById(new PostId(postId)).orElseThrow(()-> new DataNotFoundException("Post not found"));
-        if(!post.getAuthor().getId().equals(currentUserId)){
+        if(!post.getAuthorId().equals(currentUserId)){
             throw new UnauthorizedException("You have no access to this resource");
         }
     }
