@@ -128,7 +128,7 @@ public class Author {
 
     public void updateSlug(String slug){
         if(lastSlugChangedAt != null && ChronoUnit.DAYS.between(lastSlugChangedAt, LocalDateTime.now()) < 7){
-            throw new SlugCannotBeChangedException("Last slug change hasn't passed 7 days");
+            throw new SlugCannotBeChangedException("Son kullanıcı adı değişiminin üzerinden henüz bir hafta geçmedi");
         }
         if(name.length() > 16){
             throw new SlugLengthExceededException();

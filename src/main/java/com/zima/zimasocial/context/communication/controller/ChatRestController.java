@@ -35,7 +35,7 @@ public class ChatRestController {
     @GetMapping(path = "/{chatId}/messages")
     public ResponseEntity<SimplePagedModel<ChatMessageView>> getMessages(@PathVariable(name = "chatId") UUID chatId,
                                                                    @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                                   @RequestParam(name = "size", defaultValue = "20") Integer size) {
+                                                                   @RequestParam(name = "size", defaultValue = "50") Integer size) {
         return ResponseEntity.ok(chatRestControllerBridge.getMessages(chatId, PageRequest.of(page, size)));
     }
 

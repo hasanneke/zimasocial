@@ -54,7 +54,7 @@ public class AccountTest {
 
             Assertions.assertEquals(DisableReason.SOMETHING_ELSE, testAccount.getDisableReason());
             Assertions.assertEquals(LocalDate.now(), testAccount.getLastDisabledDate());
-            Assertions.assertTrue(testAccount.getIsDisabled());
+            Assertions.assertTrue(testAccount.isDisabled());
             mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountDisabledEvent(createId())));
         }
     }
