@@ -35,12 +35,12 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
                                          CASE WHEN EXISTS (
                                                      SELECT 1 FROM AuthorRelation relation
                                                      WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
-                                                     AND relation.actorId = :receiverId AND relation.receiverId = user.id
+                                                     AND relation.actorId.value = :receiverId AND relation.receiverId = user.id
                                          ) THEN true ELSE false END,
                                         CASE WHEN EXISTS (
                                                      SELECT 1 FROM AuthorRelation relation
                                                      WHERE relation.relation = com.zima.zimasocial.context.social.author.value.Relation.followed
-                                                     AND relation.receiverId = :receiverId AND relation.actorId = user.id
+                                                     AND relation.receiverId.value = :receiverId AND relation.actorId = user.id
                                          ) THEN true ELSE false END,
                                          CASE WHEN EXISTS (
                                                      SELECT 1 FROM FollowRequest followRequest
