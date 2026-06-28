@@ -96,7 +96,7 @@ public class Author {
             throw new CircularFollowException();
         }
         incrementFollowerCount();
-        return new AuthorRelation(id, followerId, Relation.followed);
+        return new AuthorRelation(followerId, id, Relation.followed);
     }
 
     public void unfollow(AuthorId unfollowerId){

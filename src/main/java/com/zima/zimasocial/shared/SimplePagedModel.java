@@ -1,7 +1,10 @@
 package com.zima.zimasocial.shared;
 
+import lombok.Getter;
+
 import java.util.Collection;
 
+@Getter
 public class SimplePagedModel<T> {
     private final Collection<T> content;
     private final long totalElement;

@@ -72,6 +72,7 @@ public class JWTService {
     public TokenResponse createRefreshToken(Account account) {
         TokenResponse tokenResponse = createShortLivedToken(account);
         RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
+        tokenEntity.setUser(account);
         tokenEntity.setToken(tokenResponse.getRefreshToken().getToken());
         tokenEntity.setExpiresAt(tokenResponse.getRefreshToken().getExpireDate());
         tokenEntity.setUserId(account.getAccountId().getValue());

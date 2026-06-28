@@ -42,6 +42,8 @@ public class ChatServiceTest {
     private AuthorRelationRepository authorRelationRepository;
     @InjectMocks
     private ChatService chatService;
+    @InjectMocks
+    private ChatServiceApplication chatServiceApplication;
 
     @Test
     void testCreateChatRoom_WhenRoomAlreadyExist_ThrowRoomAlreadyExistException() {
@@ -84,7 +86,7 @@ public class ChatServiceTest {
         ChatMessageRequest chatMessageRequest = new ChatMessageRequest("Test message");
         when(authorRepository.getAuthenticatedAuthor()).thenReturn(sender);
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        chatService.sendMessage(chatRoom.getId(), chatMessageRequest);
+        chatServiceApplication.sendMessage(chatRoom.getId(), chatMessageRequest);
         verify(chatMessageRepository).save(any(ChatMessage.class));
     }
 }

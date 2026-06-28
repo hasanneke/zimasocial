@@ -41,6 +41,7 @@ public class ChatRoom {
             column = @Column(name = "participant_2", updatable = false)
     )
     private AuthorId participant2Id;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_message_id")
     private ChatMessage lastMessage;
@@ -59,8 +60,7 @@ public class ChatRoom {
     public ChatMessage sendMessage(
                                     ChatMessageId chatMessageId,
                                     String message,
-                                   Author sender,
-                                   Author receiver) {
+                                   Author sender) {
         if(!(sender.getId().equals(participant1Id) || sender.getId().equals(participant2Id))){
             throw new AuthorIsNotInRoom();
         }
@@ -68,6 +68,10 @@ public class ChatRoom {
         this.lastMessage = chatMessage;
 
         return chatMessage;
+    }
+
+    public void updateLastMessage(ChatMessage chatMessage){
+        this.lastMessage = chatMessage;
     }
 
     public Author getOtherParticipant(Author me) {
