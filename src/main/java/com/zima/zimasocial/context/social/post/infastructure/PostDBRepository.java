@@ -128,7 +128,15 @@ public class PostDBRepository implements PostCustomRepository {
         StringBuilder baseSQLStringBuilder = new StringBuilder(
                 basePostSelectSQL + """
                     INNER JOIN users Users ON Users.id = Post.user_id
-                    WHERE Post.user_id = :owner_author_id
+                    WHERE Post.user_id = :owner_author_id AND NOT EXISTS (
+                        SELECT 1
+                        FROM user_relation UserRelation
+                        WHERE UserRelation.relation = 'blocked'
+                          AND (
+                                (UserRelation.initiated_id = :user_id AND UserRelation.receiver_id = :owner_author_id)
+                             OR (UserRelation.initiated_id = :owner_author_id AND UserRelation.receiver_id = :user_id)
+                          )
+                    )
                 """
         );
         if(filter.getCategory() != null && filter.getCategory().getType().isPresent()){
