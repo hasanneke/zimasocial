@@ -3,6 +3,8 @@ package com.zima.zimasocial.context.account.factory;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.entity.AccountId;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
+import com.zima.zimasocial.context.account.service.LoginType;
+import com.zima.zimasocial.context.account.service.UserInfo;
 import com.zima.zimasocial.context.account.value.AccountIdentity;
 import com.zima.zimasocial.context.account.value.OAuthTokenResult;
 import com.zima.zimasocial.context.account.value.PersonalInfo;
@@ -19,12 +21,13 @@ public class AccountFactory {
     private final AccountRepository accountRepository;
     private final Random random = new Random();
 
-    public Account createOAuth2Account(OAuthTokenResult tokenResult, String provider) throws Exception {
+    public Account createOAuth2Account(OAuthTokenResult tokenResult,
+                                       LoginType provider) {
         AccountIdentity accountIdentity = AccountIdentity
                 .builder()
                 .accountId(new AccountId(accountRepository.nextId()))
                 .email(tokenResult.getEmail())
-                .authProvider(provider)
+                .loginType(provider)
                 .slug(generateUniqueSlug(tokenResult.getName()))
                 .roles(Set.of(UserRole.regular))
                 .build();
@@ -33,6 +36,25 @@ public class AccountFactory {
                 .builder()
                 .name(tokenResult.getName())
                 .surname(tokenResult.getSurname())
+                .build();
+
+        return Account.newAccount(accountIdentity, personalInfo);
+    }
+
+    public Account createAccount(UserInfo userInfo, LoginType loginType) {
+        AccountIdentity accountIdentity = AccountIdentity
+                .builder()
+                .accountId(new AccountId(accountRepository.nextId()))
+                .email(userInfo.getEmail())
+                .loginType(loginType)
+                .slug(generateUniqueSlug(userInfo.getName()))
+                .roles(Set.of(UserRole.regular))
+                .build();
+
+        PersonalInfo personalInfo = PersonalInfo
+                .builder()
+                .name(userInfo.getName())
+                .surname(userInfo.getSurname())
                 .build();
 
         return Account.newAccount(accountIdentity, personalInfo);
@@ -48,7 +70,7 @@ public class AccountFactory {
                 .builder()
                 .accountId(new AccountId(accountRepository.nextId()))
                 .email(email)
-                .authProvider("test")
+                .loginType(LoginType.google)
                 .slug(slug)
                 .roles(Set.of(UserRole.regular))
                 .build();

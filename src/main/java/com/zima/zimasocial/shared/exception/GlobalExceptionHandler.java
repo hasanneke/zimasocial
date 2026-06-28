@@ -84,7 +84,9 @@ public class GlobalExceptionHandler {
                 builder().
                 timeStamp(System.currentTimeMillis()).
                 errorCode(ex.getCode()).
-                message(ex.getMessage()).build(),
+                message(ex.getMessage())
+                .body(ex.getBody())
+                .build(),
                 HttpStatus.CONFLICT);
     }
 

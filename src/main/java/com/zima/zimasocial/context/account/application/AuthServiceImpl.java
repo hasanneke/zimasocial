@@ -14,6 +14,7 @@ import com.zima.zimasocial.context.account.infastructure.entity.RefreshTokenEnti
 import com.zima.zimasocial.context.account.infastructure.repository.RefreshTokenJpaRepository;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
 import com.zima.zimasocial.context.account.service.AccountService;
+import com.zima.zimasocial.context.account.service.LoginType;
 import com.zima.zimasocial.context.account.value.AccountIdentity;
 import com.zima.zimasocial.context.account.value.OAuthTokenResult;
 import com.zima.zimasocial.context.account.value.PersonalInfo;
@@ -50,17 +51,17 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse appleLogin(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new AppleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "apple");
+        Optional<Account> account = accountRepository.findByEmailAndLoginType(oAuthTokenResult.getEmail(), LoginType.apple);
         if(account.isPresent()){
             if(account.get().isBanned()){
                 throw new AccountBannedException();
             }
-            if(account.get().getIsDisabled()){
+            if(account.get().isDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
         }
-        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "apple");
+        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, LoginType.apple);
         accountRepository.save(newAccount);
         TokenResponse response = createToken(newAccount);
         applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
@@ -72,17 +73,17 @@ public class AuthServiceImpl implements AuthService {
     public TokenResponse googleLoginV2(String token) throws Exception {
         OAuthTokenVerifier oAuthTokenVerifier = new GoogleTokenVerifier();
         OAuthTokenResult oAuthTokenResult = oAuthTokenVerifier.verify(token);
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(oAuthTokenResult.getEmail(), "google");
+        Optional<Account> account = accountRepository.findByEmailAndLoginType(oAuthTokenResult.getEmail(), LoginType.google);
         if(account.isPresent()){
             if(account.get().isBanned()){
                 throw new AccountBannedException();
             }
-            if(account.get().getIsDisabled()){
+            if(account.get().isDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createRefreshToken(account.get());
         }
-        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, "google");
+        Account newAccount = accountFactory.createOAuth2Account(oAuthTokenResult, LoginType.google);
         accountRepository.save(newAccount);
         TokenResponse tokenResponse = createRefreshToken(newAccount);
         applicationEventPublisher.publishEvent(new AccountCreatedEvent(newAccount.getAccountId().getValue()));
@@ -94,9 +95,9 @@ public class AuthServiceImpl implements AuthService {
         String email = String.format("testmail%s@example.com", random.nextInt());
         String name = "acc%s".formatted(UUID.randomUUID().toString().substring(0, 8));
         String familyName = String.format("accountsur%s", random.nextInt());
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "google");
+        Optional<Account> account = accountRepository.findByEmailAndLoginType(email, LoginType.google);
         if(account.isPresent()){
-            if(account.get().getIsDisabled()){
+            if(account.get().isDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
@@ -106,7 +107,7 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .accountId(new AccountId(accountRepository.nextId()))
                 .email(email)
-                .authProvider("dummy")
+                .loginType(LoginType.google)
                 .slug(slug)
                 .roles(Set.of(UserRole.regular))
                 .build();
@@ -127,9 +128,9 @@ public class AuthServiceImpl implements AuthService {
         String email = "hasansabbah0@example.com";
         String name = "Hasan Sabbah";
         String familyName = "Sabbah";
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "test");
+        Optional<Account> account = accountRepository.findByEmailAndLoginType(email, LoginType.google);
         if(account.isPresent()){
-            if(account.get().getIsDisabled()){
+            if(account.get().isDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
@@ -139,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .accountId(new AccountId(accountRepository.nextId()))
                 .email(email)
-                .authProvider("test")
+                .loginType(LoginType.google)
                 .slug(slug)
                 .roles(Set.of(UserRole.regular))
                 .build();
@@ -156,9 +157,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse quickLoginPrevious() throws AccountNotFoundException {
         String email = "zimablue0@example.com";
-        Optional<Account> account = accountRepository.findByEmailAndAuthProvider(email, "test");
+        Optional<Account> account = accountRepository.findByEmailAndLoginType(email, LoginType.google);
         if(account.isPresent()){
-            if(account.get().getIsDisabled()){
+            if(account.get().isDisabled()){
                 accountService.activateAccount(account.get());
             }
             return createToken(account.get());
@@ -209,7 +210,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private TokenResponse createToken(Account account) throws AccountNotFoundException {
-        return jwtService.generateToken(account.getAccountId().getValue(), account.getEmail(), account.getAuthProvider(), account);
+        return jwtService.generateToken(
+                account.getAccountId().getValue(),
+                account.getEmail(),
+                account.getLoginType().name(),
+                account);
     }
     private TokenResponse createRefreshToken(Account account) {
         TokenResponse tokenResponse = jwtService.createShortLivedToken(account);

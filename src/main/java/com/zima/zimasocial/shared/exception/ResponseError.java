@@ -9,4 +9,5 @@ public class ResponseError {
     private String errorCode;
     private String message;
     private long timeStamp;
+    private Object body;
 }

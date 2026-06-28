@@ -1,19 +1,29 @@
 package com.zima.zimasocial.context.account.service;
 
 import com.zima.zimasocial.context.account.entity.Account;
+import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.repository.AccountRepository;
+import com.zima.zimasocial.context.account.service.handler.config.AccountLoginChain;
+import com.zima.zimasocial.context.account.service.handler.context.LoginContext;
 import com.zima.zimasocial.context.account.value.DeleteReason;
 import com.zima.zimasocial.context.account.value.DisableReason;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zima.zimasocial.context.account.value.TokenResponse;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
-    @Autowired
-    public AccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final AccountLoginChain accountLoginChain;
+    @Transactional
+    public TokenResponse login(LoginCredential loginCredential) throws Exception {
+        LoginContext loginContext = new LoginContext(loginCredential);
+        accountLoginChain.start(loginContext);
+        return loginContext.getToken();
     }
 
     @Transactional
@@ -28,10 +38,17 @@ public class AccountService {
         accountRepository.save(account);
     }
     @Transactional
+    public void activateAccount() {
+        Account account = accountRepository.getAuthenticatedAccount();
+        account.activateAccount();
+        accountRepository.save(account);
+    }
+    @Transactional
     public void deleteAccount(DeleteReason reason) {
         Account account = accountRepository.getAuthenticatedAccount();
         account.deleteAccount(reason);
         accountRepository.save(account);
+        applicationEventPublisher.publishEvent(new AccountDeletedEvent(account.getAccountId()));
     }
     @Transactional
     public void makeAccountPublic() {

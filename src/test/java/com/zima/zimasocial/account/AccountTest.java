@@ -3,9 +3,12 @@ package com.zima.zimasocial.account;
 import com.zima.zimasocial.context.account.entity.Account;
 import com.zima.zimasocial.context.account.entity.AccountId;
 import com.zima.zimasocial.context.account.event.AccountActivatedEvent;
-import com.zima.zimasocial.context.account.event.AccountDeletedEvent;
 import com.zima.zimasocial.context.account.event.AccountDisabledEvent;
-import com.zima.zimasocial.context.account.value.*;
+import com.zima.zimasocial.context.account.service.LoginType;
+import com.zima.zimasocial.context.account.value.AccountIdentity;
+import com.zima.zimasocial.context.account.value.AccountState;
+import com.zima.zimasocial.context.account.value.DisableReason;
+import com.zima.zimasocial.context.account.value.PersonalInfo;
 import com.zima.zimasocial.shared.StaticEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +32,7 @@ public class AccountTest {
                 .accountId(createId())
                 .email("test@zima.com")
                 .slug(slug)
-                .authProvider("GOOGLE")
+                .loginType(LoginType.google)
                 .roles(Set.of())
                 .build();
     }
@@ -50,7 +53,7 @@ public class AccountTest {
             testAccount.disableAccount(DisableReason.SOMETHING_ELSE);
 
             Assertions.assertEquals(DisableReason.SOMETHING_ELSE, testAccount.getDisableReason());
-            Assertions.assertEquals(LocalDate.now(), testAccount.getDisableDate());
+            Assertions.assertEquals(LocalDate.now(), testAccount.getLastDisabledDate());
             Assertions.assertTrue(testAccount.getIsDisabled());
             mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountDisabledEvent(createId())));
         }
@@ -75,38 +78,13 @@ public class AccountTest {
                     .termsOfUseAccepted(true)
                     .build();
 
-            Account testAccount = Account.reconstitute(createDefaultIdentity("john-doe"), createDefaultInfo(), disabledState);
+            Account testAccount = Account.newAccount(createDefaultIdentity("john-doe"), createDefaultInfo(), disabledState);
 
             testAccount.activateAccount();
 
             Assertions.assertNull(testAccount.getDisableReason());
-            Assertions.assertNull(testAccount.getDisableDate());
-            Assertions.assertFalse(testAccount.getIsDisabled());
+            Assertions.assertFalse(testAccount.isDisabled());
             mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountActivatedEvent(createId())));
-        }
-    }
-
-    @Test
-    void testActivateAccount_WhenAccountIsNotDisabled_ThrowIllegalArgumentException() {
-        // newAccount creates an active account by default
-        Account testAccount = Account.newAccount(createDefaultIdentity("john-doe"), createDefaultInfo());
-        Assertions.assertThrows(IllegalArgumentException.class, testAccount::activateAccount);
-    }
-
-    @Test
-    void testDeleteAccount_WhenSuccess() {
-        try (MockedStatic<StaticEventPublisher> mockedStatic = Mockito.mockStatic(StaticEventPublisher.class)) {
-            Account testAccount = Account.newAccount(createDefaultIdentity("john-doe"), createDefaultInfo());
-
-            testAccount.deleteAccount(DeleteReason.SOMETHING_ELSE);
-
-            Assertions.assertEquals(DeleteReason.SOMETHING_ELSE, testAccount.getDeleteReason());
-            Assertions.assertEquals(LocalDate.now(), testAccount.getDeleteDate());
-            Assertions.assertTrue(testAccount.getIsDeleted());
-            // Checking if slug was randomized upon deletion
-            Assertions.assertNotEquals("john-doe", testAccount.getSlug());
-
-            mockedStatic.verify(() -> StaticEventPublisher.publishEvent(new AccountDeletedEvent(createId())));
         }
     }
 

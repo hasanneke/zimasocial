@@ -66,13 +66,25 @@ public class JWTService {
     public TokenResponse generateToken(Long id, String email, String provider, Account account) throws AccountNotFoundException {
         return createToken(id, email, provider, account);
     }
+    public TokenResponse generateToken(Account account) throws AccountNotFoundException {
+        return createToken(account.getAccountId().getValue(), account.getEmail(), account.getLoginType().name(), account);
+    }
+    public TokenResponse createRefreshToken(Account account) {
+        TokenResponse tokenResponse = createShortLivedToken(account);
+        RefreshTokenEntity tokenEntity = new RefreshTokenEntity();
+        tokenEntity.setToken(tokenResponse.getRefreshToken().getToken());
+        tokenEntity.setExpiresAt(tokenResponse.getRefreshToken().getExpireDate());
+        tokenEntity.setUserId(account.getAccountId().getValue());
+        refreshTokenRepository.save(tokenEntity);
+        return tokenResponse;
+    }
 
     public TokenResponse createShortLivedToken(Account account) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("id", account.getAccountId().getValue());
         claims.put("email", account.getEmail());
-        claims.put("provider", account.getAuthProvider());
+        claims.put("provider", account.getLoginType());
         OffsetDateTime tokenExpirationDate = OffsetDateTime.now().plusMinutes(5);
         OffsetDateTime refreshTokenExpirationDate = OffsetDateTime.now().plusMonths(2);
 

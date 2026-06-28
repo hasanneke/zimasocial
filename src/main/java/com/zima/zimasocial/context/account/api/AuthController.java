@@ -2,24 +2,23 @@ package com.zima.zimasocial.context.account.api;
 
 import com.google.auth.oauth2.TokenVerifier;
 import com.zima.zimasocial.context.account.abstracted.AuthService;
+import com.zima.zimasocial.context.account.service.AccountService;
+import com.zima.zimasocial.context.account.service.LoginCredential;
+import com.zima.zimasocial.context.account.service.LoginType;
 import com.zima.zimasocial.context.account.value.TokenResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/authentication")
+@RequiredArgsConstructor
 public class AuthController {
-    private AuthService authService;
+    private final AuthService authService;
+    private final AccountService accountService;
 
-    @Autowired
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
     @PostMapping(path = "/apple-login")
     ResponseEntity<TokenResponse> appleLogin(@RequestParam String token) throws Exception {
         TokenResponse tokenResponse = authService.appleLogin(token);
@@ -28,7 +27,11 @@ public class AuthController {
 
     @GetMapping(path = "/v2/google-login")
     ResponseEntity<TokenResponse> googleLoginV2(@RequestParam String token) throws Exception {
-        TokenResponse tokenResponse = authService.googleLoginV2(token);
+        TokenResponse tokenResponse = accountService.login(
+                LoginCredential.builder()
+                .loginType(LoginType.google)
+                .token(token)
+                .build());
         return ResponseEntity.ok(tokenResponse);
     }
 

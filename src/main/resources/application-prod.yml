@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:/Users/hasaneke/Development/spring_dev/zimasocial/src/main/resources/env-prod.properties
+    import: optional:file:/opt/zima/env-prod.properties
   threads:
     virtual:
       enabled: true

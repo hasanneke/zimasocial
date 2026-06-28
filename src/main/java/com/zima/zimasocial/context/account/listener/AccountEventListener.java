@@ -37,7 +37,11 @@ public class AccountEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleAccountDeleted(AccountDeletedEvent accountDeletedEvent) {
-        postRepository.deleteAllByAuthorId(new AuthorId(accountDeletedEvent.accountId().getValue()));
+    public void handleAccountSetForDeletion(AccountDeletedEvent accountDeletedEvent) {
+        List<Post> posts = postRepository.findAllByAuthorId(new AuthorId(accountDeletedEvent.accountId().getValue()));
+        for (Post post : posts) {
+            post.makeInvisible();
+        }
+        postRepository.saveAll(posts);
     }
 }
