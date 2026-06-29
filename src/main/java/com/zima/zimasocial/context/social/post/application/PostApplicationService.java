@@ -115,7 +115,7 @@ public class PostApplicationService implements PostUseCase {
         Comment comment = post.comment(commentRepository.getNextId(), commenter.getId(), content, new MediaId(mediaId), previousComments.isEmpty());
         Comment savedComment = commentRepository.save(comment);
         postRepository.save(post);
-        applicationEventPublisher.publishEvent(new PostCommentedEvent(post.getId(), savedComment.getId(), commenter.getId(), commenter.getId()));
+        applicationEventPublisher.publishEvent(new PostCommentedEvent(post, savedComment));
         return commentViewAdapter.populated(savedComment);
     }
 

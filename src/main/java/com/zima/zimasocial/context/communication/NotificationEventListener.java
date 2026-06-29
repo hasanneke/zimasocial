@@ -10,6 +10,8 @@ import com.zima.zimasocial.context.social.chat.event.ChatMessageSentEvent;
 import com.zima.zimasocial.context.social.post.event.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -21,6 +23,7 @@ import java.time.OffsetDateTime;
 public class NotificationEventListener {
     private final NotificationManager notificationManager;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePostSharedEvent(PostSharedEvent postSharedEvent) {
         PostSharedNotification postSharedNotification = PostSharedNotification
@@ -37,6 +40,7 @@ public class NotificationEventListener {
         notificationManager.throttled().sendNotification(postSharedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePostLikedEvent(PostLikedEvent postLikedEvent) {
         if(postLikedEvent.postOwnerId().equals(postLikedEvent.actorId())){
@@ -51,21 +55,22 @@ public class NotificationEventListener {
         notificationManager.throttled().sendNotification(postLikedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePostCommentedEvent(PostCommentedEvent postCommentedEvent) {
-        if(postCommentedEvent.commentOwnerId().equals(postCommentedEvent.actorId())){
+        if(postCommentedEvent.comment().getAuthorId().equals(postCommentedEvent.post().getAuthorId())){
             return;
         }
         PostCommentedNotification postCommentedNotification = PostCommentedNotification.builder()
-                .postId(postCommentedEvent.postId())
-                .actorId(new RecipientId(postCommentedEvent.actorId().getValue()))
-                .recipientId(new RecipientId(postCommentedEvent.commentOwnerId().getValue()))
+                .postId(postCommentedEvent.post().getId())
+                .actorId(new RecipientId(postCommentedEvent.comment().getAuthorId().getValue()))
+                .recipientId(new RecipientId(postCommentedEvent.post().getAuthorId().getValue()))
                 .createdAt(OffsetDateTime.now())
                 .build();
         notificationManager.sendNotification(postCommentedNotification);
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentLikedEvent(CommentLikedEvent commentLikedEvent) {
         if(commentLikedEvent.commentOwnerId().equals(commentLikedEvent.likerAuthorId())){
@@ -81,6 +86,7 @@ public class NotificationEventListener {
         notificationManager.throttled().sendNotification(commentLikedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentRepliedEvent(CommentRepliedEvent commentRepliedEvent) {
         if(commentRepliedEvent.parentCommentOwnerId().equals(commentRepliedEvent.replyerId())){
@@ -96,6 +102,7 @@ public class NotificationEventListener {
         notificationManager.sendNotification(commentRepliedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAuthorFollowedEvent(AuthorFollowedEvent authorFollowedEvent) {
         AuthorFollowedNotification authorFollowedNotification = AuthorFollowedNotification
@@ -107,6 +114,7 @@ public class NotificationEventListener {
         notificationManager.throttled().sendNotification(authorFollowedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAuthorFollowedRequestAcceptedEvent(AuthorFollowRequestAcceptedEvent authorFollowRequestAcceptedEvent) {
         AuthorFollowRequestAcceptedNotification authorFollowedNotification = AuthorFollowRequestAcceptedNotification
@@ -118,6 +126,7 @@ public class NotificationEventListener {
         notificationManager.sendNotification(authorFollowedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAuthorFollowRequestSentEvent(AuthorFollowRequestSentEvent authorFollowRequestSentEvent) {
         AuthorFollowRequestSentNotification authorFollowedNotification = AuthorFollowRequestSentNotification
@@ -129,6 +138,7 @@ public class NotificationEventListener {
         notificationManager.sendNotification(authorFollowedNotification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleChatMessageSentEvent(ChatMessageSentEvent chatMessageSentEvent) {
         ChatMessageSentNotification chatMessageSentNotification = ChatMessageSentNotification

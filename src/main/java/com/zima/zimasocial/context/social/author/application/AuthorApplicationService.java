@@ -51,6 +51,7 @@ public class AuthorApplicationService implements AuthorUseCase {
     }
 
     @Override
+    @Transactional
     public void follow(String slug) {
         Author follower = authorRepository.getAuthenticatedAuthor();
         Author followed = authorRepository.findBySlug(slug).orElseThrow(()->new AuthorNotFoundException(slug));
@@ -64,8 +65,8 @@ public class AuthorApplicationService implements AuthorUseCase {
         AuthorRelation authorRelation = followed.follow(follower.getId());
         follower.incrementFollowingCount();
         authorRelationRepository.save(authorRelation);
-        applicationEventPublisher.publishEvent(new AuthorFollowedEvent(followed, follower));
         authorRepository.saveAll(List.of(follower, followed));
+        applicationEventPublisher.publishEvent(new AuthorFollowedEvent(followed, follower));
     }
 
     @Override
