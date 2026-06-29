@@ -154,6 +154,17 @@ public class PushNotificationService {
                             .resourceId(postSharedNotification.getPostId().toString())
                             .build();
                 }
+                case AuthorAddedYourMediaToTheirListNotification authorAddedYourMediaToTheirListNotification -> {
+                    String linkToApp = webLink + "/users/" + authorAddedYourMediaToTheirListNotification.getPostIdReferencedFrom();
+                    yield
+                            PushNotification.builder()
+                                    .message("%s paylaşımınızı listesine ekledi".formatted(actor.getSlug()))
+                                    .deviceToken(deviceToken.getToken())
+                                    .linkToSource(linkToApp)
+                                    .type("post")
+                                    .resourceId(authorAddedYourMediaToTheirListNotification.getPostIdReferencedFrom().toString())
+                                    .build();
+                }
                 case SimpleNotification simpleNotification ->
                         PushNotification.builder().message(simpleNotification.getMessage()).deviceToken(deviceToken.getToken()).build();
             };

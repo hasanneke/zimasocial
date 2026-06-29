@@ -171,10 +171,10 @@ public class PostApplicationService implements PostUseCase {
     public CommentView replyComment(Long parentId, String content, UUID mediaId) {
         Author author = authorRepository.getAuthenticatedAuthor();
         Comment parent = commentRepository.findById(new CommentId(parentId)).orElseThrow(CommentNotFoundException::new);
-        Comment reply = parent.reply(author.getId(), content, new MediaId(mediaId));
+        Comment reply = parent.reply(commentRepository.getNextId(), author.getId(), content, new MediaId(mediaId));
         Comment savedReply = commentRepository.save(reply);
         commentRepository.save(parent);
-        applicationEventPublisher.publishEvent(new CommentRepliedEvent(parent.getId(), savedReply.getId(), parent.getAuthorId(), author.getId(), parent.getPostId()));
+        applicationEventPublisher.publishEvent(new CommentRepliedEvent(parent, savedReply));
         return commentViewAdapter.populated(savedReply);
     }
     @Transactional

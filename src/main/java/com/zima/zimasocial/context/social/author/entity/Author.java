@@ -6,8 +6,8 @@ import com.zima.zimasocial.context.social.author.event.AuthorFollowRequestSentEv
 import com.zima.zimasocial.context.social.author.exception.SlugCannotBeChangedException;
 import com.zima.zimasocial.context.social.author.value.AuthorId;
 import com.zima.zimasocial.context.social.author.value.Relation;
-import com.zima.zimasocial.shared.exception.ConflictException;
 import com.zima.zimasocial.shared.StaticEventPublisher;
+import com.zima.zimasocial.shared.exception.ConflictException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -103,7 +103,7 @@ public class Author {
         if(this.id.equals(unfollowerId)){
             throw new CircularUnfollowException();
         }
-        decrementFollowingCount();
+        decrementFollowerCount();
     }
 
     public AuthorRelation block(AuthorId blocker) {

@@ -61,14 +61,16 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{playlistId}/items/{mediaId}")
-    public ResponseEntity<Void> deleteItem(@PathVariable UUID playlistId, @PathVariable UUID mediaId) {
+    public ResponseEntity<Void> deleteItem(@PathVariable UUID playlistId,
+                                           @PathVariable UUID mediaId) {
         playListService
                 .removeItem(new PlayListId(playlistId), new MediaId(mediaId));
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{playlistId}/items")
-    public ResponseEntity<Void> addItem(@PathVariable UUID playlistId, @Validated @RequestBody PlayListItemPayload playListItemPayload) throws JsonProcessingException {
+    public ResponseEntity<Void> addItem(@PathVariable UUID playlistId,
+                                        @Validated @RequestBody PlayListItemPayload playListItemPayload) throws JsonProcessingException {
         playListService.addItem(new PlayListId(playlistId), playListItemPayload);
         return ResponseEntity.noContent().build();
     }

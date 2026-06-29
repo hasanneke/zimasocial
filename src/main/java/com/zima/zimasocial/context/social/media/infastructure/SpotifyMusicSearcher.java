@@ -2,8 +2,10 @@ package com.zima.zimasocial.context.social.media.infastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
 import com.zima.zimasocial.context.social.media.entity.Media;
+import com.zima.zimasocial.context.social.media.value.MediaId;
 import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,7 @@ public class SpotifyMusicSearcher implements MediaSearcher {
                 String.class
         );
         Media media = new Media();
+        media.setId(new MediaId(UuidCreator.getTimeOrdered()));
         media.setProvider("spotify");
         media.setType(MediaType.music);
         media.setResourceUrl(url);

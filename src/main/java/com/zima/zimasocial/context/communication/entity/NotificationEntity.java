@@ -211,6 +211,20 @@ public class NotificationEntity {
                 .chatId(chatMessageSentNotification.getChatRoomId().getValue())
                 .build();
     }
+
+    public static NotificationEntity buildAuthorAddedYourMediaToTheirListNotification(AuthorAddedYourMediaToTheirListNotification authorAddedYourMediaToTheirListNotification) {
+        return NotificationEntity.builder()
+                .id(authorAddedYourMediaToTheirListNotification.getId())
+                .type(NotificationType.AUTHOR_ADDED_YOUR_MEDIA_TO_THEIR_LIST_NOTIFICATION)
+                .content(authorAddedYourMediaToTheirListNotification.getMessage())
+                .targetId(authorAddedYourMediaToTheirListNotification.getPostIdReferencedFrom().getValue())
+                .targetCollection(TargetCollection.post)
+                .receiverUserId(authorAddedYourMediaToTheirListNotification.getRecipientId().getValue())
+                .actorId(authorAddedYourMediaToTheirListNotification.getActorId().getValue())
+                .isPushed(authorAddedYourMediaToTheirListNotification.isPushed())
+                .postId(authorAddedYourMediaToTheirListNotification.getPostIdReferencedFrom().getValue())
+                .build();
+    }
     public void merge(Notification notification){
         this.isPushed = notification.isPushed();
     }

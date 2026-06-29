@@ -1,8 +1,6 @@
 package com.zima.zimasocial.context.social.post.event;
 
-import com.zima.zimasocial.context.social.author.value.AuthorId;
-import com.zima.zimasocial.context.social.post.value.CommentId;
-import com.zima.zimasocial.context.social.post.value.PostId;
+import com.zima.zimasocial.context.social.post.entity.Comment;
 
-public record CommentRepliedEvent(CommentId parentCommentId, CommentId replyId, AuthorId parentCommentOwnerId, AuthorId replyerId, PostId postId) {
+public record CommentRepliedEvent(Comment parent, Comment reply) {
 }

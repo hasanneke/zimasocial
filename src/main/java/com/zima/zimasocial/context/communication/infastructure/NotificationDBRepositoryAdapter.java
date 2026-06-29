@@ -153,6 +153,17 @@ public class NotificationDBRepositoryAdapter {
                         .chatRoomId(new ChatRoomId(notificationEntity.getChatId()))
                         .build();
             }
+            case AUTHOR_ADDED_YOUR_MEDIA_TO_THEIR_LIST_NOTIFICATION ->  {
+                return AuthorAddedYourMediaToTheirListNotification.builder()
+                        .id(notificationEntity.getId())
+                        .message(notificationEntity.getContent())
+                        .recipientId(new RecipientId(notificationEntity.getReceiverUserId()))
+                        .actorId(new RecipientId(notificationEntity.getActorId()))
+                        .isPushed(notificationEntity.getIsPushed())
+                        .createdAt(notificationEntity.getCreatedAt())
+                        .postIdReferencedFrom(new PostId(notificationEntity.getPostId()))
+                        .build();
+            }
             case POST_DELETED, VERY_IMPORTANT, DANGER, WELCOME, NEWS, IMPORTANT -> {
             }
         }

@@ -69,7 +69,7 @@ public class Playlist {
         return playlist;
     }
 
-    public void addItem(Media media, AuthorId modifier) {
+    public PlaylistItem addItem(Media media, AuthorId modifier) {
         verifyOwnership(modifier);
         if(!media.getType().equals(type)){
             throw new BadRequestException("Selected media cannot be added to this playlist");
@@ -80,7 +80,9 @@ public class Playlist {
         if(items.size() >= 100){
             throw new ConflictException("Katalog 100 den fazla medya bulunduramaz");
         }
-        items.add(new PlaylistItem(new MediaId(media.getId().getValue())));
+        PlaylistItem playlistItem = new PlaylistItem(new MediaId(media.getId().getValue()));
+        items.add(playlistItem);
+        return playlistItem;
     }
 
     public void removeItem(MediaId mediaId, AuthorId authorId) {

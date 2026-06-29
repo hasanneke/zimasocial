@@ -7,6 +7,7 @@ import com.zima.zimasocial.context.social.media.exception.MediaNotFoundException
 import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistDTO;
 import com.zima.zimasocial.context.social.playlist.api.dto.PlaylistItemDTO;
+import com.zima.zimasocial.context.social.playlist.event.PlaylistItemAdded;
 import com.zima.zimasocial.context.social.playlist.exception.PlaylistNotFoundException;
 import com.zima.zimasocial.context.social.playlist.infastructure.PlaylistItem;
 import com.zima.zimasocial.context.social.playlist.infastructure.Playlist;
@@ -22,9 +23,11 @@ import com.zima.zimasocial.context.social.media.value.MediaId;
 import com.zima.zimasocial.context.social.author.exception.AuthorNotFoundException;
 import com.zima.zimasocial.context.social.author.repository.AuthorRepository;
 import com.zima.zimasocial.context.social.media.value.MediaType;
+import com.zima.zimasocial.context.social.post.value.PostId;
 import com.zima.zimasocial.shared.exception.ConflictException;
 import com.zima.zimasocial.shared.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ public class PlaylistApplicationService {
     private final AuthorRepository authorRepository;
     private final MediaItemJpaRepository mediaItemJpaRepository;
     private final PlaylistRepository playlistJpaRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void create(PlayListPayload payload) {
@@ -70,7 +74,8 @@ public class PlaylistApplicationService {
         Media media = mediaItemJpaRepository.findById(new MediaId(payload.getMediaId())).orElseThrow(MediaNotFoundException::new);
         Author modifier = authorRepository.getAuthenticatedAuthor();
         Playlist playlist = playlistJpaRepository.findById(playlistId.value()).orElseThrow(PlaylistNotFoundException::new);
-        playlist.addItem(media, modifier.getId());
+        PlaylistItem playlistItem = playlist.addItem(media, modifier.getId());
+        applicationEventPublisher.publishEvent(new PlaylistItemAdded(playlistItem, new PostId(payload.getPostIdReferencedFrom())));
         playlistJpaRepository.save(playlist);
     }
     @Transactional

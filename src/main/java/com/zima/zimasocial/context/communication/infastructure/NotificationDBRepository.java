@@ -39,6 +39,7 @@ public class NotificationDBRepository implements NotificationRepository {
                 case AuthorFollowRequestAcceptedNotification authorFollowRequestAcceptedNotification -> notificationEntity = NotificationEntity.buildAuthorFollowRequestAcceptedNotification(authorFollowRequestAcceptedNotification);
                 case ChatMessageSentNotification chatMessageSentNotification -> notificationEntity = NotificationEntity.buildNewMessageNotification(chatMessageSentNotification);
                 case PostSharedNotification postSharedNotification -> notificationEntity = NotificationEntity.buildPostSharedNotification(postSharedNotification);
+                case AuthorAddedYourMediaToTheirListNotification authorAddedYourMediaToTheirListNotification -> notificationEntity = NotificationEntity.buildAuthorAddedYourMediaToTheirListNotification(authorAddedYourMediaToTheirListNotification);
                 default -> throw new IllegalStateException("Unexpected value: " + notification);
             }
         }else{
@@ -83,6 +84,9 @@ public class NotificationDBRepository implements NotificationRepository {
             }
             case PostSharedNotification postSharedNotification -> {
                 return notificationJpaRepository.findFirstByActorIdAndTypeOrderByCreatedAtDesc(postSharedNotification.getActorId().getValue(), NotificationType.POST_SHARED).map(NotificationDBRepositoryAdapter::convertToNotification);
+            }
+            case AuthorAddedYourMediaToTheirListNotification authorAddedYourMediaToTheirListNotification -> {
+                return notificationJpaRepository.findFirstByActorIdAndReceiverUserIdAndTypeAndTargetIdOrderByCreatedAtDesc(notification.getActorId().getValue(), notification.getRecipientId().getValue(), NotificationType.AUTHOR_ADDED_YOUR_MEDIA_TO_THEIR_LIST_NOTIFICATION, authorAddedYourMediaToTheirListNotification.getPostIdReferencedFrom().getValue()).map(NotificationDBRepositoryAdapter::convertToNotification);
             }
             case SimpleNotification simpleNotification -> {
                 return Optional.empty();

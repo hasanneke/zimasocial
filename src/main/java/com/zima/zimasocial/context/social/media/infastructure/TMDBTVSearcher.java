@@ -1,8 +1,10 @@
 package com.zima.zimasocial.context.social.media.infastructure;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.zima.zimasocial.context.social.media.entity.Media;
 import com.zima.zimasocial.context.social.media.repository.MediaItemJpaRepository;
 import com.zima.zimasocial.context.social.media.abstracted.MediaSearcher;
+import com.zima.zimasocial.context.social.media.value.MediaId;
 import com.zima.zimasocial.context.social.media.value.MediaType;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,7 @@ public class TMDBTVSearcher implements MediaSearcher {
                 entity,
                 String.class
         );
+        media.setId(new MediaId(UuidCreator.getTimeOrdered()));
         media.setResourceUrl(String.format("%s/tv/%s", baseUrl, tvId));
         media.setResourceId(tvId);
         media.setType(MediaType.tv);

@@ -89,14 +89,14 @@ public class NotificationEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentRepliedEvent(CommentRepliedEvent commentRepliedEvent) {
-        if(commentRepliedEvent.parentCommentOwnerId().equals(commentRepliedEvent.replyerId())){
+        if(commentRepliedEvent.parent().getAuthorId().equals(commentRepliedEvent.reply().getAuthorId())){
             return;
         }
         CommentRepliedNotification commentRepliedNotification = CommentRepliedNotification.builder()
-                .commentId(commentRepliedEvent.parentCommentId())
-                .actorId(new RecipientId(commentRepliedEvent.replyerId().getValue()))
-                .recipientId(new RecipientId(commentRepliedEvent.parentCommentOwnerId().getValue()))
-                .postId(commentRepliedEvent.postId())
+                .commentId(commentRepliedEvent.parent().getId())
+                .actorId(new RecipientId(commentRepliedEvent.reply().getAuthorId().getValue()))
+                .recipientId(new RecipientId(commentRepliedEvent.parent().getAuthorId().getValue()))
+                .postId(commentRepliedEvent.parent().getPostId())
                 .createdAt(OffsetDateTime.now())
                 .build();
         notificationManager.sendNotification(commentRepliedNotification);

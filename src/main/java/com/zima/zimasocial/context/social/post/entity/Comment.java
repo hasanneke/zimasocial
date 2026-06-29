@@ -91,9 +91,10 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Comment reply(AuthorId replierAuthorId, String comment, MediaId mediaId){
+    public Comment reply(CommentId id, AuthorId replierAuthorId, String comment, MediaId mediaId){
         replyCount += 1;
         return Comment.builder()
+                .id(id)
                 .postId(postId)
                 .authorId(replierAuthorId)
                 .content(comment)
